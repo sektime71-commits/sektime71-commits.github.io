@@ -43,6 +43,7 @@ body.rot{--sl:max(10px,env(safe-area-inset-top));--sr:max(10px,env(safe-area-ins
 input.txt{width:100%;padding:9px 10px;border-radius:9px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.08);color:#fff;font-size:16px;font-weight:800;letter-spacing:2px;text-transform:uppercase;user-select:text;-webkit-user-select:text}
 input[type=range]{width:100%;accent-color:#ff3d6e;touch-action:pan-x}
 .card{padding:10px 12px;border-radius:12px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);margin:6px 0;cursor:pointer}
+.card .cthumb{float:right;width:46%;max-width:170px;aspect-ratio:32/15;margin:-4px -6px 0 6px;object-fit:contain;filter:drop-shadow(0 6px 6px rgba(0,0,0,.5))}.card .cthumb:not([src]){visibility:hidden}.card::after{content:'';display:block;clear:both}
 .card.on{border-color:#ff7a3d;background:rgba(255,122,61,.15)}
 .cn{font-weight:900;font-style:italic;font-size:16px}.cd{font-size:12px;opacity:.7;margin:3px 0}.cp{font-size:13px;font-weight:700;color:#ffd23d}
 .cls{display:inline-block;padding:1px 7px;border-radius:6px;font-size:11px;font-style:normal;vertical-align:middle;background:#555}
@@ -96,7 +97,7 @@ body.touch.port #rotHint{display:block}
 .stat .k{font-size:10px;opacity:.65;letter-spacing:2px}
 .stat .v{font-size:28px;font-weight:900;font-style:italic;line-height:1}
 .stat .v small{font-size:15px;opacity:.6}
-#tr{position:absolute;right:14px;top:14px;text-align:right}
+#tr{position:absolute;left:50%;transform:translateX(-50%);top:14px;text-align:center}
 #time{font-size:26px;font-weight:800;font-variant-numeric:tabular-nums}
 #best,#lastlap{font-size:12px;opacity:.75;font-variant-numeric:tabular-nums}
 #wx{font-size:13px;opacity:.9}
@@ -305,7 +306,7 @@ body.port:not(.rot) .mTitle{display:none}
 .mTrack canvas{width:120px;height:74px;border-radius:9px;flex:none}
 .mtI{display:flex;flex-direction:column;gap:2px;min-width:0}.mtI small{font-size:9px;opacity:.6;letter-spacing:1px}.mtI b{font-family:'Russo One',Arial;font-size:17px;font-weight:400}#mSummary{font-size:11px;opacity:.85;border:none;background:none;padding:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .mBar #go{margin-bottom:4px}
-.trkCards .opt{padding:8px}.tmap{width:100%;height:auto;aspect-ratio:12/7;border-radius:10px;display:block;margin-bottom:4px}
+.trkCards{display:grid!important;grid-template-columns:repeat(3,1fr);gap:8px}.trkCards .opt{padding:6px;position:relative}.tmap{width:100%;height:auto;aspect-ratio:12/7;border-radius:10px;display:block;margin-bottom:4px}.tshot{width:100%;aspect-ratio:16/8;border-radius:10px;display:block;margin-bottom:4px;object-fit:cover;background:#111}.tmini{position:absolute;right:10px;top:10px;width:30%;height:auto;aspect-ratio:12/7;border-radius:6px;box-shadow:0 2px 8px rgba(0,0,0,.6);border:1px solid rgba(255,255,255,.25)}.trkCards .tag{position:absolute;left:10px;top:10px;font-size:10px;font-weight:800;padding:2px 6px;border-radius:6px;background:rgba(0,0,0,.6)}
 .rtabs{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap}.rt{position:relative;padding:8px 12px;border-radius:9px;background:rgba(255,255,255,.07);font-size:13px;font-weight:700;cursor:pointer}.rt.on{background:linear-gradient(135deg,#f59e0b,#ea580c)}.rt .dot{right:-4px;top:-4px;width:10px;height:10px}
 #gTest{width:auto;margin:0;padding:14px 14px;font-size:13px;white-space:nowrap;letter-spacing:.5px}
 body.port:not(.rot) .mCar{bottom:calc(var(--sb) + 110px)}
@@ -315,6 +316,11 @@ body.port:not(.rot) .mCar{bottom:calc(var(--sb) + 110px)}
 #finish td{padding:6px 6px;border-bottom:1px solid rgba(255,255,255,.08)}
 #finish tr.me td{color:#ffd23d;font-weight:800}
 #finish h2{text-align:center;font-size:32px;font-style:italic;font-weight:900}
+#replayUI{position:absolute;inset:0;z-index:6;pointer-events:none}#replayUI::before,#replayUI::after{content:'';position:absolute;left:0;right:0;height:9%;background:#000}#replayUI::before{top:0}#replayUI::after{bottom:0}
+#rpLabel{position:absolute;left:calc(var(--sl,0px) + 18px);top:11%;font:italic 900 20px/1 system-ui;letter-spacing:2px;color:#fff;text-shadow:0 2px 8px #000;padding:6px 12px;border-left:4px solid #ff3d6e;background:rgba(0,0,0,.35)}
+#rpSkip{position:absolute;right:calc(var(--sr,0px) + 18px);bottom:12%;pointer-events:auto;width:auto;padding:10px 16px;font-size:14px}
+body.replay #hud>*:not(#replayUI),body.replay #touch{visibility:hidden}
+#gRoom{margin-left:8px;width:auto;padding:8px 12px;border-radius:12px;border:1px solid rgba(255,255,255,.15);background:rgba(20,22,28,.7);color:#fff;font:700 13px system-ui;backdrop-filter:blur(8px)}
 </style>
 <link rel="preconnect" href="https://cdn.jsdelivr.net"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Russo+One&display=swap" rel="stylesheet">
@@ -350,10 +356,7 @@ body.port:not(.rot) .mCar{bottom:calc(var(--sb) + 110px)}
   </div>
 
   <div class="sheet hidden" id="shTrack"><div class="sheetBox wide"><div class="sheetH">ТРАССА И ЗАЕЗД<span class="x">✕</span></div>
-    <div class="opts trkCards" id="trk">
-      <div class="opt" data-v="city"><canvas class="tmap" data-map="city" width="240" height="140"></canvas><b>🌃 Неон-Сити</b><small>Небоскрёбы, тоннель, река с мостами</small></div>
-      <div class="opt" data-v="port"><canvas class="tmap" data-map="port" width="240" height="140"></canvas><b>⚓ Старый порт</b><small>Контейнеры, краны, канал</small></div>
-      <div class="opt" data-v="mountain"><canvas class="tmap" data-map="mountain" width="240" height="140"></canvas><b>🏔 Перевал</b><small>Серпантин в ущелье, снег</small></div></div>
+    <div class="opts trkCards" id="trk"></div>
     <div id="trkBest" class="help" style="margin-top:6px"></div>
     <div class="row"><label>Режим</label><div class="opts" id="mode"><div class="opt" data-v="race">🏁 Гонка</div><div class="opt" data-v="elim">❌ Выбывание</div><div class="opt" data-v="time">⏱ На время</div></div></div>
     <div class="row"><label>Круги</label><div class="opts" id="laps"><div class="opt" data-v="1">1</div><div class="opt on" data-v="3">3</div><div class="opt" data-v="5">5</div></div></div>
@@ -385,7 +388,7 @@ body.port:not(.rot) .mCar{bottom:calc(var(--sb) + 110px)}
   <ol><li>Нажми <b>Поделиться</b> (квадрат со стрелкой ↑)</li><li>Выбери <b>«На экран „Домой“»</b></li><li>Нажми <b>Добавить</b></li><li>Запускай игру с иконки <b>Street Racer</b></li></ol>
   <button class="btn" id="a2hsOk">ПОНЯТНО</button></div></div>
 <div id="garage" class="hidden">
-  <div id="gTop"><button id="gBack">← Меню</button><div class="t">ГАРАЖ</div><div id="gCoins">💰 0</div></div>
+  <div id="gTop"><button id="gBack">← Меню</button><button id="gRoom" class="gRoomB">🔧 Гараж</button><div class="t">ГАРАЖ</div><div id="gCoins">💰 0</div></div>
   <div id="gSide"><div id="gTabs"><div class="gt on" data-t="cars">🚗 Машины</div><div class="gt" data-t="paint">🎨 Окраска</div><div class="gt" data-t="vinyl">🔥 Узоры</div><div class="gt" data-t="body">🛠 Обвес</div><div class="gt" data-t="wheels">🛞 Колёса</div><div class="gt" data-t="lights">💡 Свет</div><div class="gt" data-t="interior">💺 Салон</div><div class="gt" data-t="perf">⚡ Улучшения</div></div><div id="gPanel"></div></div>
   <div id="gView"></div>
   <div id="gBottom"><div id="gInfo"><div id="gName"></div><div id="gStats"></div></div><button class="btn sec" id="gTest">🚗 ТЕСТ-ДРАЙВ</button><button class="btn" id="gAct">В ГОНКУ</button></div>
@@ -397,6 +400,7 @@ body.port:not(.rot) .mCar{bottom:calc(var(--sb) + 110px)}
   <div id="cCups"></div><div id="cToast" class="hidden"></div></div></div>
 <div id="prefs" class="hidden ovl" style="z-index:30;background:rgba(0,0,0,.6)">
   <div class="panel" style="display:block;max-width:420px"><div class="logo" style="font-size:26px">НАСТРОЙКИ</div><div id="prefBody"></div>
+  <div class="row"><label>Автопилот (машина рулит сама, ты — нитро и тормоз)</label><div class="opts" id="autoP"><div class="opt on" data-v="0">Выкл</div><div class="opt" data-v="1">🤖 Вкл</div></div></div>
   <div class="row"><label>Управление</label><div class="opts" id="ctl"><div class="opt on" data-v="wheel">🎡 Руль</div><div class="opt" data-v="arrows">◀ ▶</div><div class="opt" data-v="tilt">📱 Наклон</div></div></div>
   <div class="row"><label>Графика</label><div class="opts" id="qual"><div class="opt on" data-v="auto">Авто</div><div class="opt" data-v="high">Ультра</div><div class="opt" data-v="low">Быстро</div></div></div>
   <div style="display:flex;gap:8px"><button class="btn sec fullBtn" id="full" style="flex:1">⛶ Во весь экран</button><button class="btn sec" id="bbHelp" style="flex:1">❓ Как играть</button></div>
@@ -429,6 +433,7 @@ body.port:not(.rot) .mCar{bottom:calc(var(--sb) + 110px)}
   <div id="sub"></div>
   <div id="feed"></div>
   <div id="msg"></div>
+  <div id="replayUI" class="hidden"><div id="rpLabel">🎬 ПОВТОР</div><div class="rpBars"></div><button id="rpSkip" class="btn">Пропустить ⏭</button></div>
   <div id="portHint" class="hidden">📱↻ Поверни телефон горизонтально</div>
   <canvas id="map" width="380" height="380"></canvas>
   <div id="speedo"><canvas id="dial" width="420" height="420"></canvas><div id="gear">N</div><div id="spd">0</div><div id="kmh">КМ/Ч</div></div>
@@ -488,10 +493,22 @@ const S = 0.8;
 const TRACKS = {
   city: { name: 'Неон-Сити', desc: 'Небоскрёбы, тоннель, река с двумя мостами', theme: 'city', tun: [200, 360], ovp: [900, 1650], river: 1810,
     ctrl: [[0, 0], [350, -20], [620, 40], [760, 220], [700, 420], [520, 470], [380, 380], [220, 420], [120, 620], [-120, 700], [-380, 620], [-520, 420], [-480, 200], [-300, 120], [-160, -60]] },
+  sunset: { name: 'Хайвей заката', desc: 'Длинные прямые на 300+ км/ч, широкие дуги, ускорители', theme: 'city', v: 'highway', tun: 'auto', ovp: 'auto', river: -1,
+    ctrl: [[0, 0], [700, 0], [1050, 60], [1180, 260], [1100, 470], [820, 560], [300, 560], [-200, 600], [-520, 520], [-640, 300], [-560, 90], [-330, 0]] },
+  downtown: { name: 'Даунтаун', desc: 'Плотная застройка, шпильки и короткие прямые', theme: 'city', v: 'down', tun: 'auto', ovp: 'auto', river: -1,
+    ctrl: [[0, 0], [380, 0], [460, 120], [360, 230], [160, 240], [120, 360], [260, 460], [520, 470], [620, 620], [480, 760], [120, 760], [-140, 700], [-200, 520], [-60, 400], [-200, 280], [-260, 120], [-160, 20]] },
   port: { name: 'Старый порт', desc: 'Контейнеры, краны, шпильки и длинные прямые', theme: 'port', tun: [1500, 1640], ovp: [420, 2050], river: -1,
     ctrl: [[0, 0], [500, 0], [640, 60], [660, 180], [560, 230], [300, 220], [220, 280], [260, 380], [520, 400], [700, 460], [720, 600], [560, 680], [200, 660], [-100, 600], [-180, 420], [-120, 260], [-220, 120], [-160, 20]] },
+  docks: { name: 'Промзона', desc: 'Склады, доки и прыжки через каналы', theme: 'port', v: 'docks', tun: 'auto', ovp: 'auto', river: -1,
+    ctrl: [[0, 0], [620, 0], [760, 120], [700, 300], [480, 330], [440, 470], [620, 560], [820, 600], [880, 780], [700, 880], [300, 860], [0, 800], [-180, 640], [-120, 440], [-260, 300], [-220, 100]] },
   mountain: { name: 'Перевал', desc: 'Серпантин в горном ущелье, снег, ели и скалы', theme: 'mountain', tun: [1200, 1330], ovp: [], river: -1,
     ctrl: [[0, 0], [300, -40], [520, 40], [580, 190], [430, 250], [260, 230], [190, 330], [300, 430], [480, 430], [630, 520], [610, 690], [420, 730], [230, 640], [60, 710], [-150, 670], [-220, 500], [-90, 410], [-170, 300], [-310, 250], [-330, 100], [-180, 30]] },
+  canyon: { name: 'Каньон', desc: 'Красная пустыня, прыжки через овраги, длинная прямая', theme: 'mountain', v: 'desert', tun: 'auto', ovp: [], river: -1,
+    ctrl: [[0, 0], [600, -20], [900, 80], [960, 300], [780, 420], [560, 380], [420, 500], [520, 680], [380, 820], [80, 800], [-120, 640], [-80, 440], [-260, 320], [-300, 120]] },
+  forest: { name: 'Лесная тропа', desc: 'Густой лес, срезки через чащу, быстрые связки', theme: 'mountain', v: 'forest', tun: 'auto', ovp: [], river: -1,
+    ctrl: [[0, 0], [420, -30], [620, 60], [600, 240], [420, 300], [400, 460], [580, 560], [560, 760], [320, 820], [140, 700], [-60, 760], [-280, 680], [-300, 480], [-140, 380], [-260, 220], [-200, 60]] },
+  glacier: { name: 'Ледник', desc: 'Высокогорье, лёд и снег, трамплины над пропастью', theme: 'mountain', v: 'glacier', tun: 'auto', ovp: [], river: -1,
+    ctrl: [[0, 0], [380, 20], [560, 160], [500, 340], [300, 380], [260, 540], [440, 640], [700, 600], [860, 740], [760, 920], [460, 940], [180, 860], [-80, 900], [-300, 760], [-280, 540], [-120, 420], [-240, 240], [-180, 60]] },
 };
 let TRACK_ID = 'city';
 try { if (typeof localStorage !== 'undefined') TRACK_ID = localStorage.getItem('sr3d_track') || 'city'; } catch (_) { }
@@ -532,7 +549,7 @@ let TRACK_LEN = 0;
   }
 }
 const DS = TRACK_LEN / N;
-const ROAD_W = 18, HALF = ROAD_W / 2;
+const ROAD_W = 22, HALF = ROAD_W / 2;
 const LAT_A = 19.5;
 const LIMIT = new Float32Array(N);
 for (let i = 0; i < N; i++) {
@@ -541,9 +558,21 @@ for (let i = 0; i < N; i++) {
   LIMIT[i] = Math.min(95, Math.sqrt(LAT_A / Math.max(ang / (2 * k * DS), 1e-5)));
 }
 for (let pass = 0; pass < 2; pass++) for (let i = N - 1; i >= 0; i--) { const nx = LIMIT[(i + 1) % N]; LIMIT[i] = Math.min(LIMIT[i], Math.sqrt(nx * nx + 2 * 14 * DS)); }
+// racing line: hug the inside of upcoming corners
+const RL = new Float32Array(N);
+{
+  const cv = new Float32Array(N);
+  for (let i = 0; i < N; i++) { const a = (i - 12 + N) % N, b = (i + 12) % N; cv[i] = TX[a] * TZ[b] - TZ[a] * TX[b]; }
+  for (let i = 0; i < N; i++) { let s2 = 0; for (let k = -20; k <= 20; k += 2) s2 += cv[(i + k + N) % N]; RL[i] = clamp(-s2 / 21 * 60, -(HALF - 3.4), HALF - 3.4); }
+}
 let minX = 1e9, maxX = -1e9, minZ = 1e9, maxZ = -1e9;
 for (let i = 0; i < N; i++) { minX = Math.min(minX, PX[i]); maxX = Math.max(maxX, PX[i]); minZ = Math.min(minZ, PZ[i]); maxZ = Math.max(maxZ, PZ[i]); }
 const CX = (minX + maxX) / 2, CZ = (minZ + maxZ) / 2;
+function straightRuns(len) { // indices whose surrounding window is straight & fast
+  const out = []; for (let i = 0; i < N; i += 10) { let ok = true; for (let k = 0; k < len && ok; k += 4) if (LIMIT[(i + k) % N] < 88) ok = false; if (ok) out.push(i); } return out;
+}
+if (TRK.tun === 'auto') { const r = straightRuns(150).filter(i => i > 80 && i + 150 < N - 60); const i = r.length ? r[Math.floor(r.length * .55)] : 600; TRK.tun = [i, i + 140]; }
+if (TRK.ovp === 'auto') { const r = straightRuns(30).filter(i => i > 60 && i < N - 80 && (i < TRK.tun[0] - 120 || i > TRK.tun[1] + 120)); TRK.ovp = r.length > 3 ? [r[Math.floor(r.length * .15)] + 15, r[Math.floor(r.length * .85)] + 15] : []; }
 const TUN0 = TRK.tun[0], TUN1 = TRK.tun[1], OVP = TRK.ovp;
 const inFeature = (i, pad = 0) => (i >= TUN0 - 8 - pad && i <= TUN1 + 8 + pad) || OVP.some(o => Math.abs(i - o) < 12 + pad);
 function trackQuery(x, z, hint) {
@@ -576,7 +605,7 @@ class SimCar {
   place(i, lat) {
     this.q = { i, lat };
     this.pos.x = PX[i] + NX[i] * lat; this.pos.z = PZ[i] + NZ[i] * lat;
-    this.h = Math.atan2(TX[i], TZ[i]); this.vel.x = 0; this.vel.z = 0; this.r = 0; this.steer = 0; this.y = 0; this.vy = 0; this.air = false; this.fly = null; this.wreck = 0; this.elim = false;
+    this.h = Math.atan2(TX[i], TZ[i]); this.vel.x = 0; this.vel.z = 0; this.r = 0; this.steer = 0; this.y = 0; this.vy = 0; this.air = false; this.fly = null; this.cutF = null; this.boostT = 0; this.wreck = 0; this.elim = false;
   }
 }
 /* ---------- RIVER (straight band crossing the loop twice -> two bridges) ---------- */
@@ -595,7 +624,7 @@ function findRiver() {
   }
   return best;
 }
-const RIVER_I = TRK.river >= 0 ? TRK.river : findRiver();
+const RIVER_I = TRK.river >= 0 ? TRK.river : TRK.theme === 'mountain' ? -1 : findRiver();
 const RIVER = RIVER_I >= 0 ? { px: PX[RIVER_I], pz: PZ[RIVER_I], nx: TX[RIVER_I], nz: TZ[RIVER_I], dx: NX[RIVER_I], dz: NZ[RIVER_I] } : null;
 const riverF = (x, z) => RIVER ? (x - RIVER.px) * RIVER.nx + (z - RIVER.pz) * RIVER.nz : 1e6;
 const BRIDGES = [];
@@ -607,6 +636,54 @@ const inBridge = (i, pad = 0) => BRIDGES.some(b => { let d = i - b.j0; if (d < -
 /* ---------- RAMPS & NITRO PICKUPS ---------- */
 const GRAV = 16, PICK_AMT = .12, PICK_RESPAWN = 9;
 const RAMPS = [], PICKUPS = [];
+// ravines (mountain themes): full-width ramp, gap in the road, guaranteed programmed flight
+const RAVINES = [], CUTS = [], BOOSTS = [];
+const idxD = (a, b) => { let d = a - b; if (d < -N / 2) d += N; if (d > N / 2) d -= N; return d; };
+const nearSpecial = (i, pad = 0) => RAVINES.some(r => idxD(i, r.i0) > -60 - pad && idxD(i, r.i0) < 110 + pad) || CUTS.some(c => idxD(i, c.i) > -60 - pad && idxD(i, c.i) < 60 + pad) || CUTS.some(c => Math.abs(idxD(i, c.j)) < 50 + pad);
+if (TRK.theme === 'mountain') {
+  let last = -1e9;
+  for (let i = 120; i < N - 160 && RAVINES.length < 4; i += 10) {
+    if (i - last < 380 || inFeature(i, 40)) continue;
+    let ok = true; for (let k = -20; k < 110 && ok; k += 2) if (LIMIT[(i + k) % N] < 52 || inFeature((i + k) % N, 10)) ok = false;
+    if (!ok) continue;
+    const L = 15, n = Math.ceil(L / DS), g0 = (i + n + 2) % N, gN = Math.ceil(30 / DS);
+    RAMPS.push({ i0: i, n, L, H: 2.8, lat: 0, hw: HALF + 2, type: RAVINES.length % 2 ? 'roll' : 'jump', gap: gN });
+    RAVINES.push({ i0: i, g0, g1: (g0 + gN) % N, px: PX[(g0 + (gN >> 1)) % N], pz: PZ[(g0 + (gN >> 1)) % N], tx: TX[(g0 + (gN >> 1)) % N], tz: TZ[(g0 + (gN >> 1)) % N], hw: gN * DS / 2 });
+    last = i;
+  }
+}
+const inGap = i => RAVINES.some(r => { const d = idxD(i, r.g0); return d >= -1 && d <= idxD(r.g1, r.g0) + 1; });
+const ravF = (x, z) => { let m = 1e9; for (const r of RAVINES) { const a = (x - r.px) * r.tx + (z - r.pz) * r.tz; m = Math.min(m, Math.abs(a) - r.hw); } return m; };
+// shortcuts: a side ramp that launches over the infield to a later part of the track
+{
+  for (let i = 100; i < N - 100 && CUTS.length < 2; i += 8) {
+    if (inFeature(i, 30) || inBridge(i, 60) || nearSpecial(i, 40)) continue;
+    let ok = true; for (let k = -30; k < 8 && ok; k += 2) if (LIMIT[(i + k + N) % N] < 45) ok = false;
+    if (!ok) continue;
+    for (let jj = i + 220; jj < i + 900; jj += 6) {
+      const j = jj % N, d = Math.hypot(PX[j] - PX[i], PZ[j] - PZ[i]); if (d < 60 || d > 230 || d > (jj - i) * DS * .5) continue;
+      const fx = (PX[j] - PX[i]) / d, fz = (PZ[j] - PZ[i]) / d;
+      if (fx * TX[i] + fz * TZ[i] < .05 || fx * TX[j] + fz * TZ[j] < .05) continue;
+      if (inFeature(j, 30) || inBridge(j, 30) || LIMIT[j] < 40 || nearSpecial(j, 0)) continue;
+      let clear = true; for (let t = .2; t < .85 && clear; t += .05) { const x = PX[i] + (PX[j] - PX[i]) * t, z = PZ[i] + (PZ[j] - PZ[i]) * t; if (TRK.theme === 'mountain' && Math.abs(ravF(x, z)) < 25) clear = false; }
+      if (!clear) continue;
+      const side = (fx * NX[i] + fz * NZ[i]) > 0 ? 1 : -1, lat = side * (HALF - 3.2);
+      CUTS.push({ i, j, lat, d, side });
+      RAMPS.push({ i0: (i - Math.ceil(12 / DS) + N) % N, n: Math.ceil(12 / DS), L: 12, H: 2.2, lat, hw: 2.6, type: 'cut', cut: CUTS.length - 1 });
+      i += 500; break;
+    }
+  }
+}
+// speed boost pads on the longest straights
+{
+  let last = -1e9;
+  for (let i = 60; i < N - 40; i += 10) {
+    if (i - last < 260 || inFeature(i, 6) || inBridge(i, 20) || nearSpecial(i, 10)) continue;
+    let ok = true; for (let k = -10; k < 70 && ok; k += 2) if (LIMIT[(i + k) % N] < 92) ok = false;
+    if (!ok) continue;
+    BOOSTS.push({ i, lat: [-HALF + 4, 0, HALF - 4][BOOSTS.length % 3], hw: 2.4, len: 10 }); last = i;
+  }
+}
 // river jumps: ramp lip right at the near bank
 BRIDGES.forEach((b, k) => {
   let j = b.j0; while (Math.abs(riverF(PX[j % N], PZ[j % N])) > RW + 9) j++;
@@ -617,9 +694,9 @@ BRIDGES.forEach((b, k) => {
   let last = -1e9, k = 0;
   const lats = [-4.2, 4.2, 0, -3.5, 3.5];
   for (let i = 140; i < N - 200; i += 10) {
-    if (i - last < (TRK.theme === 'mountain' ? 280 : 330) || inBridge(i, 140) || inBridge(i + 120, 0)) continue;
+    if (i - last < (TRK.theme === 'mountain' ? 210 : 240) || inBridge(i, 140) || inBridge(i + 120, 0) || nearSpecial(i)) continue;
     let ok = true;
-    for (let j = i - 22; j < i + 85 && ok; j += 2) { const jj = (j + N) % N; if (LIMIT[jj] < (TRK.theme === 'mountain' ? 46 : 58) || inFeature(jj, 4)) ok = false; }
+    for (let j = i - 22; j < i + 85 && ok; j += 2) { const jj = (j + N) % N; if (LIMIT[jj] < (TRK.theme === 'mountain' ? 42 : 50) || inFeature(jj, 4)) ok = false; }
     if (!ok) continue;
     const type = k % 2 ? 'roll' : 'jump', L = 12, H = type === 'roll' ? 2.1 : 1.9;
     RAMPS.push({ i0: i, n: Math.ceil(L / DS), L, H, lat: lats[k % lats.length], hw: 3.3, type });
@@ -651,12 +728,19 @@ function assistInputs(c) {
   const g = Math.sqrt(effGrip(c) * c.gripMul);
   let lim = 1e9; const look = 4 + Math.floor(Math.max(0, c.vF) * .25);
   for (let k = 2; k <= look; k += 2) lim = Math.min(lim, LIMIT[(c.q.i + k) % N]);
-  lim = lim * g * 1.13 + (c.nitroOn ? 5 : 0);
-  if (c.vF > lim + 8) { c.inp.thr = 0; c.inp.brk = clamp((c.vF - lim - 8) / 14, .1, .45); }
-  else if (c.vF > lim + 2) c.inp.thr = .25;
+  lim = lim * g * 1.1 + (c.nitroOn ? 4 : 0);
+  if (c.vF > lim + 4) { c.inp.thr = 0; c.inp.brk = clamp((c.vF - lim - 4) / 10, .15, .6); }
+  else if (c.vF > lim) c.inp.thr = .3;
+  // steering help: follow the road curvature, keep away from walls
+  const spd = Math.max(0, c.vF), ti = (c.q.i + Math.floor((8 + spd * .45) / DS)) % N, lat = clamp(c.q.lat, -HALF + 3.2, HALF - 3.2);
+  const tx = PX[ti] + NX[ti] * lat, tz = PZ[ti] + NZ[ti] * lat, diff = wrapA(Math.atan2(tx - c.pos.x, tz - c.pos.z) - c.h);
+  const auto = clamp(-diff * 2.6 + c.r * .22, -1, 1), user = c.inp.steer, edge = clamp((Math.abs(c.q.lat) - (HALF - 4)) / 3, 0, 1);
+  const k = Math.abs(user) < .08 ? .55 : (Math.sign(user) === Math.sign(c.q.lat) ? .25 + .5 * edge : .18);
+  c.inp.steer = clamp(user + (auto - user) * k * (Math.sign(auto) === Math.sign(user) || Math.abs(user) < .08 || edge > 0 ? 1 : .5), -1, 1);
 }
 function stepCar(c, dt) {
   const inp = c.inp;
+  if (c.hold) { c.vel.x = c.vel.z = 0; c.vF = 0; c.r = 0; c.steer = lerp(c.steer, inp.steer, 1 - Math.exp(-dt * 9)); return; }
   if (c.wreck > 0) { c.wreck -= dt; inp.thr = 0; inp.brk = c.air ? 0 : .5; inp.steer = 0; inp.nitro = 0; inp.hand = 0; }
   const fx = Math.sin(c.h), fz = Math.cos(c.h);
   let vx = c.vel.x * fx + c.vel.z * fz;      // forward
@@ -735,8 +819,23 @@ function stepCar(c, dt) {
   // vertical: ramps / flight
   const rr = rampAt(c, q);
   const gy = rr ? rr.r.H * rr.s / rr.r.L : 0;
+  if (!c.air) for (const b of BOOSTS) { const d = idxD(q.i, b.i); if (d >= 0 && d * DS < b.len && Math.abs(q.lat - b.lat) < b.hw) { if (!(c.boostT > .3)) c.evBoost = 1; c.boostT = 1.6; } }
+  if (c.boostT > 0) { c.boostT -= dt; if (!c.air && c.vF > 3) { const k = (c.vmax * 1.25 - c.vF) > 0 ? 9 * dt : 0; c.vel.x += Math.sin(c.h) * k; c.vel.z += Math.cos(c.h) * k; } }
+  if (c.cutF) {
+    // programmed shortcut flight along a straight line between two track points
+    const F = c.cutF; F.t += dt; const u = clamp(F.t / F.T, 0, 1);
+    c.pos.x = lerp(F.x0, F.x1, u); c.pos.z = lerp(F.z0, F.z1, u); c.y = F.H * 4 * u * (1 - u) + 1.2 * (1 - u);
+    c.vy = F.H * 4 * (1 - 2 * u) / F.T; c.h = F.h0 + wrapA(F.h1 - F.h0) * smooth(u); c.r = 0; c.air = true; c.airT += dt;
+    c.vel.x = (F.x1 - F.x0) / F.T; c.vel.z = (F.z1 - F.z0) / F.T; c.vF = F.sp; c.vS = 0;
+    const qq = trackQuery(c.pos.x, c.pos.z, u > .5 ? F.j : F.i);
+    if (u >= 1) { c.cutF = null; c.air = false; c.y = 0; c.vy = 0; c.evLand = Math.max(c.evLand || 0, 6); c.h = Math.atan2(TX[F.j], TZ[F.j]); c.vel.x = Math.sin(c.h) * F.sp; c.vel.z = Math.cos(c.h) * F.sp; c.vF = F.sp; c.evCut = 1; }
+    let di = (u >= 1 ? F.j : qq.i) - c.q.i; if (di < -N / 2) di += N; if (di > N / 2) di -= N; if (di > 0 || u >= 1) { c.dist += di; c.q = { i: u >= 1 ? F.j : qq.i, lat: u >= 1 ? CUTS[F.k].lat * .3 : qq.lat }; }
+    if (u >= 1) { c.pos.x = PX[F.j] + NX[F.j] * c.q.lat; c.pos.z = PZ[F.j] + NZ[F.j] * c.q.lat; }
+    c.trackDot = 1; return;
+  }
   if (c.air) {
     c.vy -= GRAV * dt; c.y += c.vy * dt; c.airT += dt;
+    if (c.fly && c.fly.gapEnd != null && c.y < 1.2 && idxD(c.fly.gapEnd, q.i) > 0) { c.y = 1.2; c.vy = Math.max(c.vy, 2.5); }
     if (c.fly) {
       // programmed flight: follow the track direction, glide to a safe lane, never touch barriers
       const th = Math.atan2(TX[q.i], TZ[q.i]), spd = Math.max(8, Math.hypot(c.vel.x, c.vel.z));
@@ -755,9 +854,18 @@ function stepCar(c, dt) {
       const sl = c.slope || 0;
       c.vy = Math.max(0, c.vF) * sl / Math.sqrt(1 + sl * sl) + (c.rampType === 'roll' ? 3.2 : sl > 0 ? 1.4 : 0);
       c.evLaunch = sl > 0 ? (c.rampType || 'jump') : 'drop';
-      if (sl > 0) c.fly = { latT: clamp(q.lat, -HALF + 2.6, HALF - 2.6) };
+      if (sl > 0) c.fly = { latT: clamp(q.lat, -HALF + 3, HALF - 3) };
+      const lr = c.lastRamp;
+      if (lr && lr.gap) { // ravine: make sure the arc clears the gap
+        const sp = Math.max(32, c.vF); const fx2 = Math.sin(c.h), fz2 = Math.cos(c.h); c.vel.x = fx2 * sp; c.vel.z = fz2 * sp; c.vF = sp;
+        const T = (lr.gap * DS + 14) / sp; c.vy = Math.max(c.vy, GRAV * T / 2 + 1); c.fly.gapEnd = (lr.i0 + lr.n + lr.gap + 6) % N;
+      }
+      if (lr && lr.type === 'cut') {
+        const C = CUTS[lr.cut], sp = Math.max(36, c.vF), x0 = c.pos.x, z0 = c.pos.z, x1 = PX[C.j] + NX[C.j] * C.lat * .3, z1 = PZ[C.j] + NZ[C.j] * C.lat * .3, d = Math.hypot(x1 - x0, z1 - z0);
+        c.cutF = { x0, z0, x1, z1, T: d / sp, H: 9 + d * .06, h0: c.h, h1: Math.atan2(TX[C.j], TZ[C.j]), sp, i: q.i, j: C.j, k: lr.cut, t: 0 }; c.fly = null; c.evLaunch = 'cut';
+      }
     } else c.y = gy;
-    c.slope = rr ? rr.r.H / rr.r.L : 0; c.rampType = rr ? rr.r.type : null;
+    c.slope = rr ? rr.r.H / rr.r.L : 0; c.rampType = rr ? rr.r.type : null; if (rr) c.lastRamp = rr.r;
   }
   // nitro pickups
   for (const p of PICKUPS) {
@@ -770,6 +878,7 @@ function stepCar(c, dt) {
   c.curb = !c.air && Math.abs(q.lat) > HALF - 1.0 ? 1 : 0;
   const lim = HALF + .5;
   c.scrape = Math.max(0, c.scrape - dt * 4);
+  if (!c.air && inGap(q.i)) { const r = RAVINES.find(r => { const d = idxD(q.i, r.g0); return d >= -1 && d <= idxD(r.g1, r.g0) + 1; }); const k = (r.g1 + 3) % N; c.pos.x = PX[k] + NX[k] * q.lat; c.pos.z = PZ[k] + NZ[k] * q.lat; }
   if (!SIMENV.noWalls && !c.fly && Math.abs(q.lat) > lim) {
     const s = Math.sign(q.lat), over = Math.abs(q.lat) - lim, nx = -NX[q.i] * s, nz = -NZ[q.i] * s;
     c.pos.x += nx * over; c.pos.z += nz * over;
@@ -828,11 +937,15 @@ function aiControl(c, dt, cars, player, racing) {
     const gap = di * DS;
     if (gap > 0 && gap < 12 + spd * .5 && Math.abs(o.q.lat - c.q.lat) < 2.6) { blocked = true; c.laneT = clamp(o.q.lat + (o.q.lat > 0 ? -4.2 : 4.2), -HALF + 2.2, HALF - 2.2); }
   }
-  if (!blocked) c.laneT = lerp(c.laneT, c.lane, dt * .3);
+  if (c.lane0 == null) c.lane0 = c.lane;
+  const want = clamp(RL[(c.q.i + 18) % N] * .8 + c.lane0 * .35, -HALF + 3, HALF - 3);
+  if (!blocked) c.laneT = lerp(c.laneT, want, dt * .9);
+  if (c.skill < 1 && !c.isPlayer) { c.err = (c.err || 0) + dt; if (c.err > 6 + 10 * c.skill) { c.err = 0; c.wob = .6; } }
+  if (c.wob > 0) c.wob -= dt;
   const ti = (c.q.i + Math.floor((9 + spd * .5) / DS)) % N;
   const tx = PX[ti] + NX[ti] * c.laneT, tz = PZ[ti] + NZ[ti] * c.laneT;
   const diff = wrapA(Math.atan2(tx - c.pos.x, tz - c.pos.z) - c.h);
-  c.inp.steer = clamp(-diff * 3.0 + c.r * .25, -1, 1);
+  c.inp.steer = clamp(-diff * 3.0 + c.r * .25 + (c.wob > 0 ? Math.sin(c.wob * 9) * .12 : 0), -1, 1);
   let rb = 1;
   if (player && racing && !player.finish && c !== player) { const gap = (c.dist - player.dist) * DS; rb = clamp(1 - gap / 2500, .93, 1.06); }
   const g = Math.sqrt(SIMENV.grip);
@@ -1050,7 +1163,7 @@ function buildCarKit(styleIdx, opts = {}) {
   kit.add('paintS', G3.fan(rings[NS], [0, (pN.yt + pN.yb) / 2, st.z1], false));
   // chassis tub (dark wheel wells)
   if (opts.cockpit) for (const zc of [WHEEL_Z, -WHEEL_Z]) kit.add('dark', G3.box(1.52, .5, 1.2), makeXf([0, .5, zc]));
-  else kit.add('dark', G3.box(1.52, .3, st.z1 - st.z0 - .8), makeXf([0, .42, (st.z0 + st.z1) / 2 - .05]));
+  else kit.add('dark', G3.box(1.3, .26, st.z1 - st.z0 - 1.1), makeXf([0, .44, (st.z0 + st.z1) / 2 - .05]));
   // greenhouse
   const [zr, , , zf] = st.cab, CN = 44, CM = 22, crings = [];
   for (let j = 0; j <= CN; j++) crings.push(cabinRing(st, lerp(zr, zf, j / CN), CM));
@@ -1198,8 +1311,8 @@ function buildBrakeKit(side) {
 }
 
 /* ---------- COCKPIT (style 0) ---------- */
-const EYE = [.37, 1.15, -.3];
-const SW_POS = [.37, .91, .2], SW_TILT = .38;
+const EYE = [.37, 1.23, -.34];
+const SW_POS = [.37, .87, .21], SW_TILT = .38;
 function buildCockpitKit(opts = {}) {
   const k = new Kit(), B = (m, s, p, r) => k.add(m, G3.box(...s), makeXf(p, r));
   if (opts.cage) {
@@ -1207,12 +1320,12 @@ function buildCockpitKit(opts = {}) {
     for (const sx of [-1, 1]) { tube([sx * .66, .36, -.9], [sx * .58, 1.32, -.9]); tube([sx * .58, 1.32, -.9], [sx * .6, 1.33, .15]); tube([sx * .6, 1.33, .15], [sx * .72, .95, .9]); tube([sx * .7, .5, .55], [sx * .64, .62, -.85]); tube([sx * .7, .78, .5], [sx * .64, .5, -.85]); }
     tube([-.58, 1.32, -.9], [.58, 1.32, -.9]); tube([-.6, 1.33, .15], [.6, 1.33, .15]); tube([-.62, .4, -.9], [.58, 1.3, -.9]);
   }
-  B('leather', [1.56, .2, .5], [0, .84, .74]);
-  B('leather', [1.56, .03, .56], [0, .955, .72], [.08, 0, 0]);
-  B('stitch', [1.5, .006, .006], [0, .972, .45]);
-  B('amb', [1.25, .01, .01], [0, .925, .45]);
-  B('leather', [.46, .035, .22], [.37, 1.04, .47], [.12, 0, 0]);
-  for (const sx of [-1, 1]) B('leather', [.03, .08, .2], [.37 + sx * .22, 1.01, .48]);
+  B('leather', [1.56, .2, .5], [0, .78, .76]);
+  B('leather', [1.56, .03, .56], [0, .895, .74], [.08, 0, 0]);
+  B('stitch', [1.5, .006, .006], [0, .912, .47]);
+  B('amb', [1.25, .01, .01], [0, .865, .47]);
+  B('leather', [.46, .035, .22], [.37, .975, .49], [.12, 0, 0]);
+  for (const sx of [-1, 1]) B('leather', [.03, .08, .2], [.37 + sx * .22, .945, .5]);
   B('carbon', [.3, .34, .28], [0, .71, .63]);
   B('leather', [.24, .22, .9], [0, .5, -.12]);
   B('carbon', [.2, .01, .5], [0, .615, -.05]);
@@ -1220,7 +1333,7 @@ function buildCockpitKit(opts = {}) {
   k.add('leather', G3.sphere(.032, 12, 8), makeXf([0, .76, .14]));
   B('alc', [1.62, .04, 2.0], [0, .33, -.1]);
   B('leather', [1.5, .45, .05], [0, .55, 1.0]);
-  B('alc', [1.4, .025, 1.45], [0, 1.36, -.45]);
+  B('alc', [1.4, .025, 1.45], [0, 1.43, -.45]);
   for (const sx of [-1, 1]) {
     B('leather', [.06, .6, 1.6], [sx * .84, .68, -.08]);
     B('alc', [.12, .05, .55], [sx * .78, .84, -.15]);
@@ -1231,13 +1344,13 @@ function buildCockpitKit(opts = {}) {
     B('leather', [.5, .72, .12], [sx * .37, .82, -.72], [-.18, 0, 0]);
     for (const bx of [-1, 1]) B('alc', [.08, .62, .16], [sx * .37 + bx * .23, .82, -.68], [-.18, 0, 0]);
   }
-  k.add('dark', G3.cyl(.035, .045, .26, 12), makeXf([.37, .86, .31], [-1.19, 0, 0]));
+  k.add('dark', G3.cyl(.035, .045, .26, 12), makeXf([.37, .82, .32], [-1.19, 0, 0]));
   for (const sx of [-1, 1]) {
-    const a = [sx * .8, .97, 1.0], b = [sx * .6, 1.36, .24], d = [b[0] - a[0], b[1] - a[1], b[2] - a[2]], L = Math.hypot(...d);
+    const a = [sx * .8, .93, 1.0], b = [sx * .6, 1.43, .2], d = [b[0] - a[0], b[1] - a[1], b[2] - a[2]], L = Math.hypot(...d);
     k.add('alc', G3.box(.07, L, .06), makeXf([(a[0] + b[0]) / 2, (a[1] + b[1]) / 2, (a[2] + b[2]) / 2], [Math.atan2(d[2], d[1]), 0, -Math.atan2(d[0], Math.hypot(d[1], d[2]))]));
   }
-  B('dark', [.27, .08, .035], [0, 1.27, .33]);
-  B('dark', [.02, .08, .02], [0, 1.33, .34]);
+  B('dark', [.27, .08, .035], [0, 1.34, .33]);
+  B('dark', [.02, .08, .02], [0, 1.4, .34]);
   return k;
 }
 function buildSteeringKit() { // in steering-wheel local space (plane XY, driver at -Z)
@@ -1260,7 +1373,7 @@ function buildSteeringKit() { // in steering-wheel local space (plane XY, driver
   return k;
 }
 const WRISTS = [[.178 + .045, -.045, -.1], [-.178 - .045, -.045, -.1]];
-const ELBOWS = [[.37 + .27, .75, -.44], [.37 - .27, .75, -.44]];
+const ELBOWS = [[.37 + .27, .72, -.46], [.37 - .27, .72, -.46]];
 
 /* ===================== GAME (three.js) ===================== */
 const $ = id => document.getElementById(id);
@@ -1304,7 +1417,7 @@ const canHalf = renderer.capabilities.isWebGL2 && (renderer.extensions.has('EXT_
 const MAXANI = renderer.capabilities.getMaxAnisotropy();
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(60, innerWidth / innerHeight, 0.2, 7000);
-const composer = new EffectComposer(renderer, new THREE.WebGLRenderTarget(innerWidth, innerHeight, { type: canHalf ? THREE.HalfFloatType : THREE.UnsignedByteType, samples: renderer.capabilities.isWebGL2 ? (lowEnd ? 0 : isTouch ? 2 : 4) : 0 }));
+const composer = new EffectComposer(renderer, new THREE.WebGLRenderTarget(innerWidth, innerHeight, { type: canHalf ? THREE.HalfFloatType : THREE.UnsignedByteType, samples: renderer.capabilities.isWebGL2 ? (lowEnd ? 0 : TIER === 'low' ? 2 : 4) : 0 }));
 const renderPass = new RenderPass(scene, camera);
 composer.addPass(renderPass);
 scene.add(camera);
@@ -1445,6 +1558,7 @@ const shopEm = canvasTex(1024, 160, (g) => {
   for (let k = 0; k < 4; k++) { const x = k * 256, [word, col] = shopInfo[k]; const gr = g.createLinearGradient(0, 52, 0, 160); gr.addColorStop(0, '#ffe3b0'); gr.addColorStop(1, '#7a5a30'); g.fillStyle = gr; g.globalAlpha = .7; g.fillRect(x + 14, 52, 228, 108); g.globalAlpha = 1; g.fillStyle = col; g.font = 'italic 900 22px Arial'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(word, x + 128, 16); }
 });
 
+const TRACK_ICON = { city: '🌃', sunset: '🌇', downtown: '🏙', port: '⚓', docks: '🏭', mountain: '🏔', canyon: '🏜', forest: '🌲', glacier: '🧊' };
 /* ================= TRACK RIBBONS ================= */
 function ribbon(offA, offB, yA, yB, vLen, uA = 0, uB = 1, i0 = 0, i1 = N) {
   if (offA > offB) { [offA, offB] = [offB, offA]; [yA, yB] = [yB, yA]; [uA, uB] = [uB, uA]; }
@@ -1454,7 +1568,7 @@ function ribbon(offA, offB, yA, yB, vLen, uA = 0, uB = 1, i0 = 0, i1 = N) {
     const j = i % N, v = full ? i / N * reps : i * DS / vLen;
     pos.push(PX[j] + NX[j] * offA, yA, PZ[j] + NZ[j] * offA, PX[j] + NX[j] * offB, yB, PZ[j] + NZ[j] * offB);
     uv.push(uA, v, uB, v);
-    if (i < i1) { const a = (i - i0) * 2; idx.push(a, a + 2, a + 1, a + 1, a + 2, a + 3); }
+    if (i < i1 && !(RAVINES.length && inGap(j) && inGap((j + 1) % N))) { const a = (i - i0) * 2; idx.push(a, a + 2, a + 1, a + 1, a + 2, a + 3); }
   }
   const g = new THREE.BufferGeometry();
   g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); g.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2));
@@ -1501,8 +1615,11 @@ function vnoise(x, z) {
   return lerp(lerp(hh(xi, zi), hh(xi + 1, zi), u), lerp(hh(xi, zi + 1), hh(xi + 1, zi + 1), u), v);
 }
 function fbm(x, z) { let s = 0, a = 1, f = 1 / 260; for (let o = 0; o < 4; o++) { s += a * vnoise(x * f + o * 17.3, z * f - o * 9.1); a *= .5; f *= 2.1; } return s / 1.875; }
+const VAR = TRK.v || '';
 function terrainH(x, z, dKnown) {
-  const d = dKnown ?? nearestSample(x, z).d;
+  if (RAVINES.length) { const rv = ravF(x, z); if (rv < 16) return -42 * smooth(clamp((16 - rv) / 16, 0, 1)); }
+  const ns0 = dKnown == null ? nearestSample(x, z) : null, d = dKnown ?? ns0.d;
+  if (MTN && TUN1 > TUN0) { const ii = ns0 ? ns0.i : nearestSample(x, z).i; if (ii > TUN0 + 10 && ii < TUN1 - 10 && d < HALF + 60) { const m = Math.min(ii - TUN0 - 10, TUN1 - 10 - ii) * DS; return 9.5 + Math.min(14, m * .25) * smooth(clamp(1 - (d - HALF - 20) / 40, 0, 1)) + 4 * smooth(clamp(1 - d / (HALF + 60), 0, 1)); } }
   if (d < HALF + 9) return 0;
   const t = smooth(clamp((d - (HALF + 9)) / 170, 0, 1));
   return t * (22 + 210 * Math.pow(fbm(x, z), 1.6)) + fbm(x * 4, z * 4) * 7 * clamp((d - HALF - 12) / 25, 0, 1);
@@ -1511,12 +1628,13 @@ let terrainGeo = null;
 if (MTN) {
   const SZ = 3400, SEG = isTouch ? 130 : 170, g = new THREE.PlaneGeometry(SZ, SZ, SEG, SEG); g.rotateX(-Math.PI / 2); g.translate(CX, 0, CZ);
   const P = g.attributes.position, uv = g.attributes.uv, cols = new Float32Array(P.count * 3);
-  const cGrass = new THREE.Color(0x3b4a2a), cRock = new THREE.Color(0x6e685f), cSnow = new THREE.Color(0xeef2f6), cDirt = new THREE.Color(0x5a5146), cc = new THREE.Color();
+  const PAL = { desert: [0xc8925a, 0xa4552f, 0xe9d2b0, 0xb98252], forest: [0x2f5a24, 0x5f6a55, 0xeef2f6, 0x4a3f30], glacier: [0x6b7d78, 0x7d8a96, 0xf4f8fc, 0x8a8f96] }[VAR] || [0x3b4a2a, 0x6e685f, 0xeef2f6, 0x5a5146];
+  const cGrass = new THREE.Color(PAL[0]), cRock = new THREE.Color(PAL[1]), cSnow = new THREE.Color(PAL[2]), cDirt = new THREE.Color(PAL[3]), cc = new THREE.Color();
   for (let k = 0; k < P.count; k++) {
     const x = P.getX(k), z = P.getZ(k), h = terrainH(x, z);
     P.setY(k, h); uv.setXY(k, x, z);
-    const snowLine = 70 + fbm(x * 2, z * 2) * 60;
-    cc.copy(h < 3 ? cDirt : cGrass).lerp(cRock, clamp((h - 15) / 45, 0, 1)).lerp(cSnow, clamp((h - snowLine) / 25, 0, 1));
+    const snowLine = (VAR === 'desert' ? 1e4 : VAR === 'forest' ? 150 : VAR === 'glacier' ? 18 : 70) + fbm(x * 2, z * 2) * 60;
+    cc.copy(h < 3 && h > -1 ? cDirt : h <= -1 ? cRock : cGrass).lerp(cRock, clamp((h - 15) / 45, 0, 1)).lerp(cSnow, clamp((h - snowLine) / 25, 0, 1));
     cols[k * 3] = cc.r; cols[k * 3 + 1] = cc.g; cols[k * 3 + 2] = cc.b;
   }
   g.setAttribute('color', new THREE.BufferAttribute(cols, 3)); g.computeVertexNormals();
@@ -1606,7 +1724,7 @@ let signMat;
     scene.add(new THREE.Mesh(ribbon(s * 3.6, s * 4.2, 7.25, 7.25, 4, 0, 1, TUN0, TUN1), glowMat(0xffc070, 1.3, 1.5, 1.8, { map: tunnelLightTex, side: THREE.DoubleSide })));
   }
   const ceil = new THREE.Mesh(ribbon(-(HALF + 1.7), HALF + 1.7, 7.3, 7.3, 8, 0, 3, TUN0, TUN1), new THREE.MeshStandardMaterial({ color: 0x44464a, roughness: .9, side: THREE.DoubleSide })); ceil.castShadow = true; ceil.receiveShadow = true; scene.add(ceil);
-  const top = new THREE.Mesh(ribbon(-(HALF + 8), HALF + 8, 8.4, 8.4, 30, 0, 1, TUN0, TUN1), new THREE.MeshStandardMaterial({ map: grassTex, roughness: 1 })); top.receiveShadow = true; top.castShadow = true; scene.add(top);
+  const top = new THREE.Mesh(ribbon(-(HALF + 8), HALF + 8, 8.4, 8.4, 30, 0, 1, TUN0, TUN1), (MTN ? new THREE.MeshStandardMaterial({ color: VAR === 'desert' ? 0xa4552f : 0x6e685f, roughness: 1 }) : new THREE.MeshStandardMaterial({ map: grassTex, roughness: 1 }))); top.receiveShadow = true; top.castShadow = true; scene.add(top);
   const pm = new THREE.MeshStandardMaterial({ map: concreteTex, roughness: .85 });
   for (const i of [TUN0, TUN1]) {
     const g = new THREE.Group();
@@ -1752,18 +1870,19 @@ let leafM;
   }
 }
 {
-  for (let i = 0; i < N; i += 14) for (const s of [-1, 1]) { if (rnd() < .35 || inFeature(i) || inBridge(i, 6)) continue; const off = s * (HALF + 5.2 + rnd() * 1.2); treeSpots.push([PX[i] + NX[i] * off, PZ[i] + NZ[i] * off]); }
+  for (let i = 0; i < N; i += 14) for (const s of [-1, 1]) { if (VAR === 'desert' || rnd() < .35 || inFeature(i) || inBridge(i, 6)) continue; const off = s * (HALF + 5.2 + rnd() * 1.2); treeSpots.push([PX[i] + NX[i] * off, PZ[i] + NZ[i] * off]); }
   const treeY = [];
   if (MTN) {
     let tries = 0;
-    while (treeSpots.length < (isTouch ? 1100 : 1700) && tries++ < 9000) {
+    const TREES = (isTouch ? 1100 : 1700) * (VAR === 'desert' ? 0 : VAR === 'forest' ? 1.5 : VAR === 'glacier' ? .35 : 1);
+    while (treeSpots.length < TREES && tries++ < 12000) {
       const x = CX + (rnd() - .5) * 2600, z = CZ + (rnd() - .5) * 2600, ns = nearestSample(x, z);
       if (ns.d < HALF + 12) continue;
       const h = terrainH(x, z, ns.d); if (h > 95 + fbm(x * 2, z * 2) * 40) continue;
       treeSpots.push([x, z]); treeY[treeSpots.length - 1] = h - .3;
     }
     const rocks = [];
-    for (let k = 0; k < 360; k++) { const i = Math.floor(rnd() * N), sd = rnd() < .5 ? -1 : 1, off = sd * (HALF + 13 + rnd() * 40); const x = PX[i] + NX[i] * off, z = PZ[i] + NZ[i] * off, ns = nearestSample(x, z); if (ns.d < HALF + 11) continue; rocks.push([x, terrainH(x, z, ns.d), z, 1 + rnd() * 4]); }
+    for (let k = 0; k < (VAR === 'desert' || VAR === 'glacier' ? 700 : 360); k++) { const i = Math.floor(rnd() * N), sd = rnd() < .5 ? -1 : 1, off = sd * (HALF + 13 + rnd() * 40); const x = PX[i] + NX[i] * off, z = PZ[i] + NZ[i] * off, ns = nearestSample(x, z); if (ns.d < HALF + 11) continue; rocks.push([x, terrainH(x, z, ns.d), z, 1 + rnd() * 4]); }
     const rm = new THREE.InstancedMesh(new THREE.IcosahedronGeometry(1, 0), new THREE.MeshStandardMaterial({ color: 0x77716a, roughness: .95, flatShading: true }), rocks.length);
     rocks.forEach(([x, y, z, s], k) => { dummy.position.set(x, y - s * .3, z); dummy.rotation.set(rnd() * 3, rnd() * 3, rnd() * 3); dummy.scale.set(s, s * (.6 + rnd() * .5), s * (.8 + rnd() * .4)); dummy.updateMatrix(); rm.setMatrixAt(k, dummy.matrix); });
     rm.castShadow = true; rm.receiveShadow = true; scene.add(rm);
@@ -1890,7 +2009,7 @@ const wrapBox = (v, c, r) => { let d = v - c; if (d > r) d -= 2 * r; else if (d 
 function updateWeather(dt, racing) {
   if (WX.mode === 'auto' && racing) {
     WX.timer -= dt;
-    if (WX.timer <= 0) { const opts = ['clear', 'rain', 'snow'].filter(o => o !== WX.cur); setWeather(WX.cur === 'clear' ? opts[Math.random() < .5 ? 0 : 1] : (Math.random() < .55 ? 'clear' : opts.find(o => o !== 'clear')), true); WX.timer = 32 + Math.random() * 22; }
+    if (WX.timer <= 0) { const opts = (VAR === 'desert' ? ['clear', 'rain'] : ['clear', 'rain', 'snow']).filter(o => o !== WX.cur); setWeather(WX.cur === 'clear' ? opts[Math.random() < .5 ? 0 : 1] : (Math.random() < .55 ? 'clear' : opts.find(o => o !== 'clear')), true); WX.timer = 32 + Math.random() * 22; }
   }
   const ap = (v, t, r) => v < t ? Math.min(t, v + r) : Math.max(t, v - r);
   WX.rain = ap(WX.rain, WX.tRain, dt / 7); WX.snow = ap(WX.snow, WX.tSnow, dt / (WX.tSnow > WX.snow ? 12 : 9));
@@ -1926,7 +2045,7 @@ function applyWeatherVisuals() {
   rainMesh.userData.on = rainMesh.visible = r > .01; rainMesh.material.opacity = r * (P.night ? .35 : .45);
   snowMesh.userData.on = snowMesh.visible = s > .01; snowMesh.material.opacity = s * .9;
   for (const m of snowMeshes) m.visible = s > .01;
-  snowRoadMat.opacity = s * .8; snowWalkMat.opacity = s * .92; snowGroundMat.opacity = s * .95;
+  snowRoadMat.opacity = s * .4; snowWalkMat.opacity = s * .92; snowGroundMat.opacity = s * .95;
   roadMat.roughness = lerp(P.wet, .3, r) * (1 + s * .3);
   roadMat.color.setScalar((P.night ? .8 : 1) * (1 - .3 * r));
   roofMat.color.setHex(0x55575c).lerp(tmpC.setHex(0xe8edf2), s * .9);
@@ -1991,6 +2110,33 @@ for (const r of RAMPS) {
     d.rotation.x = -Math.PI / 2; d.rotation.z = Math.atan2(TX[ja], TZ[ja]) + Math.PI; d.position.set(PX[ja] + NX[ja] * r.lat, .12, PZ[ja] + NZ[ja] * r.lat); scene.add(d);
   }
 }
+// ravines: cliff walls, floor, warning signs
+if (RAVINES.length) {
+  const cliffTex = canvasTex(256, 256, (g, w, h) => { g.fillStyle = VAR === 'desert' ? '#8a4a2a' : '#5d5952'; g.fillRect(0, 0, w, h); for (let k = 0; k < 40; k++) { g.fillStyle = `rgba(0,0,0,${.1 + rnd() * .2})`; g.fillRect(0, rnd() * h, w, 2 + rnd() * 6); } speckle(g, w, h, 9000, .3, 3); });
+  cliffTex.repeat.set(12, 2);
+  const cliffM = new THREE.MeshStandardMaterial({ map: cliffTex, roughness: .95, side: THREE.DoubleSide }), floorM = new THREE.MeshStandardMaterial({ color: VAR === 'desert' ? 0x5a3220 : 0x2b2f33, roughness: 1 });
+  const signTex = canvasTex(256, 128, (g, w, h) => { g.fillStyle = '#ffc21a'; g.fillRect(0, 0, w, h); g.fillStyle = '#111'; g.font = '900 40px Arial'; g.textAlign = 'center'; g.fillText('ОБРЫВ', w / 2, 52); g.font = '700 26px Arial'; g.fillText('ЖМИ ГАЗ!', w / 2, 100); });
+  for (const r of RAVINES) {
+    const ang = Math.atan2(r.tx, r.tz);
+    for (const sg of [-1, 1]) { const m = new THREE.Mesh(new THREE.PlaneGeometry(520, 44), cliffM); m.position.set(r.px + r.tx * r.hw * sg, -21.5, r.pz + r.tz * r.hw * sg); m.rotation.y = ang; m.receiveShadow = true; scene.add(m); }
+    const f = new THREE.Mesh(new THREE.PlaneGeometry(520, r.hw * 2 + 30).rotateX(-Math.PI / 2), floorM); f.position.set(r.px, -40, r.pz); f.rotation.y = ang + Math.PI / 2; scene.add(f);
+    const j = (r.i0 - Math.round(60 / DS) + N) % N;
+    for (const sg of [-1, 1]) { const p = new THREE.Mesh(new THREE.PlaneGeometry(3.2, 1.6), new THREE.MeshBasicMaterial({ map: signTex, side: THREE.DoubleSide })); p.position.set(PX[j] + NX[j] * sg * (HALF + 3), 2.6, PZ[j] + NZ[j] * sg * (HALF + 3)); p.rotation.y = Math.atan2(TX[j], TZ[j]) + Math.PI; scene.add(p); }
+  }
+}
+// speed boost pads
+const boostTex = canvasTex(128, 256, (g, w, h) => { g.fillStyle = '#062a3a'; g.fillRect(0, 0, w, h); for (let k = 0; k < 4; k++) { const y = h - k * 64 - 10; const gr = g.createLinearGradient(0, y, 0, y - 50); gr.addColorStop(0, '#00f0ff'); gr.addColorStop(1, '#7c3aed'); g.fillStyle = gr; g.beginPath(); g.moveTo(10, y); g.lineTo(w / 2, y - 46); g.lineTo(w - 10, y); g.lineTo(w - 34, y); g.lineTo(w / 2, y - 22); g.lineTo(34, y); g.fill(); } });
+const boostMat = new THREE.MeshBasicMaterial({ map: boostTex, toneMapped: false, transparent: true, opacity: .95, polygonOffset: true, polygonOffsetFactor: -4 });
+const boostMeshes = [];
+for (const b of BOOSTS) { const j = (b.i + Math.round(b.len / 2 / DS)) % N, m = new THREE.Mesh(new THREE.PlaneGeometry(b.hw * 2, b.len).rotateX(-Math.PI / 2), boostMat); m.position.set(PX[j] + NX[j] * b.lat, .07, PZ[j] + NZ[j] * b.lat); m.rotation.y = Math.atan2(TX[j], TZ[j]) + Math.PI; scene.add(m); boostMeshes.push(m); }
+boostTex.wrapT = THREE.RepeatWrapping;
+// shortcut signs and landing marks
+const cutSignTex = canvasTex(256, 128, (g, w, h) => { const gr = g.createLinearGradient(0, 0, w, 0); gr.addColorStop(0, '#ff3d6e'); gr.addColorStop(1, '#ffb800'); g.fillStyle = gr; g.fillRect(0, 0, w, h); g.fillStyle = '#fff'; g.font = 'italic 900 44px Arial'; g.textAlign = 'center'; g.fillText('СРЕЗКА', w / 2, 58); g.font = '900 34px Arial'; g.fillText('⚡ ⚡ ⚡', w / 2, 106); });
+for (const C of CUTS) {
+  const j = (C.i - Math.round(70 / DS) + N) % N;
+  const p = new THREE.Mesh(new THREE.PlaneGeometry(5, 2.5), new THREE.MeshBasicMaterial({ map: cutSignTex, side: THREE.DoubleSide, toneMapped: false })); p.position.set(PX[j] + NX[j] * C.side * (HALF + 2.5), 4.2, PZ[j] + NZ[j] * C.side * (HALF + 2.5)); p.rotation.y = Math.atan2(TX[j], TZ[j]) + Math.PI; scene.add(p);
+  const pole = new THREE.Mesh(new THREE.CylinderGeometry(.08, .08, 3), new THREE.MeshStandardMaterial({ color: 0x888888 })); pole.position.set(p.position.x, 1.5, p.position.z); scene.add(pole);
+}
 // nitro canisters
 const pickMat = new THREE.MeshStandardMaterial({ color: 0x1e6dff, emissive: 0x2aa8ff, emissiveIntensity: 1.2, metalness: .6, roughness: .25 });
 const pickCapMat = new THREE.MeshStandardMaterial({ color: 0xdfe6ee, metalness: 1, roughness: .2 });
@@ -2011,20 +2157,20 @@ function updatePickups(dt) {
     dummy.position.set(p.x, .13, p.z); dummy.rotation.set(0, 0, 0); dummy.scale.setScalar(sc * (1 + .12 * Math.sin(t * 5 + k))); dummy.updateMatrix(); haloI.setMatrixAt(k, dummy.matrix);
   });
   pickI.instanceMatrix.needsUpdate = capI.instanceMatrix.needsUpdate = haloI.instanceMatrix.needsUpdate = true;
-  pickMat.emissiveIntensity = preset.night ? 1.6 : 1.1;
+  pickMat.emissiveIntensity = preset.night ? 1.6 : 1.1; boostTex.offset.y = -t * 1.6;
 }
 function handleEvents(c) {
   const me = c === player;
   if (c.evLaunch) {
     if (c.evLaunch === 'crash') { const T = (c.vy + Math.sqrt(c.vy * c.vy + 2 * GRAV * c.y)) / GRAV; c.flip = { dir: c.crashDir || 1, T: T * .92 }; for (let k = 0; k < 14; k++) spark(c.pos.x, .8, c.pos.z, c.vel.x, c.vel.z); for (let k = 0; k < 5; k++) puff(c.pos.x + (Math.random() - .5) * 2, .8, c.pos.z + (Math.random() - .5) * 2, c.vel.x * .3, c.vel.z * .3, 1.6, 0x55585e, .4, 1.2); }
     if (c.evLaunch === 'roll') { const T = (c.vy + Math.sqrt(c.vy * c.vy + 2 * GRAV * c.y)) / GRAV; c.flip = { dir: c.q.lat > 0 ? 1 : -1, T: T * .9 }; }
-    if (me && c.evLaunch !== 'drop') { flash(c.evLaunch === 'roll' ? '🔄 БОЧКА!' : '🚀 ПРЫЖОК!', 1.2); if (audio) beep(c.evLaunch === 'roll' ? 880 : 660, .12, .12); }
+    if (me && c.evLaunch !== 'drop') { flash(c.evLaunch === 'cut' ? '⚡ СРЕЗКА!' : c.evLaunch === 'roll' ? '🔄 БОЧКА!' : '🚀 ПРЫЖОК!', 1.2); if (audio) beep(c.evLaunch === 'roll' ? 880 : 660, .12, .12); }
     c.evLaunch = null;
   }
   if (c.evLand) {
     const v = c.evLand; c.bv = -Math.min(1.6, v * .1);
     if (me) {
-      shake = Math.min(.8, v * .045); thump(v * 1.2); vib(25);
+      shake = Math.min(.8, v * .045); thump(v * 1.2); vib(25); if (c.airT > .6) moment(c.airT * 12 + (c.flip ? 22 : 0), c.flip ? 'Бочка в воздухе' : 'Прыжок ' + c.airT.toFixed(1) + ' с', c.airT);
       if (c.airT > .7) { if (c.flip) raceStats.rolls++; else raceStats.jumps++; const bonus = c.flip ? .3 : .12; c.nitro = Math.min(1, c.nitro + bonus); flash((c.flip ? '🔄 ЧИСТАЯ БОЧКА' : '🛬 ПРЫЖОК ' + c.airT.toFixed(1) + ' с') + ' · +НИТРО', 2); }
     }
     const fx = Math.sin(c.h), fz = Math.cos(c.h);
@@ -2033,9 +2179,11 @@ function handleEvents(c) {
     c.flip = null; c.evLand = 0;
   }
   if (c.evTakedown) {
-    if (me) { raceStats.takedowns += c.evTakedown; flash('💥 ТАРАН! +НИТРО', 1.6); feed('💥 ТАРАН · +300', 'red'); shake = .9; thump(18); vib([30, 30, 50]); lastHitT = timeAcc; }
+    if (me) { moment(42, 'Таран соперника'); raceStats.takedowns += c.evTakedown; flash('💥 ТАРАН! +НИТРО', 1.6); feed('💥 ТАРАН · +300', 'red'); shake = .9; thump(18); vib([30, 30, 50]); lastHitT = timeAcc; }
     c.evTakedown = 0;
   }
+  if (c.evCut) { if (me) { moment(36, 'Срезка по воздуху'); feed('⚡ СРЕЗКА ПРОЙДЕНА · +200', 'gold'); c.nitro = Math.min(1, c.nitro + .2); } c.evCut = 0; }
+  if (c.evBoost) { if (me) { flash('⏩ УСКОРИТЕЛЬ', .8); if (audio) beep(980, .1, .1); shake = Math.max(shake, .2); } c.evBoost = 0; }
   if (c.evPick) {
     if (me) { raceStats.picks++; if (audio) { beep(1320, .06, .1); setTimeout(() => beep(1760, .08, .1), 60); } const el = $('nitro'); el.classList.remove('gain'); void el.offsetWidth; el.classList.add('gain'); }
     c.evPick = 0;
@@ -2077,14 +2225,14 @@ const WHEEL_KITS = { 1: buildWheelKit(1), [-1]: buildWheelKit(-1) }, BRAKE_KITS 
 
 /* ================= MODELS, SAVE, TUNING ================= */
 const MODELS = [
-  { id: 'pico', name: 'PICO R', style: 4, price: 4000, cls: 'C', base: { pow: 15.4, vmax: 79, grip: 1.16, nit: 1.05 }, def: { wing: 1, rim: 1 }, desc: 'Злой хот-хэтч: лёгкий, цепкий, юркий' },
-  { id: 'veloce', name: 'VELOCE GT', style: 0, price: 0, cls: 'B', base: { pow: 16, vmax: 84, grip: 1.0, nit: 1.0 }, def: { wing: 1, rim: 0 }, desc: 'Сбалансированное купе GT' },
-  { id: 'kaze', name: 'KAZE RS', style: 3, price: 7500, cls: 'B', base: { pow: 16.4, vmax: 82, grip: 1.13, nit: 1.0 }, def: { wing: 3, rim: 1, scoop: 1 }, desc: 'Полноприводный раллийный седан: лучшее сцепление, 4 двери' },
-  { id: 'iron', name: 'IRON V8', style: 2, price: 12000, cls: 'A', base: { pow: 18.6, vmax: 87, grip: .96, nit: 1.1 }, def: { wing: 2, rim: 3 }, desc: 'Маслкар: зверский разгон, валкий в поворотах' },
-  { id: 'nova', name: 'NOVA 84', style: 5, price: 15000, cls: 'A', base: { pow: 18.2, vmax: 90, grip: 1.03, nit: 1.12 }, def: { wing: 3, rim: 4 }, desc: 'Клиновидный суперкар в духе 80-х' },
-  { id: 'vortex', name: 'VORTEX GTR', style: 7, price: 26000, cls: 'S', base: { pow: 20.4, vmax: 94, grip: 1.13, nit: 1.16 }, def: { wing: 1, rim: 5, splitter: 2 }, desc: 'Длинный капот, V12 спереди, гоночный обвес' },
-  { id: 'lumen', name: 'LUMEN P1', style: 6, price: 34000, cls: 'S', base: { pow: 21.2, vmax: 97, grip: 1.17, nit: 1.22 }, def: { wing: 0, rim: 4 }, desc: 'Прототип для гонок на выносливость с акульим плавником — самая быстрая' },
-  { id: 'apex', name: 'APEX HYPER', style: 1, price: 22000, cls: 'S', base: { pow: 19.6, vmax: 93, grip: 1.1, nit: 1.15 }, def: { wing: 1, rim: 2 }, desc: 'Гиперкар: максимум всего' },
+  { id: 'pico', name: 'PICO R', style: 4, price: 4000, cls: 'C', base: { pow: 15.4, vmax: 79, grip: 1.16, nit: 1.05 }, def: { color: 0xffb000, wing: 1, rim: 1 }, desc: 'Злой хот-хэтч: лёгкий, цепкий, юркий' },
+  { id: 'veloce', name: 'VELOCE GT', style: 0, price: 0, cls: 'B', base: { pow: 16, vmax: 84, grip: 1.0, nit: 1.0 }, def: { color: 0xd10f2f, wing: 1, rim: 0 }, desc: 'Сбалансированное купе GT' },
+  { id: 'kaze', name: 'KAZE RS', style: 3, price: 7500, cls: 'B', base: { pow: 16.4, vmax: 82, grip: 1.13, nit: 1.0 }, def: { color: 0x1f5fff, wing: 3, rim: 1, scoop: 1 }, desc: 'Полноприводный раллийный седан: лучшее сцепление, 4 двери' },
+  { id: 'iron', name: 'IRON V8', style: 2, price: 12000, cls: 'A', base: { pow: 18.6, vmax: 87, grip: .96, nit: 1.1 }, def: { color: 0x1a1a1c, wing: 2, rim: 3 }, desc: 'Маслкар: зверский разгон, валкий в поворотах' },
+  { id: 'nova', name: 'NOVA 84', style: 5, price: 15000, cls: 'A', base: { pow: 18.2, vmax: 90, grip: 1.03, nit: 1.12 }, def: { color: 0xf4f4f4, wing: 3, rim: 4 }, desc: 'Клиновидный суперкар в духе 80-х' },
+  { id: 'vortex', name: 'VORTEX GTR', style: 7, price: 26000, cls: 'S', base: { pow: 20.4, vmax: 94, grip: 1.13, nit: 1.16 }, def: { color: 0x16a34a, wing: 1, rim: 5, splitter: 2 }, desc: 'Длинный капот, V12 спереди, гоночный обвес' },
+  { id: 'lumen', name: 'LUMEN P1', style: 6, price: 34000, cls: 'S', base: { pow: 21.2, vmax: 97, grip: 1.17, nit: 1.22 }, def: { color: 0x7c3aed, wing: 0, rim: 4 }, desc: 'Прототип для гонок на выносливость с акульим плавником — самая быстрая' },
+  { id: 'apex', name: 'APEX HYPER', style: 1, price: 22000, cls: 'S', base: { pow: 19.6, vmax: 93, grip: 1.1, nit: 1.15 }, def: { color: 0xff6a00, wing: 1, rim: 2 }, desc: 'Гиперкар: максимум всего' },
 ];
 const MODEL = Object.fromEntries(MODELS.map(m => [m.id, m]));
 const UPG = [
@@ -2099,7 +2247,7 @@ const PATTERNS = [['none', 'Без узора'], ['stripes', 'Полосы'], ['
 const WINGS = [['0', 'Нет'], ['2', 'Губа'], ['1', 'GT-крыло'], ['3', 'Большое']];
 const RIMS = [['0', '10 спиц'], ['1', '5 спиц'], ['2', 'Сетка'], ['3', 'Глубокие'], ['4', 'Турбина'], ['5', 'Y-спицы']];
 const HEADS = { white: 0xeaf3ff, xenon: 0x8fbaff, gold: 0xffcf6b };
-function defTune(m) { return { color: 0xd10f2f, finish: 'metal', pattern: 'none', patColor: 0xffffff, wing: m.def.wing, scoop: m.def.scoop || 0, rim: m.def.rim, rimColor: 0xd7d9dd, caliper: 0xd11b1b, camber: 0, height: 0, tint: .5, glow: 0x00e5ff, interior: 0x1c1c20, stitch: 0xff2d55, carbonRoof: 0, num: 7, wide: 0, splitter: m.def.splitter ?? 1, skirt: 1, exhaust: 0, head: 'white', flame: 0x4aa3ff, cage: 0, plate: 'SR 777', up: { eng: 0, tyr: 0, sus: 0, nit: 0 } }; }
+function defTune(m) { return { color: m.def.color || 0xd10f2f, finish: 'metal', pattern: 'none', patColor: 0xffffff, wing: m.def.wing, scoop: m.def.scoop || 0, rim: m.def.rim, rimColor: 0xd7d9dd, caliper: 0xd11b1b, camber: 0, height: 0, tint: .5, glow: 0x00e5ff, interior: 0x1c1c20, stitch: 0xff2d55, carbonRoof: 0, num: 7, wide: 0, splitter: m.def.splitter ?? 1, skirt: 1, exhaust: 0, head: 'white', flame: 0x4aa3ff, cage: 0, plate: 'SR 777', up: { eng: 0, tyr: 0, sus: 0, nit: 0 } }; }
 let SAVE = null;
 function loadSave() {
   try { SAVE = JSON.parse(localStorage.getItem('sr3d_save') || 'null'); } catch (_) { SAVE = null; }
@@ -2113,7 +2261,7 @@ function statsOf(id) {
   return { pow: m.base.pow * (1 + .05 * u.eng), vmax: m.base.vmax * (1 + .025 * u.eng), grip: m.base.grip * (1 + .035 * u.tyr + .015 * u.sus), nit: m.base.nit * (1 + .07 * u.nit), eff: 1 + .1 * u.nit, steer: 1 + .03 * u.sus };
 }
 const hex6 = c => '#' + c.toString(16).padStart(6, '0');
-function patternTex(t) {
+function patternTex(t, st) {
   const tex = canvasTex(512, 512, (g, w, h) => {
     const pc = hex6(t.patColor);
     g.fillStyle = hex6(t.color); g.fillRect(0, 0, w, h);
@@ -2144,6 +2292,20 @@ function patternTex(t) {
       g.fillRect(U(.2), 0, U(.012), h); g.fillRect(U(.788), 0, U(.012), h); g.fillRect(U(.47), 0, U(.06), h);
       for (const [c, r] of [[.25, -1], [.75, 1]]) { g.save(); g.translate(U(c + (r < 0 ? .015 : -.015)), Y(.2)); g.rotate(r * Math.PI / 2); g.fillStyle = pc; g.font = 'italic 900 40px Arial'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('TURBO', 0, -18); g.font = 'bold 22px Arial'; g.fillText('NEXUS · VOLT', 0, 18); g.restore(); }
     } else if (t.pattern === 'split') { g.beginPath(); g.moveTo(0, Y(.6)); g.lineTo(w, Y(-.6)); g.lineTo(w, h); g.lineTo(0, h); g.fill(); }
+    if (st && st.cab) { // panel seams, door handles, fuel cap, side vents
+      const [zr, z1, z2, zf] = st.cab, seam = (u0, u1, z) => { g.fillStyle = 'rgba(0,0,0,.55)'; g.fillRect(U(u0), Y(z) - 1, U(u1 - u0), 2.2); g.fillStyle = 'rgba(255,255,255,.12)'; g.fillRect(U(u0), Y(z) + 1.2, U(u1 - u0), 1); };
+      const dF = zf - .08, dR = lerp(z1, z2, st.doors === 4 ? .05 : .3), dM = (dF + dR) / 2;
+      for (const c of [.25, .75]) {
+        seam(c - .075, c + .075, dF); seam(c - .075, c + .075, dR); if (st.doors === 4) seam(c - .075, c + .075, dM);
+        g.fillStyle = 'rgba(0,0,0,.6)'; g.fillRect(U(c - .062), Y(dF), 2, Y(dR) - Y(dF)); // door bottom line
+        const hz = (st.doors === 4 ? [dM - .12, dR - .12] : [dR - .14]);
+        for (const z of hz) { const x = U(c + (c < .5 ? -.045 : .045)); g.fillStyle = 'rgba(0,0,0,.5)'; g.fillRect(x - 3, Y(z) - 10, 6, 20); g.fillStyle = 'rgba(255,255,255,.35)'; g.fillRect(x - 2, Y(z) - 9, 2, 18); }
+      }
+      g.fillStyle = 'rgba(0,0,0,.45)'; g.beginPath(); g.arc(U(.75 + .03), Y(zr + .35), 9, 0, 7); g.fill(); g.fillStyle = 'rgba(255,255,255,.18)'; g.beginPath(); g.arc(U(.75 + .03), Y(zr + .35), 6, 0, 7); g.fill();
+      seam(.38, .62, zf + .04); seam(.36, .64, st.z1 - .32); seam(.38, .62, zr - .05);
+      g.fillStyle = 'rgba(0,0,0,.55)'; g.fillRect(U(.38), Y(st.z1 - .32), 2, Y(zf + .04) - Y(st.z1 - .32)); g.fillRect(U(.62) - 2, Y(st.z1 - .32), 2, Y(zf + .04) - Y(st.z1 - .32));
+      for (const c of [.25, .75]) for (let k = 0; k < 3; k++) { g.fillStyle = 'rgba(0,0,0,.6)'; g.fillRect(U(c + (c < .5 ? .02 : -.04)) , Y(zf - .25 - k * .09), U(.02), 3); }
+    }
   });
   tex.repeat.set(1, .2); tex.offset.set(0, .5);
   return tex;
@@ -2163,7 +2325,7 @@ class Car extends SimCar {
     this.name = name; this.cfg = cfg;
     const t = cfg.tune, md = MODEL[cfg.model];
     this.root = new THREE.Group(); this.tilt = new THREE.Group(); this.body = new THREE.Group(); this.root.add(this.tilt); this.tilt.add(this.body);
-    this.paint = regEnv(new THREE.MeshPhysicalMaterial({ map: patternTex(t), normalMap: flakeTex, normalScale: new THREE.Vector2(.1, .1), clearcoatRoughness: .03 }), 1.2);
+    this.paint = regEnv(new THREE.MeshPhysicalMaterial({ map: patternTex(t, STYLES[md.style]), normalMap: flakeTex, normalScale: new THREE.Vector2(.1, .1), clearcoatRoughness: .03 }), 1.2);
     this.paintS = regEnv(new THREE.MeshPhysicalMaterial({ color: t.color, normalMap: flakeTex, normalScale: new THREE.Vector2(.1, .1), clearcoatRoughness: .03 }), 1.2);
     applyFinish(this.paint, t.finish); applyFinish(this.paintS, t.finish);
     this.headMat = new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0xeaf3ff, emissiveIntensity: 1 });
@@ -2172,10 +2334,10 @@ class Car extends SimCar {
     const mats = { paint: this.paint, paintS: this.paintS, glass, head: this.headMat, tail: this.tailMat, plate: new THREE.MeshStandardMaterial({ map: plateTex(cfg.plate || t.plate || 'SR 777'), roughness: .5 }) };
     kitToMeshes(buildCarKit(md.style, { cockpit: isPlayer, wing: +t.wing, scoop: t.scoop, carbonRoof: t.carbonRoof, wide: t.wide, splitter: t.splitter, skirt: t.skirt, exhaust: t.exhaust }), mats, this.body);
     this.headMat.emissive.setHex(HEADS[t.head] || HEADS.white); this.flameC = new THREE.Color(t.flame || 0x4aa3ff);
-    this.rideH = t.height || 0;
+    this.rideH = Math.min(.035, t.height || 0);
     this.wheels = []; this.steerers = []; this.pivots = [];
     const wm = { rim: regEnv(new THREE.MeshStandardMaterial({ color: t.rimColor, metalness: 1, roughness: .22, side: THREE.DoubleSide })), caliper: new THREE.MeshStandardMaterial({ color: t.caliper, roughness: .35 }) };
-    const tw = t.wide ? .95 : .89;
+    const tw = (t.wide ? .95 : .89) + Math.sin((t.camber || 0) * Math.PI / 180) * .36 + this.rideH * .5;
     for (const [wx, wz, front] of [[-tw, WHEEL_Z, 1], [tw, WHEEL_Z, 1], [-tw, -WHEEL_Z, 0], [tw, -WHEEL_Z, 0]]) {
       const side = wx > 0 ? 1 : -1;
       const pivot = new THREE.Group(); pivot.position.set(wx, .36, wz); pivot.rotation.z = side * (t.camber || 0) * Math.PI / 180; this.tilt.add(pivot);
@@ -2226,11 +2388,11 @@ function buildCockpit(car) {
   im.cage = regEnv(new THREE.MeshStandardMaterial({ color: t.cage === 2 ? t.color : 0xb0b4ba, metalness: .8, roughness: .35 }));
   kitToMeshes(buildCockpitKit({ cage: t.cage }), im, g, false);
   const cl = new THREE.Mesh(new THREE.PlaneGeometry(.36, .158), new THREE.MeshBasicMaterial({ map: clusterTex, toneMapped: false }));
-  cl.position.set(.37, .98, .5); cl.lookAt(EYE_V); g.add(cl);
+  cl.position.set(.37, .925, .52); cl.lookAt(EYE_V); g.add(cl);
   const nav = new THREE.Mesh(new THREE.PlaneGeometry(.19, .19), new THREE.MeshBasicMaterial({ map: navTex, toneMapped: false, color: 0xaaaaaa }));
-  nav.position.set(0, .92, .5); nav.lookAt(EYE_V); g.add(nav);
+  nav.position.set(0, .86, .52); nav.lookAt(EYE_V); g.add(nav);
   const mg = new THREE.PlaneGeometry(.25, .068); const uv = mg.attributes.uv; for (let k = 0; k < uv.count; k++) uv.setX(k, 1 - uv.getX(k));
-  const mir = new THREE.Mesh(mg, new THREE.MeshBasicMaterial({ map: mirrorRT.texture })); mir.position.set(0, 1.27, .31); mir.lookAt(EYE_V); g.add(mir);
+  const mir = new THREE.Mesh(mg, new THREE.MeshBasicMaterial({ map: mirrorRT.texture })); mir.position.set(0, 1.34, .31); mir.lookAt(EYE_V); g.add(mir);
   const sw = new THREE.Group(); sw.position.set(...SW_POS); sw.rotation.x = SW_TILT; g.add(sw);
   const spin = new THREE.Group(); sw.add(spin);
   kitToMeshes(buildSteeringKit(), im, spin, false);
@@ -2380,9 +2542,15 @@ function initAudio() {
     const buf = ctx.createBuffer(1, ctx.sampleRate * 2, ctx.sampleRate), d = buf.getChannelData(0);
     for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
     const mkNoise = (type, freq, q) => { const s = ctx.createBufferSource(); s.buffer = buf; s.loop = true; const fl = ctx.createBiquadFilter(); fl.type = type; fl.frequency.value = freq; fl.Q.value = q; const g = ctx.createGain(); g.gain.value = 0; s.connect(fl); fl.connect(g); g.connect(master); s.start(); return g; };
-    audio = { ctx, master, music, buf, o1, o2, o3, f, eg, rg, skid: mkNoise('bandpass', 1400, 4), wind: mkNoise('lowpass', 600, .5), nitroN: mkNoise('highpass', 2500, .7), rain: mkNoise('bandpass', 3000, .4), scrape: mkNoise('bandpass', 2400, 6) };
+    const eIn = ctx.createGain(), eLP = ctx.createBiquadFilter(), ePk = ctx.createBiquadFilter(), eLow = ctx.createBiquadFilter(), eOut = ctx.createGain(), cab = ctx.createBiquadFilter();
+    eLP.type = 'lowpass'; eLP.Q.value = .9; ePk.type = 'peaking'; ePk.frequency.value = 420; ePk.Q.value = 1.4; ePk.gain.value = 5; eLow.type = 'lowshelf'; eLow.frequency.value = 160; eLow.gain.value = 6;
+    cab.type = 'lowpass'; cab.frequency.value = 20000; cab.Q.value = .5; eOut.gain.value = 0;
+    eIn.connect(eLP); eLP.connect(ePk); ePk.connect(eLow); eLow.connect(eOut); eOut.connect(cab); cab.connect(master); eg.disconnect(); eg.connect(cab);
+    const tw = osc('sine'), twg = ctx.createGain(); twg.gain.value = 0; tw.connect(twg); twg.connect(master);
+    audio = { eIn, eLP, ePk, eOut, cab, tw, twg, ctx, master, music, buf, o1, o2, o3, f, eg, rg, skid: mkNoise('bandpass', 1400, 4), wind: mkNoise('lowpass', 600, .5), nitroN: mkNoise('highpass', 2500, .7), rain: mkNoise('bandpass', 3000, .4), scrape: mkNoise('bandpass', 2400, 6) };
   } catch (e) { audio = null; }
   if (audio && PREFS.music) startMusic();
+  setEngineVoice();
 }
 function beep(freq, dur = .18, vol = .3) { if (!audio) return; const { ctx, master } = audio; const o = ctx.createOscillator(), g = ctx.createGain(); o.frequency.value = freq; o.type = 'square'; g.gain.setValueAtTime(vol, ctx.currentTime); g.gain.exponentialRampToValueAtTime(.001, ctx.currentTime + dur); o.connect(g); g.connect(master); o.start(); o.stop(ctx.currentTime + dur); }
 function thump(v) { if (!audio) return; const { ctx, master } = audio; const o = ctx.createOscillator(), g = ctx.createGain(); o.type = 'sine'; o.frequency.setValueAtTime(90, ctx.currentTime); o.frequency.exponentialRampToValueAtTime(30, ctx.currentTime + .25); g.gain.setValueAtTime(Math.min(.8, v * .05), ctx.currentTime); g.gain.exponentialRampToValueAtTime(.001, ctx.currentTime + .3); o.connect(g); g.connect(master); o.start(); o.stop(ctx.currentTime + .3); }
@@ -2448,20 +2616,23 @@ function setupRace() {
   order.forEach((c, k) => { const row = Math.floor(k / 2), side = k % 2 ? 1 : -1, i = (N - 10 - row * 6) % N; c.place(i, side * 3.6); c.dist = -(N - i); c.lapStart = 0; c.lapTimes = []; c.finish = null; c.nitro = c.isPlayer ? .35 : .3; c.prevLap = undefined; c.flip = null; cars.push(c); });
   for (const p of PICKUPS) p.t = 0;
   raceTime = 0; countdown = 3; finishShown = false; LAPS = settings.mode === 'elim' ? 99 : settings.laps;
+  RP.buf = []; RP.best = null; RP.active = false;
   elimT = 25; goT = -1; perfectUsed = false; ghostRec = []; ghostRecT = 0; setupGhost();
   $('lapK').textContent = testDrive ? 'ТЕСТ-ДРАЙВ' : settings.mode === 'elim' ? 'ВЫБЫВАНИЕ' : 'КРУГ';
   camMode = PREFS.cam || 0; orbitYaw = 0; orbitPitch = 0; lastPos = 0; bestPosAnn = 99; posAnnT = -9; draftOn = false; driftMax = 0; lastGear = 'N';
   if ($('feed')) $('feed').innerHTML = '';
   WX.mode = NET.race && NET.role !== 'host' ? 'net' : settings.wx; WX.timer = 25 + Math.random() * 15;
-  const w0 = settings.wx === 'auto' ? (MTN ? 'snow' : 'clear') : settings.wx;
+  const w0 = settings.wx === 'auto' ? (VAR === 'glacier' ? 'snow' : 'clear') : settings.wx;
   setWeather(w0, false); WX.rain = WX.tRain; WX.snow = WX.tSnow;
   for (const c of cars) updateCarVisual(c, 0);
   applyTOD(settings.tod);
   snapCamera();
+  setEngineVoice();
 }
 function resetPlayer() { TILT.zero = TILT.ang; if (!player || state !== 'race') return; const q = trackQuery(player.pos.x, player.pos.z, player.q.i); player.place(q.i, clamp(q.lat, -HALF + 2, HALF - 2)); shake = 0; }
 function playerControl(dt) {
   const c = player, brake = keys.down ? 1 : 0;
+  if (settings.auto && countdown <= 0) { c.lane = c.lane || 0; if (c.laneT == null) c.laneT = c.q.lat; c.skill = 1; aiControl(c, dt, cars, null, true); if (keys.nitro) c.inp.nitro = c.nitro > .005 ? 1 : 0; if (keys.down) { c.inp.brk = 1; c.inp.thr = 0; } c.assist = true; assistInputs(c); return; }
   c.inp.brk = brake; c.inp.thr = brake ? 0 : 1;
   const kb = (keys.right ? 1 : 0) - (keys.left ? 1 : 0);
   if (settings.ctl === 'tilt' && TILT.ok) { c.inp.steer = kb || tiltSteer(); } else if (settings.ctl === 'wheel' && (wheelUI.active || Math.abs(wheelUI.rot) > 2)) { const v = clamp(wheelUI.rot / WHEEL_MAX, -1, 1); c.inp.steer = Math.sign(v) * Math.pow(Math.abs(v), 1.1); } else c.inp.steer = kb;
@@ -2548,6 +2719,7 @@ const camPos = new THREE.Vector3(), camLook = new THREE.Vector3(), _e1 = new THR
 function vfovFor(hfov, vmin, vmax) { return clamp(2 * Math.atan(Math.tan(hfov * Math.PI / 360) / camera.aspect) * 180 / Math.PI, vmin, vmax); }
 function snapCamera() { const c = player, fx = Math.sin(c.h), fz = Math.cos(c.h); camPos.set(c.pos.x - fx * 6, 2.4, c.pos.z - fz * 6); camLook.set(c.pos.x + fx * 4, 1.1, c.pos.z + fz * 4); camera.position.copy(camPos); camera.lookAt(camLook); }
 function updateCamera(dt) {
+  if (window.__fc) { const f = window.__fc; camera.position.set(f[0], f[1], f[2]); camera.lookAt(f[3], f[4], f[5]); camera.fov = 60; camera.updateProjectionMatrix(); player.cockpit.g.visible = false; return; }
   const c = player, fx = Math.sin(c.h), fz = Math.cos(c.h), spd = Math.hypot(c.vel.x, c.vel.z), inside = camMode === 2;
   c.cockpit.g.visible = inside;
   c.cockpit.lamp.intensity = inside ? (preset.night ? .9 : .35) : 0;
@@ -2693,7 +2865,53 @@ function lapCheck(c) {
   c.prevLap = lap;
 }
 function onPlayerFinish() { if (NET.race) { netFinish(); return; }
-   const place = cars.filter(o => o.finish != null).length; showMsg(place === 1 ? '🏆 1' : place + '', 'ФИНИШ!'); setTimeout(() => { if (state === 'race') showFinish(); }, 2500); }
+   const place = cars.filter(o => o.finish != null).length; showMsg(place === 1 ? '🏆 1' : place + '', 'ФИНИШ!'); setTimeout(() => { if (state === 'race') { if (PREFS.replay !== false && !testDrive) { showMsg(''); startReplay(showFinish); } else showFinish(); } }, 2500); }
+/* ================= REPLAY: best moment ================= */
+const RP = { buf: [], best: null, active: false, t: 0, t0: 0, t1: 0, cb: null, k: 0, ang: 0 };
+function recordReplay() {
+  const fr = [raceTime]; for (const c of cars) fr.push(c.pos.x, c.pos.z, c.y, c.h, c.vF, c.air ? 1 : 0, c.airT, c.flip ? c.flip.dir : 0, c.flip ? c.flip.T : 0, c.steer, c.nitroOn ? 1 : 0, c.inp.brk, c.vy, c.elim ? 1 : 0);
+  RP.buf.push(fr); while (RP.buf.length && RP.buf[0][0] < raceTime - 45) RP.buf.shift();
+}
+function moment(score, label, dur = 0) { if (!RP.best || score > RP.best.score || RP.best.t < raceTime - 40) RP.best = { score, label, t: raceTime - dur * .5 }; }
+const RPS = 14;
+function applyReplayFrame(fr, dt) {
+  cars.forEach((c, k) => { const o = 1 + k * RPS; if (o + RPS > fr.length) return;
+    const wasAir = c.air; c.pos.x = fr[o]; c.pos.z = fr[o + 1]; c.y = fr[o + 2]; c.h = fr[o + 3]; c.vF = fr[o + 4]; c.air = !!fr[o + 5]; c.airT = fr[o + 6];
+    c.flip = fr[o + 7] ? { dir: fr[o + 7], T: fr[o + 8] } : null; c.steer = fr[o + 9]; c.nitroOn = !!fr[o + 10]; c.inp.brk = fr[o + 11]; c.vy = fr[o + 12]; c.vS = 0; c.ay = 0; c.acc = 0;
+    c.root.visible = !fr[o + 13]; if (wasAir && !c.air) c.bv = -1;
+    updateCarVisual(c, dt); });
+}
+function startReplay(cb) {
+  const b = RP.best, buf = RP.buf;
+  if (!buf.length || cars.some(c => c.remote)) return cb();
+  const tEnd = buf[buf.length - 1][0];
+  let tm = b && b.t > buf[0][0] + 1 ? b.t : tEnd - 4;
+  RP.t0 = Math.max(buf[0][0], tm - 4.5); RP.t1 = Math.min(tEnd, tm + 4); if (RP.t1 - RP.t0 < 3) return cb();
+  RP.t = RP.t0; RP.k = 0; RP.cb = cb; RP.active = true; RP.ang = Math.random() * 6; RP.saved = buf.slice(-1)[0];
+  document.body.classList.add('replay'); $('rpLabel').textContent = '🎬 ПОВТОР · ' + (b ? b.label : 'Финиш'); $('replayUI').classList.remove('hidden');
+  if (audio) audio.eOut.gain.setTargetAtTime(.05, audio.ctx.currentTime, .2);
+}
+function endReplay() {
+  if (!RP.active) return; RP.active = false; document.body.classList.remove('replay'); $('replayUI').classList.add('hidden');
+  if (RP.saved) applyReplayFrame(RP.saved, 0); for (const c of cars) c.root.visible = !c.elim;
+  const cb = RP.cb; RP.cb = null; cb && cb();
+}
+function replayTick(dt) {
+  const near = RP.best ? Math.abs(RP.t - RP.best.t) < 1.2 : false, sp = near ? .45 : 1;
+  RP.t += dt * sp; if (RP.t >= RP.t1) { endReplay(); return; }
+  const buf = RP.buf; while (RP.k < buf.length - 2 && buf[RP.k + 1][0] <= RP.t) RP.k++; while (RP.k > 0 && buf[RP.k][0] > RP.t) RP.k--;
+  const a = buf[RP.k], b = buf[Math.min(buf.length - 1, RP.k + 1)], f = clamp((RP.t - a[0]) / Math.max(1e-4, b[0] - a[0]), 0, 1);
+  const fr = a.map((v, i) => i === 0 ? RP.t : (i - 1) % RPS === 3 ? v + wrapA(b[i] - v) * f : (i - 1) % RPS >= 5 && (i - 1) % RPS !== 6 && (i - 1) % RPS !== 9 && (i - 1) % RPS !== 12 ? v : lerp(v, b[i], f));
+  applyReplayFrame(fr, dt * sp); timeAcc += dt;
+  updatePuffs(dt * sp); updateSparks(dt * sp);
+  // cinematic camera: slow orbit, low angle, switches every 3 s
+  RP.ang += dt * .35; const c = player, shot = Math.floor((RP.t - RP.t0) / 3) % 3;
+  const d = shot === 1 ? 5.5 : 8.5, hgt = shot === 2 ? 1.0 : 2.4, a2 = c.h + Math.PI + (shot === 0 ? Math.sin(RP.ang) * 1.2 : shot === 1 ? 1.4 + RP.ang * .4 : -.8);
+  camera.position.set(c.pos.x + Math.sin(a2) * d, hgt + c.y * .9, c.pos.z + Math.cos(a2) * d);
+  camera.lookAt(c.pos.x, .7 + c.y, c.pos.z); camera.fov = vfovFor(70, 38, 70); camera.updateProjectionMatrix();
+  player.cockpit.g.visible = false;
+}
+$('rpSkip').onclick = () => endReplay();
 function showFinish() {
   finishShown = true; showMsg('');
   const ranked = rankList(), myPlace = ranked.indexOf(player) + 1;
@@ -2730,7 +2948,7 @@ function playerAwareness(dt, myPos) {
     const prev = o._rel; o._rel = gap;
     if (prev !== undefined && prev > 0 && gap <= 0 && p.vF > 20 && !o.wreck && timeAcc - (o._ovT || -9) > 4) {
       o._ovT = timeAcc;
-      if (latD < 2.6 && p.vF > 30 && timeAcc - lastHitT > .7) { raceStats.nearMiss = (raceStats.nearMiss || 0) + 1; p.nitro = Math.min(1, p.nitro + .07); feed('⚡ ПОЧТИ ЗАДЕЛ · +НИТРО', 'gold'); vib(15); if (audio) beep(1700, .05, .08); }
+      if (latD < 2.6 && p.vF > 30 && timeAcc - lastHitT > .7) { raceStats.nearMiss = (raceStats.nearMiss || 0) + 1; p.nitro = Math.min(1, p.nitro + .07); feed('⚡ ПОЧТИ ЗАДЕЛ · +НИТРО', 'gold'); moment(12, 'На волоске от аварии'); vib(15); if (audio) beep(1700, .05, .08); }
       else feed('▲ ОБГОН: ' + o.name);
     }
   }
@@ -2749,13 +2967,13 @@ function setQuality(q) {
   if (q === 'auto') q = TIER;
   curQ = q; dynScale = 1;
   if (q === 'high') { pixelRatio = dpr; bloomOn = true; sun.castShadow = true; sun.shadow.mapSize.set(2048, 2048); envInterval = 1.5; }
-  else if (q === 'mid') { pixelRatio = Math.min(dpr, 1.6); bloomOn = true; sun.castShadow = true; sun.shadow.mapSize.set(1024, 1024); envInterval = 3; }
+  else if (q === 'mid') { pixelRatio = Math.min(dpr, isIOS ? 2 : 1.6); bloomOn = true; sun.castShadow = true; sun.shadow.mapSize.set(1024, 1024); envInterval = 3; }
   else { pixelRatio = Math.min(dpr, 1.1); bloomOn = false; sun.castShadow = false; envInterval = Infinity; }
   if (sun.shadow.map) { sun.shadow.map.dispose(); sun.shadow.map = null; }
   applyDPR();
 }
 let curQ = 'mid', dynScale = 1, lastFps = 60;
-function applyDPR() { const pr = pixelRatio * dynScale; renderer.setPixelRatio(pr); composer.setPixelRatio(pr); resize();
+function applyDPR() { const pr = pixelRatio * (state === 'race' ? dynScale : 1) * (state !== 'race' && isTouch ? 1.15 : 1); renderer.setPixelRatio(pr); composer.setPixelRatio(pr); resize();
 }
 function resize() { updateOrient(); const el = renderer.domElement, w = el.clientWidth || innerWidth, h = el.clientHeight || innerHeight; renderer.setSize(w, h, false); composer.setSize(w, h); camera.aspect = w / h; camera.updateProjectionMatrix(); }
 addEventListener('resize', resize);
@@ -2772,13 +2990,15 @@ function frame(now) {
   if (fpsAcc > 2) {
     const fps = fpsN / fpsAcc; fpsAcc = 0; fpsN = 0; lastFps = fps;
     if (state === 'race' && !paused) {
-      if (fps < 47 && dynScale > .55) { dynScale = Math.max(.55, dynScale - .12); applyDPR(); }
+      if (fps < 47 && dynScale > .62) { dynScale = Math.max(.62, dynScale - .1); applyDPR(); }
       else if (fps > 57.5 && dynScale < 1) { dynScale = Math.min(1, dynScale + .06); applyDPR(); }
       if (fps < 32 && dynScale <= .56 && bloomOn) { bloomOn = false; }
     }
     $('fps').classList.toggle('hidden', !PREFS.fps);
     if (PREFS.fps) $('fps').textContent = Math.round(fps) + ' FPS · ' + (pixelRatio * dynScale).toFixed(2) + 'x · ' + curQ;
   }
+  if (state !== frame.lastState) { frame.lastState = state; applyDPR(); }
+  if (RP.active) { replayTick(dt); render(); return; }
   if (paused) { if (photo) photoCam(dt); render(); return; }
   if (!wheelUI.active) wheelUI.rot *= Math.exp(-dt * 9);
   wheelUI.svg.style.transform = `rotate(${wheelUI.rot.toFixed(1)}deg)`;
@@ -2803,7 +3023,7 @@ function frame(now) {
     const live = cars.filter(c => !c.elim);
     for (const c of live) if (!c.isPlayer && !c.remote) aiControl(c, dt, live, player, racing);
     if (NET.race) netTick(dt);
-    if (!racing) for (const c of cars) { c.inp.thr = 0; c.inp.brk = 1; c.inp.nitro = 0; }
+    for (const c of cars) { c.hold = !racing && !c.remote; if (c.hold) { c.inp.thr = 0; c.inp.brk = 0; c.inp.nitro = 0; } }
     accT += sdt; const H = 1 / 120; let hit = 0;
     player.impact = 0;
     while (accT >= H) { for (const c of live) if (!c.remote) stepCar(c, H); hit = Math.max(hit, collideCars(live)); tickPickups(H); accT -= H; }
@@ -2813,6 +3033,7 @@ function frame(now) {
     if (racing) { for (const c of live) if (!c.remote) lapCheck(c); modeTick(dt); recordGhost(dt); }
     raceStats.maxSpeed = Math.max(raceStats.maxSpeed, player.vF * 3.6);
     for (const c of live) updateCarVisual(c, sdt);
+    if (racing) recordReplay();
     updateGhost();
     updatePickups(dt);
     updateCamera(dt);
@@ -2850,8 +3071,38 @@ function render() {
   else renderer.render(sc, cm);
 }
 const ENGINE = { veloce: [1, 'sawtooth'], kaze: [1.18, 'sawtooth'], iron: [.62, 'sawtooth'], apex: [1.32, 'sawtooth'], pico: [1.28, 'square'], nova: [1.06, 'sawtooth'], vortex: [.84, 'sawtooth'], lumen: [2.3, 'sine'] };
+// physically-inspired engine samples: cylinder firing pulses + exhaust resonance, synthesised once per model
+const ENG_DEF = { pico: { cyl: 4, rough: .35, tone: 1.25, turbo: .6 }, veloce: { cyl: 6, rough: .22, tone: 1, turbo: 0 }, kaze: { cyl: 4, rough: .3, tone: 1.1, turbo: 1 }, iron: { cyl: 8, rough: .55, tone: .72, turbo: 0 },
+  nova: { cyl: 6, rough: .25, tone: 1.05, turbo: .3 }, vortex: { cyl: 6, rough: .3, tone: .9, turbo: 1 }, lumen: { cyl: 0 }, apex: { cyl: 12, rough: .12, tone: 1.35, turbo: 0 } };
 let lastGear = 'N';
-function setEngineVoice() { if (!audio) return; const e = ENGINE[SAVE.sel] || ENGINE.veloce; audio.o1.type = e[1]; audio.o3.type = SAVE.sel === 'lumen' ? 'sine' : 'triangle'; audio.emul = e[0]; }
+const ENG_BUF = {};
+function engineBuffer(ctx, id) {
+  if (ENG_BUF[id]) return ENG_BUF[id];
+  const E = ENG_DEF[id] || ENG_DEF.veloce, sr = ctx.sampleRate, rpm0 = 1800, cyc = 120 / rpm0, nC = 6, len = Math.round(sr * cyc * nC);
+  const b = ctx.createBuffer(1, len, sr), d = b.getChannelData(0);
+  let sd = 1234 + E.cyl * 77; const r = () => (sd = (sd * 16807) % 2147483647) / 2147483647;
+  const jit = []; for (let k = 0; k < E.cyl; k++) jit.push([1 + (r() - .5) * E.rough * 1.4, (r() - .5) * E.rough * .25]);
+  const per = cyc / E.cyl, f1 = 95 * E.tone, f2 = 310 * E.tone;
+  for (let c = 0; c < nC; c++) for (let k = 0; k < E.cyl; k++) {
+    const t0 = (c * cyc + (k + jit[k][1] * .5) * per), [amp] = jit[k], n0 = Math.round(t0 * sr), L = Math.round(per * 1.9 * sr);
+    for (let i = 0; i < L; i++) {
+      const t = i / sr, e1 = Math.exp(-t / (per * .32)), e2 = Math.exp(-t / (per * .12));
+      const v = amp * (e1 * Math.sin(2 * Math.PI * f1 * t) * .9 + e2 * Math.sin(2 * Math.PI * f2 * t + 1) * .45 + e2 * (r() * 2 - 1) * .35);
+      d[(n0 + i) % len] += v;
+    }
+  }
+  let lp = 0, mx = 0; for (let i = 0; i < len * 2; i++) { const j = i % len; lp += (d[j] - lp) * .35; if (i >= len) { d[j] = Math.tanh(lp * 1.6); mx = Math.max(mx, Math.abs(d[j])); } }
+  for (let i = 0; i < len; i++) d[i] /= mx || 1;
+  return ENG_BUF[id] = { buf: b, rpm0 };
+}
+function setEngineVoice() {
+  if (!audio) return; const id = (player && player.cfg.model) || SAVE.sel, e = ENGINE[id] || ENGINE.veloce, E = ENG_DEF[id] || ENG_DEF.veloce;
+  audio.o1.type = e[1]; audio.o3.type = id === 'lumen' ? 'sine' : 'triangle'; audio.emul = e[0]; audio.elec = !E.cyl; audio.turboK = E.turbo || 0;
+  const A = audio, ctx = A.ctx;
+  if (A.esrc) { try { A.esrc.stop(); } catch (_) { } A.esrc.disconnect(); A.esrc = null; }
+  if (!E.cyl) return;
+  const eb = engineBuffer(ctx, id), src = ctx.createBufferSource(); src.buffer = eb.buf; src.loop = true; src.connect(A.eIn); src.start(); A.esrc = src; A.erpm0 = eb.rpm0;
+}
 function pop(vol = .18) { if (!audio) return; const { ctx, master, buf } = audio, s = ctx.createBufferSource(), f = ctx.createBiquadFilter(), g = ctx.createGain(); s.buffer = buf; f.type = 'bandpass'; f.frequency.value = 700 + Math.random() * 500; f.Q.value = 1.5; g.gain.setValueAtTime(vol, ctx.currentTime); g.gain.exponentialRampToValueAtTime(.001, ctx.currentTime + .09); s.connect(f); f.connect(g); g.connect(master); s.start(); s.stop(ctx.currentTime + .1); }
 // ---- procedural synthwave soundtrack ----
 const MUSIC = { timer: null, next: 0, step: 0 }, BPM = 106, SPB = 60 / BPM / 4;
@@ -2886,7 +3137,15 @@ function updateAudio() {
   if (g !== lastGear) { if (g > lastGear && lastGear !== 'N' && lastGear !== 'R' && SAVE.sel !== 'lumen') { audio.eg.gain.setValueAtTime(.03, t); if (Math.random() < .6) { pop(.2); setTimeout(() => pop(.12), 70); } } lastGear = g; }
   audio.o1.frequency.setTargetAtTime(base, t, .05); audio.o2.frequency.setTargetAtTime(base / 2, t, .05); audio.o3.frequency.setTargetAtTime(base * 1.5, t, .05);
   audio.f.frequency.setTargetAtTime(500 + c.inp.thr * 2200 + rpm * .15, t, .08);
-  audio.eg.gain.setTargetAtTime(.07 + c.inp.thr * .09, t, .1);
+  const thr = c.air ? .2 : c.inp.thr, inside = camMode === 2 && state === 'race';
+  if (audio.esrc) {
+    audio.esrc.playbackRate.setTargetAtTime(clamp(rpm / audio.erpm0, .35, 4.6), t, .04);
+    audio.eLP.frequency.setTargetAtTime(900 + thr * 3400 + rpm * .35, t, .06);
+    audio.eOut.gain.setTargetAtTime((.16 + thr * .2) * (c.nitroOn ? 1.15 : 1), t, .08);
+    audio.eg.gain.setTargetAtTime(.012 + thr * .012, t, .1);
+  } else audio.eg.gain.setTargetAtTime(audio.elec ? .05 + thr * .06 : .07 + thr * .09, t, .1);
+  audio.cab.frequency.setTargetAtTime(inside ? 1500 : 18000, t, .15);
+  audio.tw.frequency.setTargetAtTime(1800 + rpm * .9, t, .05); audio.twg.gain.setTargetAtTime(audio.turboK * thr * clamp((rpm - 2500) / 5000, 0, 1) * .022, t, .12);
   const v = Math.max(0, c.vF), slip = (Math.abs(c.vS) > 3 || (c.hk > .5 && v > 8)) && WX.snow < .5;
   audio.skid.gain.setTargetAtTime(slip ? Math.min(.3, Math.abs(c.vS) * .03 + .08) * (1 - WX.rain * .6) : 0, t, .05);
   audio.wind.gain.setTargetAtTime(Math.min(.25, v * .003), t, .2);
@@ -2908,6 +3167,8 @@ function bindOpts(id, key, parse = v => v) {
     if (key === 'wx') { const w = settings.wx === 'auto' ? 'clear' : settings.wx; setWeather(w, false); }
   });
 }
+try { settings.auto = localStorage.getItem('sr3d_auto') === '1'; } catch (_) { }
+document.querySelectorAll('#autoP .opt').forEach(o => { o.classList.toggle('on', (o.dataset.v === '1') === !!settings.auto); o.onclick = () => { settings.auto = o.dataset.v === '1'; document.querySelectorAll('#autoP .opt').forEach(x => x.classList.toggle('on', x === o)); try { localStorage.setItem('sr3d_auto', settings.auto ? '1' : '0'); } catch (_) { } if (state === 'race') flash(settings.auto ? '🤖 АВТОПИЛОТ ВКЛ' : 'АВТОПИЛОТ ВЫКЛ', 1.2); }; });
 bindOpts('ctl', 'ctl'); bindOpts('tod', 'tod'); bindOpts('laps', 'laps', v => +v); bindOpts('qual', 'qual'); bindOpts('wxo', 'wx');
 
 const raceUI = ['bPause', 'bCam', 'bReset', 'bZin', 'bZout', 'camPad'];
@@ -2959,6 +3220,7 @@ document.addEventListener('visibilitychange', () => { if (document.hidden && sta
 
 
 /* ================= GARAGE ================= */
+const ROOMS = {};
 const gScene = new THREE.Scene();
 gScene.background = new THREE.Color(0x0b0d12);
 gScene.fog = new THREE.Fog(0x0b0d12, 26, 60);
@@ -2970,6 +3232,7 @@ const gCam = new THREE.PerspectiveCamera(40, 1, .05, 200);
   pnl(14, 6, 0x9aa7bb, 0, 9, 0, 0, Math.PI / 2); pnl(10, 3, 0x3a4b66, 0, 3, -12); pnl(10, 3, 0x5a3a2a, -12, 3, 0, Math.PI / 2); pnl(6, 2, 0x2a4a66, 12, 3, 4, Math.PI / 2);
   const floorE = new THREE.Mesh(new THREE.PlaneGeometry(60, 60), new THREE.MeshBasicMaterial({ color: 0x0c0d10 })); floorE.rotation.x = -Math.PI / 2; es.add(floorE);
   const pm = new THREE.PMREMGenerator(renderer); gScene.environment = pm.fromScene(es, .03).texture;
+  const roomG = new THREE.Group(); gScene.add(roomG); ROOMS.garage = roomG;
   const W = 16, D0 = -13, D1 = 11, H = 8.5;
   // --- floor: polished epoxy with painted bay ---
   const floorTex = canvasTex(1024, 1024, (g, w, h) => {
@@ -2981,15 +3244,15 @@ const gCam = new THREE.PerspectiveCamera(40, 1, .05, 200);
   });
   floorTex.wrapS = floorTex.wrapT = THREE.ClampToEdgeWrapping;
   const floor = new THREE.Mesh(new THREE.PlaneGeometry(2 * W, D1 - D0).rotateX(-Math.PI / 2), new THREE.MeshStandardMaterial({ map: floorTex, roughness: .42, metalness: .1 }));
-  floor.position.set(0, 0, (D0 + D1) / 2); floor.receiveShadow = true; gScene.add(floor);
-  const tt = new THREE.Mesh(new THREE.CylinderGeometry(3.6, 3.7, .12, 64), new THREE.MeshStandardMaterial({ color: 0x1d2027, roughness: .35, metalness: .7 })); tt.position.y = .06; tt.receiveShadow = true; gScene.add(tt);
-  const ring = new THREE.Mesh(new THREE.TorusGeometry(3.66, .035, 8, 96).rotateX(Math.PI / 2), new THREE.MeshBasicMaterial({ color: 0xff3d6e })); ring.position.y = .12; gScene.add(ring);
+  floor.position.set(0, 0, (D0 + D1) / 2); floor.receiveShadow = true; roomG.add(floor);
+  const tt = new THREE.Mesh(new THREE.CylinderGeometry(3.6, 3.7, .12, 64), new THREE.MeshStandardMaterial({ color: 0x1d2027, roughness: .35, metalness: .7 })); tt.position.y = .06; tt.receiveShadow = true; roomG.add(tt);
+  const ring = new THREE.Mesh(new THREE.TorusGeometry(3.66, .035, 8, 96).rotateX(Math.PI / 2), new THREE.MeshBasicMaterial({ color: 0xff3d6e })); ring.position.y = .12; roomG.add(ring);
   // --- walls ---
   const brick = canvasTex(512, 256, (g, w, h) => { g.fillStyle = '#3a2a24'; g.fillRect(0, 0, w, h); for (let y = 0; y < h; y += 16) for (let x = (y / 16) % 2 * 24; x < w; x += 48) { const v = 70 + rnd() * 40; g.fillStyle = `rgb(${v + 30},${v * .6},${v * .45})`; g.fillRect(x + 1, y + 1, 46, 14); } speckle(g, w, h, 4000, .12); const gr = g.createLinearGradient(0, 0, 0, h); gr.addColorStop(0, 'rgba(0,0,0,.45)'); gr.addColorStop(1, 'rgba(0,0,0,0)'); g.fillStyle = gr; g.fillRect(0, 0, w, h); });
   brick.repeat.set(4, 2);
   const panelTex = canvasTex(256, 256, (g, w, h) => { g.fillStyle = '#23262d'; g.fillRect(0, 0, w, h); g.strokeStyle = 'rgba(0,0,0,.5)'; g.lineWidth = 3; g.strokeRect(2, 2, w - 4, h - 4); g.fillStyle = 'rgba(255,255,255,.04)'; g.fillRect(6, 6, w - 12, 30); speckle(g, w, h, 2000, .08); });
   panelTex.repeat.set(10, 3);
-  const wall = (w, h, mat, x, y, z, ry) => { const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), mat); m.position.set(x, y, z); m.rotation.y = ry; m.receiveShadow = true; gScene.add(m); return m; };
+  const wall = (w, h, mat, x, y, z, ry) => { const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), mat); m.position.set(x, y, z); m.rotation.y = ry; m.receiveShadow = true; roomG.add(m); return m; };
   wall(2 * W, H, new THREE.MeshStandardMaterial({ map: brick, roughness: .9 }), 0, H / 2, D0, 0);
   wall(D1 - D0, H, new THREE.MeshStandardMaterial({ map: panelTex, roughness: .7, metalness: .3 }), -W, H / 2, (D0 + D1) / 2, Math.PI / 2);
   wall(D1 - D0, H, new THREE.MeshStandardMaterial({ map: panelTex, roughness: .7, metalness: .3 }), W, H / 2, (D0 + D1) / 2, -Math.PI / 2);
@@ -2997,7 +3260,7 @@ const gCam = new THREE.PerspectiveCamera(40, 1, .05, 200);
   const ceil = wall(2 * W, D1 - D0, new THREE.MeshStandardMaterial({ color: 0x111317, roughness: 1 }), 0, H, (D0 + D1) / 2, 0); ceil.rotation.x = Math.PI / 2;
   // ceiling LED panels
   const led = new THREE.MeshBasicMaterial({ color: 0xdbe8ff });
-  for (let x = -12; x <= 12; x += 6) for (let z = -9; z <= 7; z += 5.5) { const p = new THREE.Mesh(new THREE.BoxGeometry(3.2, .08, .7), led); p.position.set(x, H - .1, z); gScene.add(p); }
+  for (let x = -12; x <= 12; x += 6) for (let z = -9; z <= 7; z += 5.5) { const p = new THREE.Mesh(new THREE.BoxGeometry(3.2, .08, .7), led); p.position.set(x, H - .1, z); roomG.add(p); }
   // windows on the left wall: night city outside
   const cityTex = canvasTex(1024, 256, (g, w, h) => {
     const gr = g.createLinearGradient(0, 0, 0, h); gr.addColorStop(0, '#0b1230'); gr.addColorStop(.7, '#3a1d4f'); gr.addColorStop(1, '#ff7a3d'); g.fillStyle = gr; g.fillRect(0, 0, w, h);
@@ -3005,16 +3268,16 @@ const gCam = new THREE.PerspectiveCamera(40, 1, .05, 200);
   });
   cityTex.wrapS = cityTex.wrapT = THREE.ClampToEdgeWrapping;
   const glassM = new THREE.MeshBasicMaterial({ map: cityTex }), mullM = new THREE.MeshStandardMaterial({ color: 0x15171c, metalness: .7, roughness: .4 });
-  for (let k = 0; k < 3; k++) { const z = D0 + 4 + k * 7; wall(6, 3.6, glassM, -W + .05, 4.4, z, Math.PI / 2); for (const dz of [-3, 0, 3]) { const m = new THREE.Mesh(new THREE.BoxGeometry(.2, 3.8, .14), mullM); m.position.set(-W + .1, 4.4, z + dz); gScene.add(m); } for (const dy of [-1.85, 1.85]) { const m = new THREE.Mesh(new THREE.BoxGeometry(.2, .14, 6.1), mullM); m.position.set(-W + .1, 4.4 + dy, z); gScene.add(m); } }
+  for (let k = 0; k < 3; k++) { const z = D0 + 4 + k * 7; wall(6, 3.6, glassM, -W + .05, 4.4, z, Math.PI / 2); for (const dz of [-3, 0, 3]) { const m = new THREE.Mesh(new THREE.BoxGeometry(.2, 3.8, .14), mullM); m.position.set(-W + .1, 4.4, z + dz); roomG.add(m); } for (const dy of [-1.85, 1.85]) { const m = new THREE.Mesh(new THREE.BoxGeometry(.2, .14, 6.1), mullM); m.position.set(-W + .1, 4.4 + dy, z); roomG.add(m); } }
   // neon sign on back wall
   const signTex = canvasTex(1024, 256, (g, w, h) => { g.clearRect(0, 0, w, h); g.font = 'italic 900 120px Arial'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.shadowColor = '#ff3d6e'; g.shadowBlur = 30; g.fillStyle = '#ff6a8a'; g.fillText('STREET', w * .3, h / 2); g.shadowColor = '#3dd5ff'; g.fillStyle = '#9feaff'; g.fillText('RACER', w * .72, h / 2); });
   signTex.wrapS = signTex.wrapT = THREE.ClampToEdgeWrapping;
-  const sign = new THREE.Mesh(new THREE.PlaneGeometry(10, 2.5), new THREE.MeshBasicMaterial({ map: signTex, transparent: true })); sign.position.set(-3, 6, D0 + .05); gScene.add(sign);
+  const sign = new THREE.Mesh(new THREE.PlaneGeometry(10, 2.5), new THREE.MeshBasicMaterial({ map: signTex, transparent: true })); sign.position.set(-3, 6, D0 + .05); roomG.add(sign);
   // roller door on back wall
   const doorTex = canvasTex(256, 256, (g, w, h) => { g.fillStyle = '#4a4f58'; g.fillRect(0, 0, w, h); for (let y = 0; y < h; y += 12) { g.fillStyle = 'rgba(255,255,255,.09)'; g.fillRect(0, y, w, 3); g.fillStyle = 'rgba(0,0,0,.35)'; g.fillRect(0, y + 8, w, 3); } speckle(g, w, h, 1500, .1); });
   wall(7, 5.5, new THREE.MeshStandardMaterial({ map: doorTex, roughness: .55, metalness: .6 }), 9, 2.75, D0 + .04, 0);
   const stripeTex = canvasTex(64, 16, (g, w, h) => { for (let x = -16; x < w; x += 16) { g.fillStyle = '#facc15'; g.beginPath(); g.moveTo(x, h); g.lineTo(x + 8, 0); g.lineTo(x + 16, 0); g.lineTo(x + 8, h); g.fill(); g.fillStyle = '#111'; } }); stripeTex.repeat.set(10, 1);
-  const st = new THREE.Mesh(new THREE.BoxGeometry(7.4, .35, .1), new THREE.MeshStandardMaterial({ map: stripeTex })); st.position.set(9, 5.7, D0 + .1); gScene.add(st);
+  const st = new THREE.Mesh(new THREE.BoxGeometry(7.4, .35, .1), new THREE.MeshStandardMaterial({ map: stripeTex })); st.position.set(9, 5.7, D0 + .1); roomG.add(st);
   // pegboard with tools + workbench on right wall
   const pegTex = canvasTex(512, 256, (g, w, h) => {
     g.fillStyle = '#5b4a36'; g.fillRect(0, 0, w, h); g.fillStyle = 'rgba(0,0,0,.45)'; for (let y = 8; y < h; y += 16) for (let x = 8; x < w; x += 16) g.fillRect(x, y, 3, 3);
@@ -3023,38 +3286,95 @@ const gCam = new THREE.PerspectiveCamera(40, 1, .05, 200);
     for (let k = 0; k < 8; k++) { g.strokeStyle = '#9aa0a8'; g.lineWidth = 5; g.beginPath(); g.arc(50 + k * 55, 200, 16, 0, 6.3); g.stroke(); }
   });
   wall(9, 3.2, new THREE.MeshStandardMaterial({ map: pegTex, roughness: .8 }), W - .05, 3.3, -6, -Math.PI / 2);
-  const bench = new THREE.Mesh(new THREE.BoxGeometry(1.2, .1, 9), new THREE.MeshStandardMaterial({ color: 0x6b4a2f, roughness: .7 })); bench.position.set(W - .7, 1.1, -6); gScene.add(bench);
+  const bench = new THREE.Mesh(new THREE.BoxGeometry(1.2, .1, 9), new THREE.MeshStandardMaterial({ color: 0x6b4a2f, roughness: .7 })); bench.position.set(W - .7, 1.1, -6); roomG.add(bench);
   const chestM = new THREE.MeshStandardMaterial({ color: 0xb91c1c, metalness: .5, roughness: .35 });
-  for (const z of [-9.5, -2.5]) { const c = new THREE.Mesh(new THREE.BoxGeometry(1.1, 1.05, 2), chestM); c.position.set(W - .7, .53, z); c.castShadow = true; gScene.add(c); for (let k = 0; k < 4; k++) { const dr = new THREE.Mesh(new THREE.BoxGeometry(.04, .16, 1.7), new THREE.MeshStandardMaterial({ color: 0xcfd3d8, metalness: 1, roughness: .2 })); dr.position.set(W - 1.27, .2 + k * .22, z); gScene.add(dr); } }
+  for (const z of [-9.5, -2.5]) { const c = new THREE.Mesh(new THREE.BoxGeometry(1.1, 1.05, 2), chestM); c.position.set(W - .7, .53, z); c.castShadow = true; roomG.add(c); for (let k = 0; k < 4; k++) { const dr = new THREE.Mesh(new THREE.BoxGeometry(.04, .16, 1.7), new THREE.MeshStandardMaterial({ color: 0xcfd3d8, metalness: 1, roughness: .2 })); dr.position.set(W - 1.27, .2 + k * .22, z); roomG.add(dr); } }
   // shelves with boxes and amber strips (left-back corner)
   const shM = new THREE.MeshStandardMaterial({ color: 0x1f2937, metalness: .6, roughness: .5 }), glowO = new THREE.MeshBasicMaterial({ color: 0xff9a3c }), boxM = new THREE.MeshStandardMaterial({ color: 0xb8a98c, roughness: .9 });
   for (let u = 0; u < 2; u++) {
-    const g = new THREE.Group(); g.position.set(-12.5 + u * 5.4, 0, D0 + 1); gScene.add(g);
+    const g = new THREE.Group(); g.position.set(-12.5 + u * 5.4, 0, D0 + 1); roomG.add(g);
     for (const px of [-2.5, 2.5]) for (const pz of [-.6, .6]) { const p = new THREE.Mesh(new THREE.BoxGeometry(.12, 5.4, .12), shM); p.position.set(px, 2.7, pz); g.add(p); }
     for (let lv = 0; lv < 4; lv++) { const y = .35 + lv * 1.6; const b = new THREE.Mesh(new THREE.BoxGeometry(5.1, .08, 1.4), shM); b.position.y = y; g.add(b); const s2 = new THREE.Mesh(new THREE.BoxGeometry(5.1, .05, .05), glowO); s2.position.set(0, y + .06, .7); g.add(s2); for (let k = 0; k < 4; k++) if (rnd() < .8) { const bx = new THREE.Mesh(new THREE.BoxGeometry(.6 + rnd() * .5, .35 + rnd() * .6, .8), boxM); bx.position.set(-1.9 + k * 1.25, y + .3, 0); bx.castShadow = true; g.add(bx); } }
   }
   // tyre racks, oil drums, cones
   const tyreG = new THREE.TorusGeometry(.42, .2, 10, 24).rotateX(Math.PI / 2), tyreM = new THREE.MeshStandardMaterial({ color: 0x111111, roughness: .85 });
-  for (let st2 = 0; st2 < 4; st2++) for (let k = 0; k < 2 + (st2 % 3); k++) { const t = new THREE.Mesh(tyreG, tyreM); t.position.set(-13.8, .2 + k * .4, -2 + st2 * 1.15); t.castShadow = true; gScene.add(t); }
+  for (let st2 = 0; st2 < 4; st2++) for (let k = 0; k < 2 + (st2 % 3); k++) { const t = new THREE.Mesh(tyreG, tyreM); t.position.set(-13.8, .2 + k * .4, -2 + st2 * 1.15); t.castShadow = true; roomG.add(t); }
   const drumM = new THREE.MeshStandardMaterial({ color: 0x1d4ed8, metalness: .5, roughness: .45 });
-  for (const [x, z, c] of [[13.6, 3, 0x1d4ed8], [14.1, 4.2, 0xd11b1b], [13.2, 4.6, 0x1d4ed8]]) { const d = new THREE.Mesh(new THREE.CylinderGeometry(.42, .42, 1.2, 20), drumM.clone()); d.material.color.setHex(c); d.position.set(x, .6, z); d.castShadow = true; gScene.add(d); }
+  for (const [x, z, c] of [[13.6, 3, 0x1d4ed8], [14.1, 4.2, 0xd11b1b], [13.2, 4.6, 0x1d4ed8]]) { const d = new THREE.Mesh(new THREE.CylinderGeometry(.42, .42, 1.2, 20), drumM.clone()); d.material.color.setHex(c); d.position.set(x, .6, z); d.castShadow = true; roomG.add(d); }
   const coneM = new THREE.MeshStandardMaterial({ color: 0xff6a00, roughness: .6 });
-  for (const [x, z] of [[6.5, 6.8], [7.6, 7.4], [-7, 7]]) { const c = new THREE.Mesh(new THREE.ConeGeometry(.24, .7, 16), coneM); c.position.set(x, .35, z); c.castShadow = true; gScene.add(c); }
+  for (const [x, z] of [[6.5, 6.8], [7.6, 7.4], [-7, 7]]) { const c = new THREE.Mesh(new THREE.ConeGeometry(.24, .7, 16), coneM); c.position.set(x, .35, z); c.castShadow = true; roomG.add(c); }
   // car lift (two posts) on the right-front
   const liftM = new THREE.MeshStandardMaterial({ color: 0x2563eb, metalness: .6, roughness: .4 });
-  for (const z of [3.5, 8]) { const p = new THREE.Mesh(new THREE.BoxGeometry(.5, 4.2, .5), liftM); p.position.set(10.8, 2.1, z); p.castShadow = true; gScene.add(p); }
-  const arm = new THREE.Mesh(new THREE.BoxGeometry(.25, .15, 4.5), liftM); arm.position.set(10.8, 4.1, 5.75); gScene.add(arm);
+  for (const z of [3.5, 8]) { const p = new THREE.Mesh(new THREE.BoxGeometry(.5, 4.2, .5), liftM); p.position.set(10.8, 2.1, z); p.castShadow = true; roomG.add(p); }
+  const arm = new THREE.Mesh(new THREE.BoxGeometry(.25, .15, 4.5), liftM); arm.position.set(10.8, 4.1, 5.75); roomG.add(arm);
   // pillars
-  for (const [x, z] of [[-W + .4, D0 + .4], [W - .4, D0 + .4]]) { const p = new THREE.Mesh(new THREE.BoxGeometry(.8, H, .8), new THREE.MeshStandardMaterial({ color: 0x2b2e35, roughness: .8 })); p.position.set(x, H / 2, z); gScene.add(p); }
+  for (const [x, z] of [[-W + .4, D0 + .4], [W - .4, D0 + .4]]) { const p = new THREE.Mesh(new THREE.BoxGeometry(.8, H, .8), new THREE.MeshStandardMaterial({ color: 0x2b2e35, roughness: .8 })); p.position.set(x, H / 2, z); roomG.add(p); }
   // lights: soft key + fill + coloured rims (no harsh glare)
-  gScene.add(new THREE.HemisphereLight(0xd8e2ff, 0x3a3026, 1.7));
-  for (const [x, z, tx, tz] of [[-6, 4, -6, D0], [6, 4, 8, D0], [0, -4, -W, -2], [0, -4, W, -4], [0, -2, 0, D1]]) { const w2 = new THREE.SpotLight(0xffe6c4, 70, 32, .9, 1, 1.5); w2.position.set(x, H - .5, z); w2.target.position.set(tx, 2.5, tz); gScene.add(w2, w2.target); }
-  const key = new THREE.SpotLight(0xfff2e0, 110, 40, .7, .9, 1.6); key.position.set(4, 8, 6); key.target.position.set(0, .4, 0); key.castShadow = true; key.shadow.mapSize.set(1024, 1024); key.shadow.bias = -.0005; gScene.add(key, key.target);
-  const fill = new THREE.SpotLight(0xbcd2ff, 45, 40, .8, 1, 1.6); fill.position.set(-6, 7, 4); fill.target.position.set(0, .5, 0); gScene.add(fill, fill.target);
-  const rimA = new THREE.SpotLight(0xff4f7a, 28, 30, .6, .8, 1.6); rimA.position.set(-5, 5, -7); rimA.target.position.set(0, .6, 0); gScene.add(rimA, rimA.target);
-  const rimB = new THREE.SpotLight(0x3dd5ff, 38, 30, .6, .8, 1.6); rimB.position.set(6, 5, -6); rimB.target.position.set(0, .6, 0); gScene.add(rimB, rimB.target);
+  roomG.add(new THREE.HemisphereLight(0xd8e2ff, 0x3a3026, 1.7));
+  for (const [x, z, tx, tz] of [[-6, 4, -6, D0], [6, 4, 8, D0], [0, -4, -W, -2], [0, -4, W, -4], [0, -2, 0, D1]]) { const w2 = new THREE.SpotLight(0xffe6c4, 70, 32, .9, 1, 1.5); w2.position.set(x, H - .5, z); w2.target.position.set(tx, 2.5, tz); roomG.add(w2, w2.target); }
+  const key = new THREE.SpotLight(0xfff2e0, 110, 40, .7, .9, 1.6); key.position.set(4, 8, 6); key.target.position.set(0, .4, 0); key.castShadow = true; key.shadow.mapSize.set(1024, 1024); key.shadow.bias = -.0005; roomG.add(key, key.target);
+  const fill = new THREE.SpotLight(0xbcd2ff, 45, 40, .8, 1, 1.6); fill.position.set(-6, 7, 4); fill.target.position.set(0, .5, 0); roomG.add(fill, fill.target);
+  const rimA = new THREE.SpotLight(0xff4f7a, 28, 30, .6, .8, 1.6); rimA.position.set(-5, 5, -7); rimA.target.position.set(0, .6, 0); roomG.add(rimA, rimA.target);
+  const rimB = new THREE.SpotLight(0x3dd5ff, 38, 30, .6, .8, 1.6); rimB.position.set(6, 5, -6); rimB.target.position.set(0, .6, 0); roomG.add(rimB, rimB.target);
+  // --- studio: white infinity cove, soft box lights ---
+  {
+    const g = new THREE.Group(); g.visible = false; gScene.add(g); ROOMS.studio = g;
+    const cove = new THREE.Mesh(new THREE.SphereGeometry(40, 48, 24, 0, Math.PI * 2, 0, Math.PI / 2), new THREE.MeshStandardMaterial({ color: 0xe9ecf1, roughness: .9, side: THREE.BackSide }));
+    cove.scale.y = .5; g.add(cove);
+    const fl = new THREE.Mesh(new THREE.CircleGeometry(40, 64).rotateX(-Math.PI / 2), new THREE.MeshStandardMaterial({ color: 0xdfe3ea, roughness: .25, metalness: .05 })); fl.position.y = .005; fl.receiveShadow = true; g.add(fl);
+    for (const [x, z] of [[-6, 4], [6, 4], [0, -7]]) { const p = new THREE.Mesh(new THREE.PlaneGeometry(5, 2.2), new THREE.MeshBasicMaterial({ color: 0xffffff, side: THREE.DoubleSide })); p.position.set(x, 7.5, z); p.lookAt(0, 0, 0); g.add(p); }
+    g.add(new THREE.HemisphereLight(0xffffff, 0xb8bcc4, 2.2));
+    const k2 = new THREE.SpotLight(0xffffff, 160, 40, .8, .9, 1.4); k2.position.set(5, 9, 6); k2.castShadow = true; k2.shadow.mapSize.set(1024, 1024); g.add(k2, k2.target);
+    const k3 = new THREE.SpotLight(0xffffff, 90, 40, .8, .9, 1.4); k3.position.set(-6, 8, -3); g.add(k3, k3.target);
+  }
+  // --- rooftop: night city skyline, helipad ---
+  {
+    const g = new THREE.Group(); g.visible = false; gScene.add(g); ROOMS.roof = g;
+    const padTex = canvasTex(512, 512, (c, w, h) => { c.fillStyle = '#2b2f36'; c.fillRect(0, 0, w, h); speckle(c, w, h, 20000, .08); c.strokeStyle = '#f4f4f4'; c.lineWidth = 14; c.beginPath(); c.arc(w / 2, h / 2, 200, 0, 7); c.stroke(); c.fillStyle = '#f4f4f4'; c.font = '900 220px Arial'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText('H', w / 2, h / 2 + 10); });
+    const fl = new THREE.Mesh(new THREE.PlaneGeometry(30, 30).rotateX(-Math.PI / 2), new THREE.MeshStandardMaterial({ map: padTex, roughness: .55 })); fl.receiveShadow = true; g.add(fl);
+    const railM = new THREE.MeshStandardMaterial({ color: 0x9aa3ad, metalness: .8, roughness: .3 });
+    for (let k = 0; k < 4; k++) { const r = new THREE.Mesh(new THREE.BoxGeometry(30, .06, .06), railM); r.position.set(0, 1.1, 15); r.rotation.y = 0; const gg = new THREE.Group(); gg.rotation.y = k * Math.PI / 2; gg.add(r); g.add(gg); for (let i = -14; i <= 14; i += 2) { const p = new THREE.Mesh(new THREE.BoxGeometry(.05, 1.1, .05), railM); p.position.set(i, .55, 15); gg.add(p); } }
+    const ledM = new THREE.MeshBasicMaterial({ color: 0x3dd5ff }); for (let k = 0; k < 4; k++) { const l = new THREE.Mesh(new THREE.BoxGeometry(30, .05, .05), ledM); const gg = new THREE.Group(); gg.rotation.y = k * Math.PI / 2; l.position.set(0, .03, 14.9); gg.add(l); g.add(gg); }
+    const sky = canvasTex(2048, 512, (c, w, h) => { const gr = c.createLinearGradient(0, 0, 0, h); gr.addColorStop(0, '#05081a'); gr.addColorStop(.6, '#1c1446'); gr.addColorStop(1, '#ff6a3d'); c.fillStyle = gr; c.fillRect(0, 0, w, h);
+      for (let k = 0; k < 400; k++) { c.fillStyle = `rgba(255,255,255,${rnd() * .8})`; c.fillRect(rnd() * w, rnd() * h * .5, 1.5, 1.5); }
+      for (let k = 0; k < 220; k++) { const bw = 14 + rnd() * 50, bh = 40 + rnd() * 260, x = rnd() * w; c.fillStyle = `rgb(${8 + rnd() * 14},${10 + rnd() * 14},${22 + rnd() * 20})`; c.fillRect(x, h - bh, bw, bh); for (let y = h - bh + 5; y < h - 4; y += 7) for (let xx = x + 3; xx < x + bw - 3; xx += 6) if (rnd() < .3) { c.fillStyle = rnd() < .5 ? '#ffd9a0' : '#9fd0ff'; c.fillRect(xx, y, 2, 3); } } });
+    const cyl = new THREE.Mesh(new THREE.CylinderGeometry(60, 60, 34, 64, 1, true), new THREE.MeshBasicMaterial({ map: sky, side: THREE.BackSide, fog: false })); cyl.position.y = 10; g.add(cyl);
+    g.add(new THREE.HemisphereLight(0x8fa6ff, 0x221a2a, 1.3));
+    const k2 = new THREE.SpotLight(0xffe2c0, 130, 40, .7, .9, 1.5); k2.position.set(4, 9, 5); k2.castShadow = true; k2.shadow.mapSize.set(1024, 1024); g.add(k2, k2.target);
+    const k3 = new THREE.SpotLight(0xff4f7a, 50, 30, .7, .8, 1.5); k3.position.set(-6, 5, -6); g.add(k3, k3.target);
+    const k4 = new THREE.SpotLight(0x3dd5ff, 50, 30, .7, .8, 1.5); k4.position.set(6, 5, -6); g.add(k4, k4.target);
+  }
 }
 let gCar = null, gModel = SAVE.sel, gTab = 'cars', gYaw = 2.4, gPitch = .18, gDist = 7.2, gAuto = true;
+/* car thumbnails for the garage list (rendered once, offscreen) */
+const THUMBS = {};
+let thumbQ = null;
+function makeThumb(id) {
+  const W = 640, H = 300;
+  if (!thumbQ) {
+    const sc = new THREE.Scene(); sc.environment = gScene.environment;
+    sc.add(new THREE.HemisphereLight(0xe8eeff, 0x302a28, 2.4)); const l = new THREE.DirectionalLight(0xffffff, 3); l.position.set(4, 7, 6); sc.add(l); const l2 = new THREE.DirectionalLight(0x9fc0ff, 1.4); l2.position.set(-6, 3, -4); sc.add(l2);
+    const cam = new THREE.PerspectiveCamera(26, W / H, .1, 60); cam.position.set(6.3, 2.1, 8.6); cam.lookAt(0, .55, 0);
+    thumbQ = { sc, cam, rt: new THREE.WebGLRenderTarget(W, H), px: new Uint8Array(W * H * 4), cv: document.createElement('canvas') };
+    thumbQ.cv.width = 320; thumbQ.cv.height = 150;
+  }
+  const T = thumbQ, car = new Car({ model: id, tune: SAVE.cars[id] || defTune(MODEL[id]), plate: MODEL[id].name.split(' ')[0] }, '', false, T.sc);
+  car.setNight(PRESETS.night); for (const b of car.beams) b.visible = false; car.glow.visible = false;
+  car.root.rotation.y = 0;
+  const tm = renderer.toneMapping; renderer.setRenderTarget(T.rt); renderer.setClearColor(0x000000, 0); renderer.clear(); renderer.render(T.sc, T.cam);
+  renderer.readRenderTargetPixels(T.rt, 0, 0, W, H, T.px); renderer.setRenderTarget(null); renderer.toneMapping = tm;
+  T.sc.remove(car.root); car.dispose();
+  const big = document.createElement('canvas'); big.width = W; big.height = H; const g = big.getContext('2d'), im = g.createImageData(W, H), d = im.data;
+  const lut = new Uint8Array(256); for (let k = 0; k < 256; k++) { const v = k / 255, a = v * 1.15, tm2 = a / (1 + a) * 1.6; lut[k] = Math.round(255 * Math.min(1, tm2 <= .0031308 ? tm2 * 12.92 : 1.055 * Math.pow(tm2, 1 / 2.4) - .055)); }
+  for (let y = 0; y < H; y++) { const sy = (H - 1 - y) * W * 4, dy = y * W * 4; for (let x = 0; x < W * 4; x += 4) { d[dy + x] = lut[T.px[sy + x]]; d[dy + x + 1] = lut[T.px[sy + x + 1]]; d[dy + x + 2] = lut[T.px[sy + x + 2]]; d[dy + x + 3] = T.px[sy + x + 3]; } }
+  g.putImageData(im, 0, 0);
+  const c2 = T.cv.getContext('2d'); c2.clearRect(0, 0, 320, 150); c2.imageSmoothingQuality = 'high'; c2.drawImage(big, 0, 0, 320, 150);
+  THUMBS[id] = T.cv.toDataURL('image/png');
+}
+function thumbsIdle() { const id = MODELS.map(m => m.id).find(i => !THUMBS[i]); if (!id) return; try { makeThumb(id); } catch (e) { THUMBS[id] = 'x'; } if (state === 'garage' && gTab === 'cars') { const im = document.querySelector(`.cthumb[data-m="${id}"]`); if (im && THUMBS[id] !== 'x') im.src = THUMBS[id]; } setTimeout(thumbsIdle, 250); }
+let ROOM = 'garage'; try { ROOM = localStorage.getItem('sr3d_room') || 'garage'; } catch (_) { }
+const ROOM_N = { garage: '🔧 Гараж', studio: '💡 Студия', roof: '🌃 Крыша' };
+function setRoom(r) { if (!ROOMS[r]) r = 'garage'; ROOM = r; for (const k in ROOMS) ROOMS[k].visible = k === r; gScene.fog.color.setHex(r === 'studio' ? 0xe9ecf1 : r === 'roof' ? 0x120c26 : 0x0b0d12); gScene.background.setHex(r === 'studio' ? 0xe9ecf1 : r === 'roof' ? 0x120c26 : 0x0b0d12); gScene.fog.far = r === 'studio' ? 120 : 60; try { localStorage.setItem('sr3d_room', r); } catch (_) { } if ($('gRoom')) $('gRoom').textContent = ROOM_N[r]; }
 function buildGarageCar() {
   if (gCar) { gScene.remove(gCar.root); gCar.dispose(); }
   gCar = new Car({ model: gModel, tune: SAVE.cars[gModel], stats: statsOf(gModel) }, '', true, gScene);
@@ -3133,7 +3453,7 @@ function renderGarage() {
   const m = MODEL[gModel], t = SAVE.cars[gModel], owned = SAVE.owned.includes(gModel);
   document.querySelectorAll('#gTabs .gt').forEach(x => x.classList.toggle('on', x.dataset.t === gTab));
   let h = '';
-  if (gTab === 'cars') h = MODELS.map(md => `<div class="card ${md.id === gModel ? 'on' : ''}" data-model="${md.id}"><div class="cn">${md.name} <span class="cls c${md.cls}">${md.cls}</span></div><div class="cd">${md.desc}</div><div class="cp">${SAVE.owned.includes(md.id) ? (SAVE.sel === md.id ? '✅ Выбрана' : 'Куплена') : '💰 ' + md.price.toLocaleString('ru-RU')}</div></div>`).join('');
+  if (gTab === 'cars') h = MODELS.map(md => `<div class="card ${md.id === gModel ? 'on' : ''}" data-model="${md.id}"><img class="cthumb" data-m="${md.id}" alt="" ${THUMBS[md.id] && THUMBS[md.id] !== 'x' ? `src="${THUMBS[md.id]}"` : ''}><div class="cn">${md.name} <span class="cls c${md.cls}">${md.cls}</span></div><div class="cd">${md.desc}</div><div class="cp">${SAVE.owned.includes(md.id) ? (SAVE.sel === md.id ? '✅ Выбрана' : 'Куплена') : '💰 ' + md.price.toLocaleString('ru-RU')}</div></div>`).join('');
   else if (gTab === 'paint') h = `<div class="row"><label>Цвет кузова</label>${swatches(PAINTS, t.color, 'color', `<label class="opt sw pick" style="background:conic-gradient(red,yellow,lime,cyan,blue,magenta,red)"><input type="color" data-k="color" value="${hex6(t.color)}"></label>`)}</div><div class="row"><label>Покрытие</label>${choices(FINISHES, t.finish, 'finish')}</div><div class="row"><label>Крыша</label>${choices([[0, 'В цвет'], [1, 'Карбон']], t.carbonRoof, 'carbonRoof')}</div><div class="row"><label>Готовые стили (в один тап)</label><div class="opts">${LIVERIES.map((l, i) => `<div class="opt" data-livery="${i}">${l[0]}</div>`).join('')}</div></div>`;
   else if (gTab === 'vinyl') h = `<div class="row"><label>Узор</label>${choices(PATTERNS, t.pattern, 'pattern')}</div><div class="row"><label>Цвет узора</label>${swatches(PAINTS, t.patColor, 'patColor')}</div>` + (t.pattern === 'race' ? `<div class="row"><label>Номер</label>${choices([[1, '1'], [7, '7'], [13, '13'], [27, '27'], [77, '77'], [99, '99']], t.num, 'num')}</div>` : '');
   else if (gTab === 'body') h = `<div class="row"><label>Спойлер</label>${choices(WINGS, t.wing, 'wing')}</div><div class="row"><label>Передний сплиттер</label>${choices([[0, 'Нет'], [1, 'Губа'], [2, 'Гоночный']], t.splitter, 'splitter')}</div><div class="row"><label>Пороги</label>${choices([[0, 'Нет'], [1, 'Карбон'], [2, 'В цвет']], t.skirt, 'skirt')}</div><div class="row"><label>Широкий кузов</label>${choices([[0, 'Стандарт'], [1, 'Widebody']], t.wide, 'wide')}</div><div class="row"><label>Воздухозаборник на капоте</label>${choices([[0, 'Нет'], [1, 'Есть']], t.scoop, 'scoop')}</div><div class="row"><label>Выхлоп</label>${choices([[0, '4 трубы'], [1, 'По центру'], [2, '2 больших']], t.exhaust, 'exhaust')}</div>` + slider('height', 'Занижение', 0, .06, .005, t.height, SLFMT.height) + `<div class="row"><label>Номер</label><input class="txt" maxlength="8" data-k="plate" value="${String(t.plate).replace(/"/g, '')}"></div>`;
@@ -3153,7 +3473,7 @@ function renderGarage() {
 const NEEDS_REBUILD = new Set(['splitter', 'skirt', 'wide', 'exhaust', 'head', 'flame', 'cage', 'plate', 'color', 'finish', 'pattern', 'patColor', 'num', 'wing', 'scoop', 'rim', 'rimColor', 'camber', 'caliper', 'interior', 'stitch', 'tint', 'glow', 'carbonRoof', 'height']);
 let rebuildT = 0;
 function setTune(k, v) {
-  const t = SAVE.cars[gModel];
+  const t = SAVE.cars[gModel]; if (THUMBS[gModel]) { delete THUMBS[gModel]; clearTimeout(setTune.tt); setTune.tt = setTimeout(thumbsIdle, 1500); }
   t[k] = ['finish', 'pattern', 'head', 'plate'].includes(k) ? (k === 'plate' ? String(v).toUpperCase().slice(0, 8) || 'SR 777' : v) : +v;
   saveSave();
   if (NEEDS_REBUILD.has(k)) { clearTimeout(rebuildT); rebuildT = setTimeout(() => { buildGarageCar(); }, k === 'camber' || k === 'height' || k === 'tint' ? 60 : 0); }
@@ -3195,6 +3515,7 @@ function closeGarage() {
   if (gCar && gModel !== SAVE.sel) { gModel = SAVE.sel; buildGarageCar(); }
 }
 $('gBack').onclick = () => { closeGarage(); toMenu(); };
+$('gRoom').onclick = () => { const ks = Object.keys(ROOM_N); setRoom(ks[(ks.indexOf(ROOM) + 1) % ks.length]); };
 $('btnGarage').onclick = () => openGarage();
 $('gTest').onclick = () => { testDrive = gModel; if (!savedSettings) savedSettings = Object.assign({}, settings); Object.assign(settings, { mode: 'time', laps: 99 }); $('garage').classList.add('hidden'); startRace(); feed('🚗 ТЕСТ-ДРАЙВ: ' + MODEL[gModel].name, 'blue'); };
 
@@ -3287,6 +3608,7 @@ function renderTasks() {
 $('tasks').addEventListener('click', e => { const o = e.target.closest('.tclaim'); if (!o) return; const t = dailyTasks()[+o.dataset.i], def = TASK_DEFS.find(x => x.id === t.id); if (t.c || t.p < def.g) return; t.c = true; SAVE.coins += def.r; saveSave(); updateCoins(); renderTasks(); if (audio) beep(1400, .12, .12); });
 renderTasks();
 // track & mode selectors
+$('trk').innerHTML = Object.entries(TRACKS).map(([id, t]) => `<div class="opt" data-v="${id}"><img class="tshot" src="img/trk_${id}.jpg" alt="" loading="lazy" onerror="this.style.display='none'"><canvas class="tmini tmap" data-map="${id}" width="120" height="70"></canvas><span class="tag">${{ city: 'ГОРОД', port: 'ПОРТ', mountain: 'ГОРЫ' }[t.theme]}</span><b>${TRACK_ICON[id]} ${t.name}</b><small>${t.desc}</small></div>`).join('');
 document.querySelectorAll('#trk .opt').forEach(o => { o.classList.toggle('on', o.dataset.v === TRACK_ID); o.onclick = () => { if (o.dataset.v === TRACK_ID) return; try { localStorage.setItem('sr3d_track', o.dataset.v); } catch (_) { } $('loading').classList.remove('hidden'); $('loading').firstElementChild.textContent = 'ЗАГРУЗКА ТРАССЫ…'; setTimeout(() => location.reload(), 50); }; });
 document.querySelectorAll('#mode .opt').forEach(o => { o.classList.toggle('on', o.dataset.v === settings.mode); o.onclick = () => { settings.mode = o.dataset.v; try { localStorage.setItem('sr3d_mode', settings.mode); } catch (_) { } document.querySelectorAll('#mode .opt').forEach(x => x.classList.toggle('on', x === o)); renderMenu(); }; });
 
@@ -3300,7 +3622,7 @@ const CUPS = [
   { name: 'Чемпионат S', cls: 'S', reward: 20000, k: 1.15, need: 2, events: [{ track: 'city', mode: 'race', laps: 3, tod: 'night', wx: 'auto' }, { track: 'mountain', mode: 'elim', tod: 'day', wx: 'snow' }, { track: 'port', mode: 'race', laps: 5, tod: 'night', wx: 'rain' }] },
 ];
 const CUP_AI = { C: ['pico', 'pico', 'pico', 'pico', 'pico'], B: ['veloce', 'kaze', 'pico', 'veloce', 'kaze'], A: ['iron', 'nova', 'kaze', 'iron', 'nova'], S: ['apex', 'vortex', 'lumen', 'apex', 'vortex'] };
-const TRACK_ICON = { city: '🌃', port: '⚓', mountain: '🏔' }, MODE_N = { race: 'Гонка', elim: 'Выбывание', time: 'На время' }, TOD_I = { day: '☀️', sunset: '🌇', night: '🌙' }, WX_I = { clear: '', rain: '🌧', snow: '❄️', auto: '🔄' };
+const MODE_N = { race: 'Гонка', elim: 'Выбывание', time: 'На время' }, TOD_I = { day: '☀️', sunset: '🌇', night: '🌙' }, WX_I = { clear: '', rain: '🌧', snow: '❄️', auto: '🔄' };
 let careerEv = null, savedSettings = null, careerFocus = null;
 if (!SAVE.career) SAVE.career = {};
 const evStars = (ci, k) => SAVE.career[ci + ':' + k] || 0;
@@ -3502,8 +3824,7 @@ $('ldTip').textContent = TIPS[Math.floor(Math.random() * TIPS.length)];
 
 /* ================= ONLINE (WebRTC P2P via PeerJS) ================= */
 Object.assign(NET, { role: null, peer: null, conns: new Map(), host: null, code: null, myId: null, players: new Map(), stake: 0, race: null, remote: new Map(), sendT: 0, rtt: 80, results: null, showCars: [], cfg: { laps: 3, tod: 'night', wx: 'clear' } });
-const ICE = [{ urls: 'stun:stun.l.google.com:19302' }, { urls: 'stun:stun1.l.google.com:19302' }, { urls: 'stun:global.stun.twilio.com:3478' },
-  { urls: 'turn:openrelay.metered.ca:80', username: 'openrelayproject', credential: 'openrelayproject' }, { urls: 'turn:openrelay.metered.ca:443?transport=tcp', username: 'openrelayproject', credential: 'openrelayproject' }];
+const ICE = [{ urls: 'stun:stun.l.google.com:19302' }, { urls: 'stun:stun1.l.google.com:19302' }, { urls: 'stun:global.stun.twilio.com:3478' }];
 const esc = t => String(t).replace(/[&<>"']/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
 const num = (v, d = 0) => { v = +v; return isFinite(v) ? v : d; };
 let myName = ''; try { myName = localStorage.getItem('sr3d_name') || ''; } catch (_) { }
@@ -3526,51 +3847,119 @@ function netSend(msg, except) {
   else if (NET.host && NET.host.open) try { NET.host.send(data); } catch (_) { }
 }
 function lobbyMsg() { return { t: 'lobby', code: NET.code, stake: NET.stake, cfg: NET.cfg, track: TRACK_ID, players: [...NET.players].map(([id, p]) => ({ id, name: p.name, car: p.car, coins: p.coins })) }; }
+/* --- relay transport (MQTT over secure WebSocket): works on any network, used together with WebRTC --- */
+const BROKERS = ['wss://broker.hivemq.com:8884/mqtt', 'wss://broker.emqx.io:8084/mqtt', 'wss://test.mosquitto.org:8081'];
+const MY_UID = Math.random().toString(36).slice(2, 10);
+async function getMqtt() { if (!window.mqtt) await loadScript('https://cdn.jsdelivr.net/npm/mqtt@5/dist/mqtt.min.js'); return window.mqtt; }
+function mqConnect() {
+  return new Promise(async (res, rej) => {
+    let mq; try { mq = await getMqtt(); } catch (e) { return rej(e); }
+    let k = 0;
+    const next = () => {
+      if (k >= BROKERS.length) return rej(new Error('no broker'));
+      const cl = mq.connect(BROKERS[k++], { clientId: 'sr3d_' + Math.random().toString(36).slice(2, 10), clean: true, connectTimeout: 6000, reconnectPeriod: 2500, keepalive: 25 });
+      let done = false; const to = setTimeout(() => { if (!done) { done = true; try { cl.end(true); } catch (_) { } next(); } }, 7000);
+      cl.on('connect', () => { if (!done) { done = true; clearTimeout(to); res(cl); } });
+      cl.on('error', () => { });
+    };
+    next();
+  });
+}
+class MqConn {
+  constructor(cl, topic) { this.cl = cl; this.topic = topic; this.open = true; this.h = {}; this.relay = true; }
+  on(e, f) { (this.h[e] = this.h[e] || []).push(f); if (e === 'open' && this.open) setTimeout(f, 0); }
+  emit(e, a) { for (const f of this.h[e] || []) try { f(a); } catch (_) { } }
+  send(d) { if (this.open) try { this.cl.publish(this.topic, d); } catch (_) { } }
+  close() { if (!this.open) return; this.send(JSON.stringify({ t: '__bye' })); this.open = false; this.emit('close'); }
+}
+function acceptConn(conn) {
+  if (NET.players.size >= 4 || NET.race) { conn.on('open', () => { conn.send(JSON.stringify({ t: 'full' })); setTimeout(() => conn.close(), 300); }); return; }
+  const id = 'p' + Math.random().toString(36).slice(2, 7);
+  conn.on('data', d => onNet(d, id, conn));
+  conn.on('close', () => dropPlayer(id));
+  conn.on('error', () => dropPlayer(id));
+}
 async function hostRoom() {
-  if (NET.role) return;
-  netStatus('Подключаюсь к серверу соединений…');
+  if (NET.role || NET.connecting) return;
+  NET.connecting = true;
+  netStatus('Создаю комнату…');
+  const A = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789'; let code = ''; for (let k = 0; k < 5; k++) code += A[Math.floor(Math.random() * A.length)];
+  let up = false;
+  const ready = () => {
+    if (up) return; up = true; NET.connecting = false;
+    Object.assign(NET, { role: 'host', code, myId: 'host' });
+    NET.players.clear(); NET.players.set('host', { name: myName, car: myCar(), coins: SAVE.coins, uid: MY_UID });
+    netStatus('Комната создана. Позови друга по ссылке или QR-коду!'); renderOnline(); refreshShowroomFriends(); renderMenu();
+    clearInterval(NET.pingI); NET.pingI = setInterval(() => { if (NET.role === 'host') netSend({ t: 'ping', at: performance.now() }); }, 2500);
+  };
+  let fails = 0; const fail = () => { if (++fails >= 2 && !up) { NET.connecting = false; netStatus('Онлайн сейчас недоступен: нет связи с серверами. Проверь интернет (Wi-Fi или мобильный) и попробуй ещё раз.', true); closeOnline(true); } };
+  // 1) relay (always works through firewalls / mobile networks)
+  mqConnect().then(cl => {
+    NET.mq = cl; const pre = 'sr3d/' + code + '/';
+    cl.subscribe(pre + 'up/+', { qos: 0 });
+    const vconns = new Map();
+    cl.on('message', (topic, payload) => {
+      if (!topic.startsWith(pre + 'up/')) return;
+      const gid = topic.slice(pre.length + 3), txt = payload.toString();
+      let c = vconns.get(gid);
+      if (!c) { if (txt.indexOf('"hello"') < 0) return; c = new MqConn(cl, pre + 'dn/' + gid); vconns.set(gid, c); acceptConn(c); }
+      if (txt === '{"t":"__bye"}') { vconns.delete(gid); if (c.open) { c.open = false; c.emit('close'); } return; }
+      c.emit('data', txt);
+    });
+    ready();
+  }).catch(fail);
+  // 2) direct WebRTC
   try {
     const Peer = await getPeerLib();
-    const A = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789'; let code = ''; for (let k = 0; k < 5; k++) code += A[Math.floor(Math.random() * A.length)];
     const peer = new Peer('sr3d-' + code, { config: { iceServers: ICE } });
     NET.peer = peer;
-    peer.on('open', () => {
-      Object.assign(NET, { role: 'host', code, myId: 'host' });
-      NET.players.clear(); NET.players.set('host', { name: myName, car: myCar(), coins: SAVE.coins });
-      netStatus('Комната создана. Позови друга по ссылке или QR-коду!'); renderOnline(); refreshShowroomFriends(); renderMenu();
-      setInterval(() => { if (NET.role === 'host') netSend({ t: 'ping', at: performance.now() }); }, 2500);
-    });
-    peer.on('connection', conn => {
-      if (NET.players.size >= 4 || NET.race) { conn.on('open', () => { conn.send(JSON.stringify({ t: 'full' })); setTimeout(() => conn.close(), 300); }); return; }
-      const id = 'p' + Math.random().toString(36).slice(2, 7);
-      conn.on('data', d => onNet(d, id, conn));
-      conn.on('close', () => dropPlayer(id));
-      conn.on('error', () => dropPlayer(id));
-    });
-    peer.on('error', e => { netStatus('Ошибка сети: ' + (e.type === 'unavailable-id' ? 'код занят, попробуй ещё раз' : e.type || e.message), true); if (!NET.role) closeOnline(true); });
+    peer.on('open', ready);
+    peer.on('connection', acceptConn);
+    peer.on('error', e => { if (!up) fail(); });
     peer.on('disconnected', () => { try { peer.reconnect(); } catch (_) { } });
-  } catch (e) { netStatus('Онлайн недоступен: нет связи с сервером соединений. Проверь интернет.', true); }
+  } catch (e) { fail(); }
 }
 async function joinRoom(code) {
   code = String(code || '').toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 5);
   if (code.length !== 5) { netStatus('Код комнаты — 5 символов', true); return; }
   if (NET.role) closeOnline(true);
   netStatus('Подключаюсь к комнате ' + code + '…');
+  NET.connecting = true; NET.host = null;
+  const cands = [];
+  const hello = conn => conn.send(JSON.stringify({ t: 'hello', name: myName, car: myCar(), coins: SAVE.coins, uid: MY_UID }));
+  const attach = conn => {
+    cands.push(conn);
+    conn.on('data', d => {
+      if (!NET.host) {
+        let m; try { m = JSON.parse(d); } catch (_) { return; }
+        if (!m || (m.t !== 'welcome' && m.t !== 'full')) return;
+        if (m.t === 'full') { netStatus('Комната заполнена (максимум 4 игрока)', true); closeOnline(true); return; }
+        NET.host = conn; NET.connecting = false; clearTimeout(tmo);
+        for (const o of cands) if (o !== conn) try { o.close(); } catch (_) { }
+        Object.assign(NET, { role: 'guest', code });
+        netStatus('Подключено' + (conn.relay ? ' (через сервер)' : ' (напрямую)') + '! Ждём старта от хоста'); renderMenu();
+      }
+      if (conn === NET.host) onNet(d, 'host', conn);
+    });
+    conn.on('close', () => { if (conn === NET.host && NET.role === 'guest') { netStatus('Хост закрыл комнату', true); hostGone(); } });
+    conn.on('error', () => { });
+  };
+  const tmo = setTimeout(() => { if (!NET.host) { netStatus('Комната ' + code + ' не найдена. Проверь код — хост должен держать игру открытой на экране.', true); closeOnline(true); } }, 16000);
+  mqConnect().then(cl => {
+    if (NET.host && !NET.host.relay) { cl.end(true); return; }
+    NET.mq = cl; const pre = 'sr3d/' + code + '/';
+    const conn = new MqConn(cl, pre + 'up/' + MY_UID);
+    cl.subscribe(pre + 'dn/' + MY_UID, { qos: 0 }, () => { hello(conn); setTimeout(() => { if (!NET.host) hello(conn); }, 3000); });
+    cl.on('message', (topic, payload) => { const txt = payload.toString(); if (txt === '{"t":"__bye"}') { if (conn.open) { conn.open = false; conn.emit('close'); } return; } conn.emit('data', txt); });
+    attach(conn);
+  }).catch(() => { });
   try {
     const Peer = await getPeerLib();
     const peer = new Peer(undefined, { config: { iceServers: ICE } });
     NET.peer = peer;
-    peer.on('open', () => {
-      const conn = peer.connect('sr3d-' + code, { reliable: true });
-      NET.host = conn;
-      const tmo = setTimeout(() => { if (!conn.open) { netStatus('Не удалось подключиться. Проверь код или попроси друга создать комнату заново.', true); closeOnline(true); } }, 15000);
-      conn.on('open', () => { clearTimeout(tmo); Object.assign(NET, { role: 'guest', code }); conn.send(JSON.stringify({ t: 'hello', name: myName, car: myCar(), coins: SAVE.coins })); netStatus('Подключено! Ждём старта от хоста'); renderOnline(); });
-      conn.on('data', d => onNet(d, 'host', conn));
-      conn.on('close', () => { if (NET.role === 'guest') { netStatus('Хост закрыл комнату', true); hostGone(); } });
-      conn.on('error', () => { });
-    });
-    peer.on('error', e => { netStatus(e.type === 'peer-unavailable' ? 'Комната ' + code + ' не найдена' : 'Ошибка сети: ' + (e.type || e.message), true); closeOnline(true); });
-  } catch (e) { netStatus('Онлайн недоступен: нет связи с сервером соединений. Проверь интернет.', true); }
+    peer.on('open', () => { const conn = peer.connect('sr3d-' + code, { reliable: true }); attach(conn); conn.on('open', () => hello(conn)); });
+    peer.on('error', () => { });
+  } catch (e) { }
 }
 function dropPlayer(id) {
   if (!NET.players.has(id)) return;
@@ -3589,7 +3978,8 @@ function hostGone() {
   for (const [id] of NET.remote) remoteGone(id);
   NET.role = null; NET.players.clear(); NET.conns.clear(); NET.host = null;
   try { NET.peer && NET.peer.destroy(); } catch (_) { }
-  NET.peer = null; refreshShowroomFriends(); renderOnline(); renderMenu();
+  try { NET.mq && NET.mq.end(true); } catch (_) { }
+  NET.peer = null; NET.mq = null; refreshShowroomFriends(); renderOnline(); renderMenu();
   if (inRace) netCheckResults(true);
 }
 function closeOnline(silent) {
@@ -3597,7 +3987,8 @@ function closeOnline(silent) {
   for (const c of NET.conns.values()) try { c.close(); } catch (_) { }
   try { NET.host && NET.host.close(); } catch (_) { }
   try { NET.peer && NET.peer.destroy(); } catch (_) { }
-  Object.assign(NET, { role: null, peer: null, host: null, code: null, myId: null, stake: 0 }); NET.conns.clear(); NET.players.clear();
+  try { NET.mq && NET.mq.end(true); } catch (_) { }
+  Object.assign(NET, { role: null, peer: null, mq: null, host: null, code: null, myId: null, stake: 0, connecting: false }); NET.conns.clear(); NET.players.clear();
   if (!silent) netStatus('');
   refreshShowroomFriends(); renderOnline(); renderMenu();
 }
@@ -3606,9 +3997,10 @@ function onNet(raw, from, conn) {
   if (!m || typeof m.t !== 'string') return;
   if (NET.role === 'host') {
     if (m.t === 'hello') {
+      if (m.uid && [...NET.players.values()].some(p => p.uid === m.uid)) { if (NET.conns.get(from) !== conn) { conn.send(JSON.stringify({ t: 'dup' })); } return; }
       if (NET.players.size >= 4) return;
       NET.conns.set(from, conn);
-      NET.players.set(from, { name: String(m.name || 'Гость').slice(0, 16), car: sanitizeCar(m.car), coins: num(m.coins) });
+      NET.players.set(from, { name: String(m.name || 'Гость').slice(0, 16), car: sanitizeCar(m.car), coins: num(m.coins), uid: String(m.uid || '').slice(0, 12) });
       conn.send(JSON.stringify({ t: 'welcome', id: from }));
       netSend(lobbyMsg()); toastAny('🎮 ' + NET.players.get(from).name + ' подключился!'); if (audio) beep(1300, .1, .1);
       renderOnline(); refreshShowroomFriends(); renderMenu(); return;
@@ -3814,7 +4206,10 @@ ensureShowroom(); renderMenu();
 if (renderer.compileAsync) renderer.compileAsync(scene, camera).catch(() => { });
 $('loading').classList.add('hidden');
 $('menu').classList.remove('hidden');
+setRoom(ROOM);
 window.__gameReady = true;
+setTimeout(thumbsIdle, 2500);
+window.__sr = { start: () => startRace(), get st() { return { state, countdown, raceTime, i: player.q.i, lat: player.q.lat, v: player.vF, y: player.pos.y, vy: player.vy, cars: cars.map(c => [c.q.i, +c.vF.toFixed(1), +c.pos.y.toFixed(2)]) }; }, cam: m => { camMode = m; }, bot: v => { settings.auto = v; }, tp: (i, lat = 0) => { player.place(i, lat); snapCamera(); }, set: (k, v) => { settings[k] = v; }, N, view: (i, back, up, side = 0) => { const j = (i - Math.round(back / DS) + N) % N; window.__fc = [PX[j] + NX[j] * side, up, PZ[j] + NZ[j] * side, PX[i], 0, PZ[i]]; }, free: () => { window.__fc = null; }, gar: (m, tab) => { if (state !== 'garage') openGarage(); gModel = m; if (tab) gTab = tab; buildGarageCar(); renderGarage(); }, pv: () => { const i = RAVINES.length ? RAVINES[0].i0 + 12 : CUTS.length ? CUTS[0].i : BOOSTS.length ? BOOSTS[0].i + 20 : 150; const j = (i - Math.round(75 / DS) + N) % N; window.__fc = [PX[j] + NX[j] * 34, 30, PZ[j] + NZ[j] * 34, PX[i], 0, PZ[i]]; document.body.classList.add('replay'); }, info: () => ({ RAVINES, CUTS, BOOSTS: BOOSTS.length, RAMPS: RAMPS.length, TUN: [TUN0, TUN1], DS }) };
 requestAnimationFrame(frame);
 
 </script>
