@@ -1675,7 +1675,7 @@ let leafM;
           const rot = rnd() < .5 ? 1 : 0, col = Math.floor(rnd() * 7);
           for (let a = -1; a <= 1; a++) for (let b = 0; b < 2; b++) {
             const ox = rot ? a * 2.9 : (b - .5) * 13, oz = rot ? (b - .5) * 13 : a * 2.9, n = 1 + Math.floor(rnd() * 4);
-            for (let k = 0; k < n; k++) containers.push([cx + ox, 1.3 + k * 2.6, cz + oz, rot, (col + a * 3 + b * 5 + k * 2) % 7]);
+            for (let k = 0; k < n; k++) containers.push([cx + ox, 1.3 + k * 2.6, cz + oz, rot, ((col + a * 3 + b * 5 + k * 2) % 7 + 7) % 7]);
           }
           if (rnd() < .18 && cranes.length < 40) cranes.push([cx + (rnd() - .5) * 10, cz + (rnd() - .5) * 10, rnd() * 6.28]);
           continue;
@@ -1731,7 +1731,7 @@ let leafM;
     const ctex = canvasTex(256, 64, (g, w, h) => { g.fillStyle = '#d8d8d8'; g.fillRect(0, 0, w, h); for (let x = 0; x < w; x += 6) { g.fillStyle = 'rgba(0,0,0,.18)'; g.fillRect(x, 0, 2, h); g.fillStyle = 'rgba(255,255,255,.15)'; g.fillRect(x + 3, 0, 1, h); } g.fillStyle = 'rgba(0,0,0,.35)'; g.fillRect(0, 0, w, 3); g.fillRect(0, h - 3, w, 3); g.fillRect(0, 0, 3, h); g.fillRect(w - 3, 0, 3, h); speckle(g, w, h, 600, .2); });
     const cm = new THREE.InstancedMesh(new THREE.BoxGeometry(12.2, 2.55, 2.45), new THREE.MeshStandardMaterial({ map: ctex, roughness: .7, metalness: .3 }), containers.length);
     const CC = [0xb33a2a, 0x2a5db3, 0x2f8f4e, 0xd08a1a, 0x6b6f76, 0xe0e0e0, 0x8a3fb3].map(c => new THREE.Color(c));
-    containers.forEach(([x, y, z, r, c], k) => { dummy.position.set(x, y, z); dummy.rotation.set(0, r ? Math.PI / 2 : 0, 0); dummy.scale.set(1, 1, 1); dummy.updateMatrix(); cm.setMatrixAt(k, dummy.matrix); cm.setColorAt(k, CC[c]); });
+    containers.forEach(([x, y, z, r, c], k) => { dummy.position.set(x, y, z); dummy.rotation.set(0, r ? Math.PI / 2 : 0, 0); dummy.scale.set(1, 1, 1); dummy.updateMatrix(); cm.setMatrixAt(k, dummy.matrix); cm.setColorAt(k, CC[c] || CC[0]); });
     cm.castShadow = true; cm.receiveShadow = true; scene.add(cm);
   }
   if (RIVER && PORT) for (let k = -9; k <= 9; k++) for (const sg of [-1, 1]) {
