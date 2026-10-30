@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>GMC Pre-Review Checklist</title>
+<meta name="description" content="A practical checklist for Shopify stores with a Google Merchant Center Misrepresentation suspension: what to verify before you spend a review request.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600&family=Inter+Tight:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+/* Layout: a single reading column like a field inspection form — numbered sections (the order matters), checkable items, progress bar pinned at top. */
+:root{
+  --bg:#f5f6f3; --paper:#ffffff; --ink:#1b1f1c; --muted:#5d665f; --line:#d9ddd6;
+  --accent:#1f6f4a; --accent-soft:#e2f0e8; --warn:#9a5b00; --warn-soft:#fbefd9;
+  --f-display:"Fraunces", Georgia, serif; --f-body:"Inter Tight", system-ui, -apple-system, "Segoe UI", sans-serif; --f-mono:"JetBrains Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#121513; --paper:#1a1f1c; --ink:#e6ebe7; --muted:#9aa59d; --line:#2c332e;
+  --accent:#5cc493; --accent-soft:#183528; --warn:#e7a54a; --warn-soft:#3a2b14; color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#121513; --paper:#1a1f1c; --ink:#e6ebe7; --muted:#9aa59d; --line:#2c332e;
+  --accent:#5cc493; --accent-soft:#183528; --warn:#e7a54a; --warn-soft:#3a2b14; color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.55;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 56px}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+.wrap{max-width:720px;margin:0 auto;display:flex;flex-direction:column;gap:22px}
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);padding-block:12px 10px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:12px}
+.bar .track{flex:1;height:6px;border-radius:3px;background:var(--line);overflow:hidden}
+.bar .fill{height:100%;width:0;background:var(--accent);transition:width .25s}
+.bar span{font-family:var(--f-mono);font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
+header{display:flex;flex-direction:column;gap:10px;padding-top:18px}
+.eyebrow{font-family:var(--f-mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--accent)}
+h1{font-family:var(--f-display);font-weight:600;font-size:clamp(28px,6vw,40px);line-height:1.12;margin:0;text-wrap:balance}
+.lede{margin:0;color:var(--muted);max-width:62ch}
+.note{background:var(--warn-soft);color:var(--warn);border-radius:10px;padding:12px 14px;font-size:14px}
+section{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:18px;display:flex;flex-direction:column;gap:12px}
+section h2{display:flex;gap:12px;align-items:baseline;margin:0;font-size:19px;font-weight:600;text-wrap:balance}
+section h2 b{font-family:var(--f-mono);font-size:13px;color:var(--accent);font-weight:500}
+section p.why{margin:0;color:var(--muted);font-size:14px}
+ul.items{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+ul.items li{border-top:1px solid var(--line)}
+ul.items li:first-child{border-top:0}
+label.item{display:grid;grid-template-columns:22px 1fr;gap:12px;padding:10px 0;cursor:pointer;align-items:start}
+label.item input{width:20px;height:20px;margin:2px 0 0;accent-color:var(--accent)}
+label.item span{min-width:0}
+label.item small{display:block;color:var(--muted);font-size:13.5px;margin-top:2px}
+label.item input:checked + span{color:var(--muted);text-decoration:line-through;text-decoration-color:var(--line)}
+code{font-family:var(--f-mono);font-size:13px;background:var(--accent-soft);color:var(--accent);padding:1px 5px;border-radius:4px}
+a{color:var(--accent)}
+.cta{background:var(--accent-soft);border:1px solid var(--accent);border-radius:12px;padding:18px;display:flex;flex-direction:column;gap:8px}
+.cta h2{margin:0;font-size:19px}
+.cta p{margin:0}
+footer{color:var(--muted);font-size:13px;display:flex;flex-direction:column;gap:6px}
+button.reset{align-self:flex-start;background:transparent;border:1px solid var(--line);color:var(--muted);border-radius:8px;padding:6px 12px;font:inherit;font-size:13px;cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <div class="bar" aria-hidden="true"><div class="track"><div class="fill" id="fill"></div></div><span id="count">0 / 0 checked</span></div>
+
+  <header>
+    <div class="eyebrow">Google Merchant Center · Misrepresentation</div>
+    <h1>Check this before you spend a review request</h1>
+    <p class="lede">Each failed review adds a cooldown, and accounts get a limited number of attempts. Google rarely says what triggered the suspension, so the safest move is to close every mismatch first. This list covers the common causes in Google's Misrepresentation policy and in real Shopify Community threads.</p>
+    <div class="note">No checklist guarantees reinstatement. Google makes the final call, and some suspensions are permanent. Use this to avoid wasting an attempt on something fixable.</div>
+  </header>
+
+  <section>
+    <h2><b>01</b>One business, the same everywhere</h2>
+    <p class="why">Google cross-checks who you are. Small differences between places read as a trust problem.</p>
+    <ul class="items">
+      <li><label class="item"><input type="checkbox"><span>Business name, address, email and phone match across Merchant Center business info, the contact page, policies and checkout.</span></label></li>
+      <li><label class="item"><input type="checkbox"><span>A contact page with a real postal address and an email that gets answered.<small>A contact form alone is weak evidence.</small></span></label></li>
+      <li><label class="item"><input type="checkbox"><span>EU stores: an Impressum / legal notice linked in the footer, with the registered business details.</span></label></li>
+      <li><label class="item"><input type="checkbox"><span>About page with real information about who runs the store. No template text.</span></label></li>
+      <li><label class="item"><input type="checkbox"><span>The website domain is verified and claimed in Merchant Center, the store opens on that domain over HTTPS, and it doesn't bounce to a <code>myshopify.com</code> address.</span></label></li>
+    </ul>
+  </section>
+
+  <section>
+    <h2><b>02</b>Policies a customer can actually use</h2>
+    <p class="why">Generic or missing policies are one of the most common findings.</p>
+    <ul class="items">
+      <li><label class="item"><input type="checkbox"><span>Shipping policy: costs, delivery times and countries you ship to.<small>Times must match what you set in Merchant Center.</small></span></label></li>
+      <li><label class="item"><input type="checkbox"><span>Returns and refunds: the return window, how to start a return, who pays return shipping, when refunds are issued.</span></label></li>
+      <li><label class="item"><input type="checkbox"><span>Privacy policy and terms of service, all linked in the footer.</span></label></li>
+      <li><label class="item"><input type="checkbox"><span>No placeholder text, other stores' names, or wording copied from a template that doesn't fit your business.</span></label></li>
+    </ul>
+  </section>
+
+  <section>
+    <h2><b>03</b>Feed = product page = checkout</h2>
+    <p class="why">Compare a sample of products field by field. One mismatch can be enough.</p>
+    <ul class="items">
+      <li><label class="item"><input type="checkbox"><span>Price in the feed equals the price on the page and in checkout, in the same currency.<small>EU: prices shown including VAT, matching the feed.</small></span></label></li>
+      <li><label class="item"><input type="checkbox"><span>Availability matches: in-stock items can be bought, out-of-stock items say so.</span></label></li>
+      <li><label class="item"><input type="checkbox"><span>No fees appear at checkout that weren't shown earlier.</span></label></li>
+      <li><label class="item"><input type="checkbox"><span>Structured data on product pages shows the same price and availability.<small>Check with Google's Rich Results Test.</small></span></label></li>
+      <li><label class="item"><input type="checkbox"><span>Titles, images and variants in the feed describe the same item as the page.</span></label></li>
+    </ul>
+  </section>
+
+  <section>
+    <h2><b>04</b>Product identifiers</h2>
+    <p class="why">Easy to overlook, especially for own-brand products.</p>
+    <ul class="items">
+      <li><label class="item"><input type="checkbox"><span>Branded products carry their real GTIN (barcode) and brand.</span></label></li>
+      <li><label class="item"><input type="checkbox"><span>Own-brand or handmade items without a GTIN have <code>identifier_exists</code> set to <code>no</code> in the feed, plus a brand value.</span></label></li>
+    </ul>
+  </section>
+
+  <section>
+    <h2><b>05</b>Claims you can back up</h2>
+    <p class="why">Misrepresentation is literally about misleading shoppers.</p>
+    <ul class="items">
+      <li><label class="item"><input type="checkbox"><span>No "#1", "certified", "official" or similar claims you can't prove.</span></label></li>
+      <li><label class="item"><input type="checkbox"><span>No fake "was" prices, permanent sale timers or stock counters that never change.</span></label></li>
+      <li><label class="item"><input type="checkbox"><span>Reviews are real and attributable. Imported or invented reviews are a risk.</span></label></li>
+      <li><label class="item"><input type="checkbox"><span>Dropshipping: delivery times are realistic and the policy says where items ship from.</span></label></li>
+    </ul>
+  </section>
+
+  <section>
+    <h2><b>06</b>Before you press "Request review"</h2>
+    <ul class="items">
+      <li><label class="item"><input type="checkbox"><span>Everything above is fixed and live, not just planned.</span></label></li>
+      <li><label class="item"><input type="checkbox"><span>Don't create a new Merchant Center account for the same store as a workaround.</span></label></li>
+      <li><label class="item"><input type="checkbox"><span>Note what you changed and when. If the review fails, you know what's already been ruled out.</span></label></li>
+      <li><label class="item"><input type="checkbox"><span>Ask someone else to look at the store with fresh eyes. Mismatches on your own site are hard to see.</span></label></li>
+    </ul>
+  </section>
+
+  <div class="cta">
+    <h2>Want a second pair of eyes?</h2>
+    <p>I'm Sergey (ReviewReady). I compare your feed, product pages, structured data and policies field by field and send you a written list of what doesn't match. The first 10 products are free. Email your store URL to <b>sektime71@gmail.com</b> or find me on Shopify Community as <b>sektime9992</b>. <a href="./">More about the audit</a>.</p>
+  </div>
+
+  <footer>
+    <button class="reset" id="reset" type="button">Clear my checks</button>
+    <span>Source: Google's <a href="https://support.google.com/merchants/answer/6150127" target="_blank" rel="noopener">Misrepresentation policy</a>, plus patterns from public Shopify Community threads. Your checks are saved only in this browser.</span>
+  </footer>
+</div>
+
+<script>
+(() => {
+  const boxes=[...document.querySelectorAll('label.item input')];
+  const KEY='gmc-checklist-v1';
+  let saved=[]; try{ saved=JSON.parse(localStorage.getItem(KEY)||'[]'); }catch{}
+  boxes.forEach((b,i)=>{ b.id='c'+i; if(saved[i]) b.checked=true; });
+  const upd=()=>{ const n=boxes.filter(b=>b.checked).length; document.getElementById('fill').style.width=(n/boxes.length*100)+'%'; document.getElementById('count').textContent=`${n} / ${boxes.length} checked`;
+    try{ localStorage.setItem(KEY, JSON.stringify(boxes.map(b=>b.checked))); }catch{} };
+  boxes.forEach(b=>b.addEventListener('change',upd));
+  document.getElementById('reset').addEventListener('click',()=>{ boxes.forEach(b=>b.checked=false); upd(); });
+  upd();
+})();
+</script>
+
+</body>
+</html>

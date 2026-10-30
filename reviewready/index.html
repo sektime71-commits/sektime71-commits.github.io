@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>ReviewReady — Merchant Center pre-review audit for Shopify stores</title>
+<meta name="description" content="Suspended in Google Merchant Center? We compare your feed, product pages and policies and send a written list of every mismatch before you spend a review request. First 10 products free.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600&family=Inter+Tight:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+:root{--bg:#f5f6f3;--paper:#fff;--ink:#1b1f1c;--muted:#5d665f;--line:#d9ddd6;--accent:#1f6f4a;--accent-soft:#e2f0e8;--warn:#9a5b00;--warn-soft:#fbefd9;--bad:#a8342a;
+--f-display:"Fraunces",Georgia,serif;--f-body:"Inter Tight",system-ui,-apple-system,"Segoe UI",sans-serif;--f-mono:"JetBrains Mono",ui-monospace,Menlo,monospace;color-scheme:light}
+@media (prefers-color-scheme:dark){:root{--bg:#121513;--paper:#1a1f1c;--ink:#e6ebe7;--muted:#9aa59d;--line:#2c332e;--accent:#5cc493;--accent-soft:#183528;--warn:#e7a54a;--warn-soft:#3a2b14;--bad:#ef7a70;color-scheme:dark}}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:17px;line-height:1.55;padding:0 max(16px,env(safe-area-inset-left)) 64px max(16px,env(safe-area-inset-right))}
+.wrap{max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:40px}
+a{color:var(--accent)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+nav{display:flex;justify-content:space-between;align-items:center;padding-top:20px;gap:12px;flex-wrap:wrap}
+.logo{font-family:var(--f-display);font-weight:600;font-size:20px;text-decoration:none;color:var(--ink)}
+.logo span{color:var(--accent)}
+nav .links{display:flex;gap:16px;font-size:15px}
+h1,h2,h3{margin:0;text-wrap:balance}
+p{margin:0}
+.hero{display:flex;flex-direction:column;gap:18px;padding-top:12px}
+.eyebrow{font-family:var(--f-mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--accent)}
+h1{font-family:var(--f-display);font-weight:600;font-size:clamp(32px,7vw,50px);line-height:1.08}
+.lede{color:var(--muted);font-size:19px;max-width:60ch}
+.cta-row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+.btn{display:inline-flex;align-items:center;gap:8px;background:var(--accent);color:var(--paper);text-decoration:none;border-radius:10px;padding:13px 20px;font-weight:600}
+.btn.ghost{background:none;color:var(--accent);border:1px solid var(--accent)}
+.note{background:var(--warn-soft);color:var(--warn);border-radius:10px;padding:12px 14px;font-size:15px}
+section{display:flex;flex-direction:column;gap:16px}
+h2{font-family:var(--f-display);font-weight:600;font-size:clamp(24px,5vw,30px);line-height:1.2}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+@media (max-width:600px){.grid{grid-template-columns:minmax(0,1fr)}}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:6px}
+.card h3{font-size:17px;font-weight:600;display:flex;gap:10px;align-items:baseline}
+.card h3 b{font-family:var(--f-mono);font-size:12px;color:var(--accent);font-weight:500}
+.card p{color:var(--muted);font-size:15px}
+.report{background:var(--paper);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.report-h{padding:12px 16px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;font-size:14px;color:var(--muted)}
+.report-h b{color:var(--ink)}
+.row{display:grid;grid-template-columns:64px 72px minmax(0,1fr);gap:10px;padding:12px 16px;border-bottom:1px solid var(--line);font-size:15px;align-items:start}
+.row:last-child{border-bottom:0}
+.row .id{font-family:var(--f-mono);font-size:13px;color:var(--muted)}
+.tag{font-family:var(--f-mono);font-size:11px;font-weight:500;border-radius:999px;padding:2px 8px;text-transform:uppercase;letter-spacing:.04em;justify-self:start}
+.tag.fail{background:var(--bad);color:var(--paper)}
+.tag.warn{background:var(--warn-soft);color:var(--warn)}
+.tag.pass{background:var(--accent-soft);color:var(--accent)}
+.row small{display:block;color:var(--muted);font-size:13px;font-family:var(--f-mono);margin-top:3px;overflow-wrap:anywhere}
+@media (max-width:480px){.row{grid-template-columns:56px minmax(0,1fr)}.row .id{grid-row:span 2}}
+ol.steps{margin:0;padding-left:22px;display:flex;flex-direction:column;gap:10px}
+.price{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+@media (max-width:600px){.price{grid-template-columns:minmax(0,1fr)}}
+.plan{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:18px;display:flex;flex-direction:column;gap:10px}
+.plan.main{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
+.plan .amt{font-family:var(--f-display);font-size:34px;font-weight:600}
+.plan ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:4px;font-size:15px}
+details{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:12px 16px}
+details summary{cursor:pointer;font-weight:600}
+details p{margin-top:8px;color:var(--muted);font-size:15px}
+.contact{background:var(--accent-soft);border:1px solid var(--accent);border-radius:12px;padding:20px;display:flex;flex-direction:column;gap:10px}
+.mono{font-family:var(--f-mono);font-size:15px;user-select:all}
+footer{color:var(--muted);font-size:13px;display:flex;flex-direction:column;gap:6px;border-top:1px solid var(--line);padding-top:16px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav>
+    <a class="logo" href="./">Review<span>Ready</span></a>
+    <div class="links"><a href="checklist.html">Free checklist</a><a href="#pricing">Pricing</a><a href="#contact">Contact</a></div>
+  </nav>
+
+  <header class="hero">
+    <div class="eyebrow">Google Merchant Center · Shopify</div>
+    <h1>Suspended for misrepresentation? Check the store before you spend a review.</h1>
+    <p class="lede">I compare your product feed with the live product pages, your policies and your contact details, and send you a written list of every mismatch, each linked to the exact page. The first 10 products are free.</p>
+    <div class="cta-row"><a class="btn" href="#contact">Get a free 10-product check</a><a class="btn ghost" href="checklist.html">Do it yourself: free checklist</a></div>
+    <p class="note">No one can guarantee reinstatement: Google makes the final decision, and some suspensions are permanent. The goal is to avoid wasting a review request on something that can be fixed.</p>
+  </header>
+
+  <section>
+    <h2>What gets checked</h2>
+    <div class="grid">
+      <div class="card"><h3><b>01</b>Business identity</h3><p>Name, address, email and phone match across Merchant Center, contact page, policies and checkout. Domain claimed, no redirects to myshopify.com.</p></div>
+      <div class="card"><h3><b>02</b>Policies</h3><p>Shipping, returns and refunds, privacy and terms exist, are linked in the footer and are not template text from another store.</p></div>
+      <div class="card"><h3><b>03</b>Feed = page = checkout</h3><p>Price, currency and availability in your product data match what shoppers see on each product page and in its structured data.</p></div>
+      <div class="card"><h3><b>04</b>Product identifiers</h3><p>Real GTINs on branded products; own-brand items handled with identifier_exists and a brand value.</p></div>
+      <div class="card"><h3><b>05</b>Claims and pricing</h3><p>Compare-at ("was") prices, sale timers, "#1" and "official" claims, reviews and delivery promises you may not be able to back up.</p></div>
+      <div class="card"><h3><b>06</b>Before you press "Request review"</h3><p>What's fixed and live, what's only planned, and what to note down so a failed review still teaches you something.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>What the report looks like</h2>
+    <p style="color:var(--muted)">An illustration of the format. Every finding has a checklist number, a status and the exact place it was found.</p>
+    <div class="report" role="table" aria-label="Example report format">
+      <div class="report-h"><span><b>Example store</b> · 10 products checked</span><span>3 fail · 2 warn · 19 pass</span></div>
+      <div class="row" role="row"><span class="id">03.1</span><span class="tag fail">fail</span><span>Product shows a compare-at price on every size, 212 → 193, on 4 of 5 newest products.<small>/products/sneaker-x · compare_at_price</small></span></div>
+      <div class="row" role="row"><span class="id">02.2</span><span class="tag fail">fail</span><span>Refund policy has no return window and no instructions to start a return.<small>/policies/refund-policy</small></span></div>
+      <div class="row" role="row"><span class="id">04.1</span><span class="tag warn">warn</span><span>Branded products have no barcode (GTIN) on any variant.<small>/products.json · variants[].barcode</small></span></div>
+      <div class="row" role="row"><span class="id">01.2</span><span class="tag pass">pass</span><span>Contact page shows a postal address and an email address.<small>/pages/contact</small></span></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>How it works</h2>
+    <ol class="steps">
+      <li>Send your store URL by email (and, if you like, the exact message Google showed you).</li>
+      <li>I check 10 products, your policies and contact details for free and send the findings.</li>
+      <li>If you want the full audit, I check the whole checklist on up to 50 products and send a written report within 3 business days of payment.</li>
+      <li>You fix what's listed and request the review when everything is live.</li>
+    </ol>
+  </section>
+
+  <section id="pricing">
+    <h2>Pricing</h2>
+    <div class="price">
+      <div class="plan"><h3>Free check</h3><div class="amt">$0</div><ul><li>10 products: price, availability, structured data</li><li>Policies and contact details</li><li>Findings by email</li></ul></div>
+      <div class="plan main"><h3>Full pre-review audit</h3><div class="amt">$49</div><ul><li>All 24 checklist points</li><li>Up to 50 products</li><li>Written report, every finding linked to the page</li><li>Within 3 business days of payment</li></ul></div>
+    </div>
+    <p style="color:var(--muted);font-size:15px">Agencies: reports can be white-label for your clients. Ask for terms if you have several stores.</p>
+  </section>
+
+  <section>
+    <h2>Questions</h2>
+    <details><summary>Do you need access to my Merchant Center or Shopify admin?</summary><p>No. The check uses what is public on your store. If you want me to look at the exact error in Merchant Center, you can send a screenshot.</p></details>
+    <details><summary>Will this get my account reinstated?</summary><p>There is no guarantee. Google decides, and some suspensions are permanent. The audit finds the mismatches that commonly cause misrepresentation suspensions so you don't waste a review request on them.</p></details>
+    <details><summary>Is this only for Shopify?</summary><p>The checks are built around Shopify stores. Other platforms: ask first.</p></details>
+    <details><summary>Who is behind ReviewReady?</summary><p>I'm Sergey, an independent specialist. I do the audits myself with automated checks and a manual review of every finding.</p></details>
+  </section>
+
+  <section class="contact" id="contact">
+    <h2>Get your free 10-product check</h2>
+    <p>Email your store URL to:</p>
+    <p class="mono">sektime71@gmail.com</p>
+    <p style="font-size:15px;color:var(--muted)">Or reply to me on Shopify Community: <b>sektime9992</b>.</p>
+  </section>
+
+  <footer>
+    <span>ReviewReady · Independent pre-review audits for Google Merchant Center. Not affiliated with Google or Shopify.</span>
+    <span><a href="checklist.html">Free checklist</a> · <a href="oferta.html">Договор-оферта (RU)</a></span>
+  </footer>
+</div>
+</body>
+</html>
