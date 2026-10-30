@@ -71,7 +71,7 @@ body.port:not(.rot) #gBottom{grid-column:1;grid-row:3}
 .panel{background:rgba(10,12,20,.74);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.12);border-radius:18px;padding:20px 22px;max-width:440px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.5);margin:auto}
 body.land #menu{justify-content:flex-start}
 body.land #menu .panel{max-width:560px;margin:auto auto auto 0;display:grid;grid-template-columns:1fr 1fr;column-gap:16px;padding:14px 18px}
-body.land #menu .logo,body.land #menu .sub,body.land #menu .btn,body.land #menu .help,body.land #menu #rotHint,body.land #menu #mCoins,body.land #menu #tasks{grid-column:1/3}
+body.land #menu .logo,body.land #menu .sub,body.land #menu .btn,body.land #menu .help,body.land #menu #rotHint,body.land #menu #mCoins,body.land #menu #tasks,body.land #menu .btn{grid-column:1/3}
 body.land #menu .row{margin:6px 0}
 body.land #menu .logo{font-size:30px}
 body.land #menu .btn{margin-top:8px;padding:12px}
@@ -208,6 +208,13 @@ body.touch.land #nitro.gain{animation:ngain .45s ease-out}
 .ev{display:flex;align-items:center;gap:8px;padding:7px 0;border-top:1px solid rgba(255,255,255,.07);font-size:13px}.ev.focus{background:rgba(61,213,255,.12);border-radius:8px;padding:7px}
 .evn{flex:1}.evs{color:#ffd23d;letter-spacing:1px}.evgo{flex:none;min-width:0;padding:7px 12px;font-weight:800}
 #cToast{position:fixed;left:50%;bottom:12%;transform:translateX(-50%);background:rgba(0,0,0,.85);padding:10px 18px;border-radius:12px;font-weight:700;z-index:30}
+.photoHide{display:none!important}
+#feed{position:absolute;right:var(--sr);top:36%;display:flex;flex-direction:column;align-items:flex-end;gap:5px;pointer-events:none}
+.fi{background:rgba(0,0,0,.55);padding:5px 11px;border-radius:8px;font-size:13px;font-weight:900;font-style:italic;letter-spacing:1px;border-left:3px solid #fff;animation:fin .25s ease-out;transition:opacity .45s,transform .45s}
+.fi.out{opacity:0;transform:translateX(30px)}.fi.gold{border-color:#ffd23d;color:#ffe48a}.fi.red{border-color:#ff3d3d;color:#ff9a9a}.fi.blue{border-color:#3dd5ff;color:#9feaff}.fi.purple{border-color:#a855f7;color:#d7b4ff}.fi.green{border-color:#39ff88;color:#9dffc4}
+@keyframes fin{from{opacity:0;transform:translateX(40px) scale(.9)}to{opacity:1;transform:none}}
+body.touch.land #feed{top:30%}
+.tutg{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}.tutg div{background:rgba(255,255,255,.06);border-radius:10px;padding:8px 10px;font-size:13px;line-height:1.35}.tutg b{display:block;font-size:14px;margin-bottom:3px}
 #finish table{width:100%;border-collapse:collapse;margin-top:10px;font-size:15px}
 #finish td{padding:6px 6px;border-bottom:1px solid rgba(255,255,255,.08)}
 #finish tr.me td{color:#ffd23d;font-weight:800}
@@ -225,7 +232,7 @@ body.touch.land #nitro.gain{animation:ngain .45s ease-out}
   <div class="panel">
     <div class="logo">STREET RACER</div>
     <div class="sub">ГОРОДСКИЕ ГОНКИ · 3D</div>
-    <div class="row"><label>Трасса</label><div class="opts" id="trk"><div class="opt" data-v="city">🌃 Неон-Сити</div><div class="opt" data-v="port">⚓ Старый порт</div><div class="opt" data-v="mountain">🏔 Перевал</div></div></div>
+    <div class="row"><label>Трасса</label><div class="opts" id="trk"><div class="opt" data-v="city">🌃 Неон-Сити</div><div class="opt" data-v="port">⚓ Старый порт</div><div class="opt" data-v="mountain">🏔 Перевал</div></div><div id="trkBest" class="help" style="margin-top:5px;text-align:left"></div></div>
     <div class="row"><label>Режим</label><div class="opts" id="mode"><div class="opt" data-v="race">🏁 Гонка</div><div class="opt" data-v="elim">❌ Выбывание</div><div class="opt" data-v="time">⏱ На время</div></div></div>
     <div class="row"><label>Время суток</label><div class="opts" id="tod">
       <div class="opt" data-v="day">☀️ День</div><div class="opt" data-v="sunset">🌇 Закат</div><div class="opt on" data-v="night">🌃 Ночь</div></div></div>
@@ -244,13 +251,14 @@ body.touch.land #nitro.gain{animation:ngain .45s ease-out}
     <button class="btn sec" id="btnCareer" style="font-size:17px;font-weight:900;letter-spacing:2px;background:linear-gradient(135deg,#7c3aed,#3b82f6)">🏆 КАРЬЕРА · КУБКИ</button>
     <button class="btn sec" id="btnGarage" style="font-size:17px;font-weight:900;letter-spacing:2px">🏁 ГАРАЖ · ТЮНИНГ · МАШИНЫ</button>
     <button class="btn sec fullBtn" id="full">⛶ Играть во весь экран</button>
+    <button class="btn sec" id="btnPrefs">⚙️ Настройки · звук · музыка</button>
     <div class="help" id="helpTxt">Газ — автоматически. Собирай синие баллоны — копится нитро. Тарань соперников! Нитро ровно на «СТАРТ» — идеальный старт.<br>A D / ← → — руль · S / ↓ — тормоз · ПРОБЕЛ — дрифт · SHIFT / ↑ — нитро<br>C — камера · колесо мыши / + − — зум · тяни мышью — обзор · R — на трассу · P — пауза</div>
   </div>
 </div>
 
 <div id="pause" class="hidden" style="position:fixed;inset:0;z-index:21;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.5)">
   <div class="panel" style="max-width:320px;display:block"><div class="logo" style="font-size:34px">ПАУЗА</div>
-  <button class="btn" id="resume">ПРОДОЛЖИТЬ</button><button class="btn sec fullBtn" id="full2">⛶ Во весь экран</button><button class="btn sec" id="restart">Заново</button><button class="btn sec" id="toMenu">В меню</button></div>
+  <button class="btn" id="resume">ПРОДОЛЖИТЬ</button><button class="btn sec" id="btnPhoto">📷 Фоторежим</button><button class="btn sec fullBtn" id="full2">⛶ Во весь экран</button><button class="btn sec" id="restart">Заново</button><button class="btn sec" id="toMenu">В меню</button></div>
 </div>
 
 <div id="finish" class="hidden" style="position:fixed;inset:0;z-index:21;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.45);padding:16px;overflow:auto">
@@ -274,6 +282,20 @@ body.touch.land #nitro.gain{animation:ngain .45s ease-out}
   <div class="ctop"><button id="cBack" class="gb">← Меню</button><div class="t">КАРЬЕРА</div><div id="cCoins" class="coins"></div></div>
   <div class="ccar"><span id="cCar"></span><button id="cGarage" class="gb">🏁 Гараж</button></div>
   <div id="cCups"></div><div id="cToast" class="hidden"></div></div></div>
+<div id="prefs" class="hidden" style="position:fixed;z-index:30;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.6);overflow:auto;padding:12px">
+  <div class="panel" style="display:block;max-width:420px"><div class="logo" style="font-size:26px">НАСТРОЙКИ</div><div id="prefBody"></div><button class="btn" id="prefClose">ГОТОВО</button></div></div>
+<div id="tut" class="hidden" style="position:fixed;z-index:31;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.7);overflow:auto;padding:12px">
+  <div class="panel" style="display:block;max-width:560px"><div class="logo" style="font-size:26px">КАК ИГРАТЬ</div>
+  <div class="tutg">
+    <div><b>🎡 Руль</b>Крути пальцем руль слева. Газ жмётся сам.</div>
+    <div><b>🛑 Тормоз</b>Перед крутыми поворотами. Держи на месте — задний ход.</div>
+    <div><b>🌀 Дрифт</b>Зажми в повороте — машину заносит, копится нитро.</div>
+    <div><b>🔥 Нитро</b>Собирай синие баллоны и жми НИТРО. Нажми ровно на «СТАРТ» — идеальный старт.</div>
+    <div><b>🚀 Трамплины</b>Жёлтый — прыжок, синий — бочка. Полёт ведётся автоматически.</div>
+    <div><b>💥 Тараны</b>Врежься в соперника на скорости — он улетит. Проскочи впритирку — «почти задел».</div>
+  </div><button class="btn" id="tutOk">ПОЕХАЛИ!</button></div></div>
+<div id="photo" class="hidden" style="position:fixed;inset:0;z-index:25;touch-action:none"><div class="ib" id="phClose" style="right:12px;top:12px;position:absolute">✕</div><div style="position:absolute;left:50%;bottom:14px;transform:translateX(-50%);background:rgba(0,0,0,.45);padding:6px 12px;border-radius:10px;font-size:12px;pointer-events:none">📷 Крути пальцем, щипок — зум. Сделай скриншот телефона</div></div>
+<div id="fps" class="hidden" style="position:fixed;left:50%;top:2px;transform:translateX(-50%);z-index:40;font:11px monospace;background:rgba(0,0,0,.5);padding:2px 6px;border-radius:4px;pointer-events:none"></div>
 <div id="camPad" class="hidden"></div>
 
 <div id="hud" class="hidden">
@@ -284,6 +306,7 @@ body.touch.land #nitro.gain{animation:ngain .45s ease-out}
   <div id="board" class="box"></div>
   <div id="tr" class="box"><div id="time">0:00.00</div><div id="lastlap">Круг: —</div><div id="best">Рекорд: —</div><div id="wx"></div></div>
   <div id="sub"></div>
+  <div id="feed"></div>
   <div id="msg"></div>
   <div id="portHint" class="hidden">📱↻ Поверни телефон горизонтально</div>
   <canvas id="map" width="380" height="380"></canvas>
@@ -426,7 +449,7 @@ class SimCar {
     this.nitro = 1; this.nitroOn = false; this.vF = 0; this.vS = 0; this.acc = 0; this.ay = 0;
     this.trackDot = 0; this.wrong = 0; this.curb = 0; this.scrape = 0; this.impact = 0; this.slipF = 0; this.slipR = 0;
     this.y = 0; this.vy = 0; this.air = false; this.airT = 0; this.slope = 0; this.rampType = null;
-    this.gripMul = isPlayer ? 1.22 : 1; this.assist = isPlayer; this.hk = 0; this.nitroMul = 1; this.nitroEff = 1; this.driftT = 0;
+    this.gripMul = isPlayer ? 1.22 : 1; this.assist = isPlayer; this.hk = 0; this.nitroMul = 1; this.nitroEff = 1; this.driftT = 0; this.draft = 0;
   }
   place(i, lat) {
     this.q = { i, lat };
@@ -542,6 +565,7 @@ function stepCar(c, dt) {
       else acc += inp.thr * 26;
     }
     if (c.nitroOn) acc += 12 * c.nitroMul;
+    if (c.draft > 0) acc += 3.2 * c.draft * Math.max(0, 1 - vx / (vmax * 1.08));
     if (c.hk > .3 && inp.thr > 0 && vx > 10) acc += 3.5 * c.hk;
     const brakeMax = 32 * (.45 + .55 * effGrip(c));
     if (inp.brk > 0) { if (vx > .8) acc -= inp.brk * brakeMax; else if (vx > -14) acc -= inp.brk * 9; }
@@ -1120,7 +1144,8 @@ const ELBOWS = [[.37 + .27, .75, -.44], [.37 - .27, .75, -.44]];
 const $ = id => document.getElementById(id);
 const isTouch = matchMedia('(pointer:coarse)').matches || ('ontouchstart' in window && navigator.maxTouchPoints > 0);
 const isAndroid = /Android/i.test(navigator.userAgent);
-const lowEnd = !!((navigator.deviceMemory && navigator.deviceMemory <= 4) || (navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4));
+const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent) || (/Macintosh/.test(navigator.userAgent) && navigator.maxTouchPoints > 1);
+const lowEnd = !isIOS && !!((navigator.deviceMemory && navigator.deviceMemory <= 4) || (navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4));
 const APP = $('app');
 if (isTouch) { document.body.classList.add('touch'); $('helpTxt').innerHTML = 'Газ — сам. Собирай синие баллоны и жми НИТРО. Трамплины: жёлтый — прыжок, синий — бочка.<br>Крути РУЛЬ · ТОРМОЗ · ДРИФТ · двумя пальцами — зум, одним — обзор<br>🎥 камера (погоня / дальняя / салон / капот) · ↺ на трассу'; }
 let ROT = false;
@@ -1145,6 +1170,12 @@ renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 APP.prepend(renderer.domElement);
 renderer.domElement.addEventListener('webglcontextlost', e => { e.preventDefault(); const l = $('loading'); l.classList.remove('hidden'); l.firstElementChild.textContent = 'Графика перезапускается…'; setTimeout(() => location.reload(), 1200); });
+const GPU = (() => { try { const gl = renderer.getContext(), e = gl.getExtension('WEBGL_debug_renderer_info'); return e ? String(gl.getParameter(e.UNMASKED_RENDERER_WEBGL)) : ''; } catch (_) { return ''; } })();
+const TIER = !isTouch ? 'high' : isIOS ? 'mid' : (lowEnd || /Mali-(4|T|G3|G5[12]|G7[16])|Adreno \(TM\) ([2-5]\d\d|6[01]\d)|PowerVR|SGX/i.test(GPU)) ? 'low' : 'mid';
+let PREFS = { music: 1, mvol: .55, svol: .8, vib: 1, fps: 0, cam: 0 };
+try { Object.assign(PREFS, JSON.parse(localStorage.getItem('sr3d_prefs') || '{}')); } catch (_) { }
+const savePrefs = () => { try { localStorage.setItem('sr3d_prefs', JSON.stringify(PREFS)); } catch (_) { } };
+const vib = ms => { if (PREFS.vib && navigator.vibrate) try { navigator.vibrate(ms); } catch (_) { } };
 const canHalf = renderer.capabilities.isWebGL2 && (renderer.extensions.has('EXT_color_buffer_half_float') || renderer.extensions.has('EXT_color_buffer_float'));
 const MAXANI = renderer.capabilities.getMaxAnisotropy();
 const scene = new THREE.Scene();
@@ -1868,7 +1899,7 @@ function handleEvents(c) {
   if (c.evLand) {
     const v = c.evLand; c.bv = -Math.min(1.6, v * .1);
     if (me) {
-      shake = Math.min(.8, v * .045); thump(v * 1.2);
+      shake = Math.min(.8, v * .045); thump(v * 1.2); vib(25);
       if (c.airT > .7) { if (c.flip) raceStats.rolls++; else raceStats.jumps++; const bonus = c.flip ? .3 : .12; c.nitro = Math.min(1, c.nitro + bonus); flash((c.flip ? '🔄 ЧИСТАЯ БОЧКА' : '🛬 ПРЫЖОК ' + c.airT.toFixed(1) + ' с') + ' · +НИТРО', 2); }
     }
     const fx = Math.sin(c.h), fz = Math.cos(c.h);
@@ -1877,7 +1908,7 @@ function handleEvents(c) {
     c.flip = null; c.evLand = 0;
   }
   if (c.evTakedown) {
-    if (me) { raceStats.takedowns += c.evTakedown; flash('💥 ТАРАН! +НИТРО', 1.6); shake = .9; thump(18); }
+    if (me) { raceStats.takedowns += c.evTakedown; flash('💥 ТАРАН! +НИТРО', 1.6); feed('💥 ТАРАН · +300', 'red'); shake = .9; thump(18); vib([30, 30, 50]); lastHitT = timeAcc; }
     c.evTakedown = 0;
   }
   if (c.evPick) {
@@ -2040,6 +2071,7 @@ class Car extends SimCar {
     for (const sx of [-1, 1]) { const b = new THREE.Mesh(bg, new THREE.MeshBasicMaterial({ color: 0xfff1d6, alphaMap: beamTex, transparent: true, opacity: .045, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide })); b.position.set(sx * .6, .64, 2.3); b.rotation.x = .05; this.body.add(b); this.beams.push(b); }
     this.flames = [];
     for (const sx of [-.37, .37]) { const f = new THREE.Sprite(new THREE.SpriteMaterial({ map: softTex, color: 0x66aaff, blending: THREE.AdditiveBlending, transparent: true, depthWrite: false })); f.position.set(sx, .4, -2.62); f.visible = false; this.body.add(f); this.flames.push(f); }
+    if (!isPlayer && TIER !== 'high') this.root.traverse(o => { if (o.isMesh) o.castShadow = false; });
     parent.add(this.root);
     this.wheelRot = 0; this.roll = 0; this.pitch = 0; this.rollV = 0; this.pitchV = 0; this.lastSkid = [null, null]; this.vis = { steer: 0 };
     this.flip = null; this.apitch = 0; this.bp = 0; this.bv = 0; this.droop = 0;
@@ -2212,7 +2244,8 @@ function initAudio() {
   if (audio) { audio.ctx.resume && audio.ctx.resume(); return; }
   try {
     const ctx = new (window.AudioContext || window.webkitAudioContext)();
-    const master = ctx.createGain(); master.gain.value = .5; master.connect(ctx.destination);
+    const master = ctx.createGain(); master.gain.value = .55 * PREFS.svol; master.connect(ctx.destination);
+    const music = ctx.createGain(); music.gain.value = PREFS.music ? PREFS.mvol * .4 : 0; music.connect(ctx.destination);
     const osc = (type) => { const o = ctx.createOscillator(); o.type = type; o.start(); return o; };
     const o1 = osc('sawtooth'), o2 = osc('square'), o3 = osc('triangle');
     const f = ctx.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = 800; f.Q.value = 3;
@@ -2222,8 +2255,9 @@ function initAudio() {
     const buf = ctx.createBuffer(1, ctx.sampleRate * 2, ctx.sampleRate), d = buf.getChannelData(0);
     for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
     const mkNoise = (type, freq, q) => { const s = ctx.createBufferSource(); s.buffer = buf; s.loop = true; const fl = ctx.createBiquadFilter(); fl.type = type; fl.frequency.value = freq; fl.Q.value = q; const g = ctx.createGain(); g.gain.value = 0; s.connect(fl); fl.connect(g); g.connect(master); s.start(); return g; };
-    audio = { ctx, master, o1, o2, o3, f, eg, rg, skid: mkNoise('bandpass', 1400, 4), wind: mkNoise('lowpass', 600, .5), nitroN: mkNoise('highpass', 2500, .7), rain: mkNoise('bandpass', 3000, .4), scrape: mkNoise('bandpass', 2400, 6) };
+    audio = { ctx, master, music, buf, o1, o2, o3, f, eg, rg, skid: mkNoise('bandpass', 1400, 4), wind: mkNoise('lowpass', 600, .5), nitroN: mkNoise('highpass', 2500, .7), rain: mkNoise('bandpass', 3000, .4), scrape: mkNoise('bandpass', 2400, 6) };
   } catch (e) { audio = null; }
+  if (audio && PREFS.music) startMusic();
 }
 function beep(freq, dur = .18, vol = .3) { if (!audio) return; const { ctx, master } = audio; const o = ctx.createOscillator(), g = ctx.createGain(); o.frequency.value = freq; o.type = 'square'; g.gain.setValueAtTime(vol, ctx.currentTime); g.gain.exponentialRampToValueAtTime(.001, ctx.currentTime + dur); o.connect(g); g.connect(master); o.start(); o.stop(ctx.currentTime + dur); }
 function thump(v) { if (!audio) return; const { ctx, master } = audio; const o = ctx.createOscillator(), g = ctx.createGain(); o.type = 'sine'; o.frequency.setValueAtTime(90, ctx.currentTime); o.frequency.exponentialRampToValueAtTime(30, ctx.currentTime + .25); g.gain.setValueAtTime(Math.min(.8, v * .05), ctx.currentTime); g.gain.exponentialRampToValueAtTime(.001, ctx.currentTime + .3); o.connect(g); g.connect(master); o.start(); o.stop(ctx.currentTime + .3); }
@@ -2291,7 +2325,8 @@ function setupRace() {
   raceTime = 0; countdown = 3; finishShown = false; LAPS = settings.mode === 'elim' ? 99 : settings.laps;
   elimT = 25; goT = -1; perfectUsed = false; ghostRec = []; ghostRecT = 0; setupGhost();
   $('lapK').textContent = settings.mode === 'elim' ? 'ВЫБЫВАНИЕ' : 'КРУГ';
-  camMode = 0; orbitYaw = 0; orbitPitch = 0;
+  camMode = PREFS.cam || 0; orbitYaw = 0; orbitPitch = 0; lastPos = 0; bestPosAnn = 99; posAnnT = -9; draftOn = false; driftMax = 0; lastGear = 'N';
+  if ($('feed')) $('feed').innerHTML = '';
   WX.mode = settings.wx; WX.timer = 25 + Math.random() * 15;
   const w0 = settings.wx === 'auto' ? (MTN ? 'snow' : 'clear') : settings.wx;
   setWeather(w0, false); WX.rain = WX.tRain; WX.snow = WX.tSnow;
@@ -2541,7 +2576,7 @@ function showFinish() {
   if (mode === 'time') $('finTitle').textContent = newGhost ? '⏱ НОВЫЙ РЕКОРД ТРАССЫ!' : '⏱ ЗАЕЗД НА ВРЕМЯ';
   if (mode === 'elim') $('finTitle').textContent = myPlace === 1 ? '🏆 ПОСЛЕДНИЙ ВЫЖИВШИЙ!' : 'ВЫБЫЛ · МЕСТО ' + myPlace;
   const placeR = mode === 'time' ? 600 + (newGhost ? 900 : 0) : ([2500, 1600, 1100, 700, 500, 300][myPlace - 1] || 300) * (mode === 'elim' ? 1.3 : LAPS / 3);
-  const rw = Math.round(placeR + raceStats.jumps * 100 + raceStats.rolls * 250 + raceStats.drift * 20 + raceStats.picks * 10 + raceStats.takedowns * 300);
+  const rw = Math.round(placeR + raceStats.jumps * 100 + raceStats.rolls * 250 + raceStats.drift * 20 + raceStats.picks * 10 + raceStats.takedowns * 300 + (raceStats.nearMiss || 0) * 40);
   taskProgress({ races: 1, win: myPlace === 1 && mode !== 'time' ? 1 : 0, rolls: raceStats.rolls, jumps: raceStats.jumps, drift: raceStats.drift, picks: raceStats.picks, takedowns: raceStats.takedowns, speed: raceStats.maxSpeed });
   SAVE.coins += rw; saveSave();
   $('finTable').innerHTML = ranked.map((r, k) => `<tr class="${r === player ? 'me' : ''}"><td>${k + 1}</td><td>${r.name}</td><td style="text-align:right">${r.finish != null ? fmt(r.finish) : 'в пути'}</td></tr>`).join('') + `<tr><td colspan="3" style="opacity:.7;text-align:center;padding-top:12px">Лучший круг: ${fmt(bl)} · Рекорд: ${fmt(best)}</td></tr>`
@@ -2550,16 +2585,50 @@ function showFinish() {
   $('finish').classList.remove('hidden');
 }
 
+
+/* ================= RACE AWARENESS: slipstream, near-miss, overtakes, trick feed ================= */
+let lastHitT = -9, lastPos = 0, draftOn = false, driftMax = 0, bestPosAnn = 99, posAnnT = -9;
+function feed(txt, cls = '') {
+  const el = document.createElement('div'); el.className = 'fi ' + cls; el.textContent = txt;
+  const f = $('feed'); f.prepend(el); while (f.children.length > 4) f.lastChild.remove();
+  setTimeout(() => el.classList.add('out'), 1800); setTimeout(() => el.remove(), 2300);
+}
+function playerAwareness(dt, myPos) {
+  const p = player; let draft = 0;
+  if (p.finish != null) return;
+  for (const o of cars) {
+    if (o === p || o.elim) continue;
+    const gap = (o.dist - p.dist) * DS, latD = Math.abs(o.q.lat - p.q.lat);
+    if (gap > 3 && gap < 30 && latD < 1.9 && p.vF > 25 && !o.air && !p.air) draft = Math.max(draft, 1 - (gap - 3) / 27);
+    const prev = o._rel; o._rel = gap;
+    if (prev !== undefined && prev > 0 && gap <= 0 && p.vF > 20 && !o.wreck && timeAcc - (o._ovT || -9) > 4) {
+      o._ovT = timeAcc;
+      if (latD < 2.6 && p.vF > 30 && timeAcc - lastHitT > .7) { raceStats.nearMiss = (raceStats.nearMiss || 0) + 1; p.nitro = Math.min(1, p.nitro + .07); feed('⚡ ПОЧТИ ЗАДЕЛ · +НИТРО', 'gold'); vib(15); if (audio) beep(1700, .05, .08); }
+      else feed('▲ ОБГОН: ' + o.name);
+    }
+  }
+  p.draft = lerp(p.draft, draft, 1 - Math.exp(-dt * 3));
+  if (p.draft > .45 && !draftOn) { draftOn = true; feed('💨 СЛИПСТРИМ', 'blue'); } else if (p.draft < .15) draftOn = false;
+  if (p.driftT > 0) driftMax = Math.max(driftMax, p.driftT); else if (driftMax > 1.2) { feed('🌀 ДРИФТ ' + driftMax.toFixed(1) + ' с · +НИТРО', 'purple'); driftMax = 0; } else driftMax = 0;
+  if (myPos < bestPosAnn && countdown <= 0 && timeAcc - posAnnT > 2.5) { if (bestPosAnn < 99) feed('🏁 ' + myPos + '-е МЕСТО', 'green'); bestPosAnn = myPos; posAnnT = timeAcc; }
+  if (myPos > bestPosAnn + 1) bestPosAnn = myPos;
+  lastPos = myPos;
+}
+
 /* ================= LOOP ================= */
 let last = performance.now(), accT = 0, fpsAcc = 0, fpsN = 0, pixelRatio = 1, bloomOn = true, envInterval = 3, timeAcc = 0, portT = 0;
 function setQuality(q) {
   const dpr = Math.min(devicePixelRatio || 1, 2);
-  if (q === 'auto') q = isTouch ? (lowEnd ? 'low' : 'mid') : 'high';
-  if (q === 'high') { pixelRatio = dpr; bloomOn = true; sun.shadow.mapSize.set(2048, 2048); envInterval = 1.5; }
-  else if (q === 'mid') { pixelRatio = Math.min(dpr, 1.5); bloomOn = true; sun.shadow.mapSize.set(1024, 1024); envInterval = 3; }
-  else { pixelRatio = Math.min(dpr, 1); bloomOn = false; sun.shadow.mapSize.set(1024, 1024); envInterval = 6; }
+  if (q === 'auto') q = TIER;
+  curQ = q; dynScale = 1;
+  if (q === 'high') { pixelRatio = dpr; bloomOn = true; sun.castShadow = true; sun.shadow.mapSize.set(2048, 2048); envInterval = 1.5; }
+  else if (q === 'mid') { pixelRatio = Math.min(dpr, 1.6); bloomOn = true; sun.castShadow = true; sun.shadow.mapSize.set(1024, 1024); envInterval = 3; }
+  else { pixelRatio = Math.min(dpr, 1.1); bloomOn = false; sun.castShadow = false; envInterval = Infinity; }
   if (sun.shadow.map) { sun.shadow.map.dispose(); sun.shadow.map = null; }
-  renderer.setPixelRatio(pixelRatio); composer.setPixelRatio(pixelRatio); resize();
+  applyDPR();
+}
+let curQ = 'mid', dynScale = 1, lastFps = 60;
+function applyDPR() { const pr = pixelRatio * dynScale; renderer.setPixelRatio(pr); composer.setPixelRatio(pr); resize();
 }
 function resize() { updateOrient(); const el = renderer.domElement, w = el.clientWidth || innerWidth, h = el.clientHeight || innerHeight; renderer.setSize(w, h, false); composer.setSize(w, h); camera.aspect = w / h; camera.updateProjectionMatrix(); }
 addEventListener('resize', resize);
@@ -2573,8 +2642,17 @@ function frame(now) {
   const dt = Math.min(.05, (now - last) / 1000); last = now;
   if (!player) return;
   timeAcc += dt; fpsAcc += dt; fpsN++;
-  if (fpsAcc > 3) { const fps = fpsN / fpsAcc; fpsAcc = 0; fpsN = 0; if (fps < 36 && pixelRatio > .6 && state === 'race') { pixelRatio = Math.max(.6, pixelRatio - .2); renderer.setPixelRatio(pixelRatio); composer.setPixelRatio(pixelRatio); resize(); } }
-  if (paused) { render(); return; }
+  if (fpsAcc > 2) {
+    const fps = fpsN / fpsAcc; fpsAcc = 0; fpsN = 0; lastFps = fps;
+    if (state === 'race' && !paused) {
+      if (fps < 47 && dynScale > .55) { dynScale = Math.max(.55, dynScale - .12); applyDPR(); }
+      else if (fps > 57.5 && dynScale < 1) { dynScale = Math.min(1, dynScale + .06); applyDPR(); }
+      if (fps < 32 && dynScale <= .56 && bloomOn) { bloomOn = false; }
+    }
+    $('fps').classList.toggle('hidden', !PREFS.fps);
+    if (PREFS.fps) $('fps').textContent = Math.round(fps) + ' FPS · ' + (pixelRatio * dynScale).toFixed(2) + 'x · ' + curQ;
+  }
+  if (paused) { if (photo) photoCam(dt); render(); return; }
   if (!wheelUI.active) wheelUI.rot *= Math.exp(-dt * 9);
   wheelUI.svg.style.transform = `rotate(${wheelUI.rot.toFixed(1)}deg)`;
   window.__beaconMat.color.setRGB(1, .1, .1).multiplyScalar((Math.sin(timeAcc * 3) > .3 ? 1 : .15) * (preset.night ? 2 : preset.name === 'sunset' ? 1.5 : 1));
@@ -2602,7 +2680,7 @@ function frame(now) {
     player.impact = 0;
     while (accT >= H) { for (const c of live) stepCar(c, H); hit = Math.max(hit, collideCars(live)); tickPickups(H); accT -= H; }
     for (const c of live) handleEvents(c);
-    if (hit > 2) { shake = Math.min(1, hit * .06); thump(hit); }
+    if (hit > 2) { shake = Math.min(1, hit * .06); thump(hit); lastHitT = timeAcc; vib(Math.min(60, hit * 4)); }
     if (player.impact > 3) { shake = Math.min(1, player.impact * .05); thump(player.impact); }
     if (racing) { for (const c of live) lapCheck(c); modeTick(dt); recordGhost(dt); }
     raceStats.maxSpeed = Math.max(raceStats.maxSpeed, player.vF * 3.6);
@@ -2613,6 +2691,7 @@ function frame(now) {
     if (flashT > 0) { flashT -= dt; if (flashT <= 0) $('sub').textContent = ''; }
     else if (racing && player.finish == null) { if (player.trackDot < -4) player.wrong += dt; else player.wrong = 0; $('sub').textContent = player.wrong > 1.2 ? '⚠ НЕВЕРНОЕ НАПРАВЛЕНИЕ' : ''; }
     const myPos = drawHUD(dt);
+    if (racing) playerAwareness(dt, myPos);
     if (camMode === 2 && (mirrorTick++ & 1) === 0) { drawCluster(myPos); renderMirror(); }
     updateAudio();
     const spd = Math.abs(player.vF);
@@ -2640,9 +2719,41 @@ function render() {
   if (bloomOn) { renderPass.scene = sc; renderPass.camera = cm; try { composer.render(); } catch (e) { bloomOn = false; renderer.render(sc, cm); } }
   else renderer.render(sc, cm);
 }
+const ENGINE = { veloce: [1, 'sawtooth'], kaze: [1.18, 'sawtooth'], iron: [.62, 'sawtooth'], apex: [1.32, 'sawtooth'], pico: [1.28, 'square'], nova: [1.06, 'sawtooth'], vortex: [.84, 'sawtooth'], lumen: [2.3, 'sine'] };
+let lastGear = 'N';
+function setEngineVoice() { if (!audio) return; const e = ENGINE[SAVE.sel] || ENGINE.veloce; audio.o1.type = e[1]; audio.o3.type = SAVE.sel === 'lumen' ? 'sine' : 'triangle'; audio.emul = e[0]; }
+function pop(vol = .18) { if (!audio) return; const { ctx, master, buf } = audio, s = ctx.createBufferSource(), f = ctx.createBiquadFilter(), g = ctx.createGain(); s.buffer = buf; f.type = 'bandpass'; f.frequency.value = 700 + Math.random() * 500; f.Q.value = 1.5; g.gain.setValueAtTime(vol, ctx.currentTime); g.gain.exponentialRampToValueAtTime(.001, ctx.currentTime + .09); s.connect(f); f.connect(g); g.connect(master); s.start(); s.stop(ctx.currentTime + .1); }
+// ---- procedural synthwave soundtrack ----
+const MUSIC = { timer: null, next: 0, step: 0 }, BPM = 106, SPB = 60 / BPM / 4;
+const CHORDS = [[57, 60, 64], [53, 57, 60], [48, 52, 55], [55, 59, 62]];
+const mtof = m => 440 * Math.pow(2, (m - 69) / 12);
+function startMusic() { if (!audio || MUSIC.timer) return; MUSIC.next = audio.ctx.currentTime + .15; MUSIC.timer = setInterval(schedMusic, 30); }
+function stopMusic() { clearInterval(MUSIC.timer); MUSIC.timer = null; }
+function schedMusic() { if (!audio || audio.ctx.state !== 'running') return; const ctx = audio.ctx; if (MUSIC.next < ctx.currentTime) MUSIC.next = ctx.currentTime + .05; while (MUSIC.next < ctx.currentTime + .14) { playStep(MUSIC.step, MUSIC.next); MUSIC.next += SPB; MUSIC.step = (MUSIC.step + 1) % 512; } }
+function mVoice(type, freq, t, dur, vol, filt) {
+  const ctx = audio.ctx, o = ctx.createOscillator(), g = ctx.createGain(); o.type = type; o.frequency.value = freq;
+  g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(vol, t + .008); g.gain.exponentialRampToValueAtTime(.0008, t + dur);
+  if (filt) { const f = ctx.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = filt; o.connect(f); f.connect(g); } else o.connect(g);
+  g.connect(audio.music); o.start(t); o.stop(t + dur + .02);
+}
+function mNoise(t, dur, vol, type, freq) { const ctx = audio.ctx, s = ctx.createBufferSource(), f = ctx.createBiquadFilter(), g = ctx.createGain(); s.buffer = audio.buf; f.type = type; f.frequency.value = freq; g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(.0008, t + dur); s.connect(f); f.connect(g); g.connect(audio.music); s.start(t, Math.random()); s.stop(t + dur + .02); }
+function playStep(st, t) {
+  const bar = Math.floor(st / 16) % 4, s = st % 16, ch = CHORDS[bar], race = state === 'race', sec = Math.floor(st / 64) % 8;
+  if (s % 4 === 0) { const ctx = audio.ctx, o = ctx.createOscillator(), g = ctx.createGain(); o.frequency.setValueAtTime(140, t); o.frequency.exponentialRampToValueAtTime(42, t + .14); g.gain.setValueAtTime(.9, t); g.gain.exponentialRampToValueAtTime(.001, t + .22); o.connect(g); g.connect(audio.music); o.start(t); o.stop(t + .25); }
+  if ((s === 4 || s === 12) && (race || sec > 1)) mNoise(t, .16, .35, 'bandpass', 1800);
+  if (s % 2 === 1) mNoise(t, .04, race ? .12 : .06, 'highpass', 7000);
+  if (s % 2 === 0) mVoice('sawtooth', mtof(ch[0] - 24 + (s % 8 === 6 ? 12 : 0)), t, SPB * 1.7, .22, 600);
+  if (race || sec % 2) mVoice('square', mtof(ch[s % 3] + 12 + ((s >> 2) % 2) * 12), t, SPB * .9, .05, 2600);
+  if (s === 0) for (const n of ch) { mVoice('sawtooth', mtof(n), t, SPB * 15, .045, 1400); mVoice('sawtooth', mtof(n) * 1.006, t, SPB * 15, .04, 1400); }
+  if (race && sec >= 4 && s % 4 === 2) mVoice('triangle', mtof(ch[(s >> 2) % 3] + 24), t, SPB * 2, .06, 4000);
+}
+function setMusicVol() { if (audio) audio.music.gain.setTargetAtTime(PREFS.music ? PREFS.mvol * .4 : 0, audio.ctx.currentTime, .1); if (PREFS.music) startMusic(); }
+addEventListener('pointerdown', () => { if (!audio) initAudio(); else if (audio.ctx.state !== 'running' && !paused) audio.ctx.resume(); }, { once: false, passive: true });
 function updateAudio() {
   if (!audio) return;
-  const c = player, t = audio.ctx.currentTime, rpm = calcRpm(c), base = rpm / 30;
+  const c = player, t = audio.ctx.currentTime, rpm = calcRpm(c), base = rpm / 30 * (audio.emul || 1);
+  const g = calcGear(c);
+  if (g !== lastGear) { if (g > lastGear && lastGear !== 'N' && lastGear !== 'R' && SAVE.sel !== 'lumen') { audio.eg.gain.setValueAtTime(.03, t); if (Math.random() < .6) { pop(.2); setTimeout(() => pop(.12), 70); } } lastGear = g; }
   audio.o1.frequency.setTargetAtTime(base, t, .05); audio.o2.frequency.setTargetAtTime(base / 2, t, .05); audio.o3.frequency.setTargetAtTime(base * 1.5, t, .05);
   audio.f.frequency.setTargetAtTime(500 + c.inp.thr * 2200 + rpm * .15, t, .08);
   audio.eg.gain.setTargetAtTime(.07 + c.inp.thr * .09, t, .1);
@@ -2678,7 +2789,7 @@ function tryLandscape() {
   } catch (_) { }
 }
 function startRace() {
-  initAudio(); tryLandscape();
+  initAudio(); setEngineVoice(); tryLandscape();
   if (settings.ctl === 'tilt') { TILT.zero = null; enableTilt(); }
   setTimeout(() => { if (settings.ctl === 'tilt' && state === 'race') flash('📱 НАКЛОНЯЙ ТЕЛЕФОН КАК РУЛЬ · ↺ — ВЫРОВНЯТЬ', 3); }, 100);
   $('menu').classList.add('hidden'); $('finish').classList.add('hidden'); $('pause').classList.add('hidden');
@@ -2690,6 +2801,8 @@ function startRace() {
   for (const k in keys) keys[k] = false;
   wheelUI.rot = 0; pads.clear();
   beep(523, .2, .3);
+  let tut = null; try { tut = localStorage.getItem('sr3d_tut'); } catch (_) { }
+  if (!tut) { paused = true; $('tut').classList.remove('hidden'); }
 }
 function toMenu() {
   const wasCareer = !!careerEv;
@@ -2703,7 +2816,7 @@ function toMenu() {
   $('menu').classList.remove('hidden');
   if (wasCareer) openCareer();
 }
-function togglePause() { if (state !== 'race' || finishShown) return; paused = !paused; $('pause').classList.toggle('hidden', !paused); if (audio) { if (paused) audio.ctx.suspend(); else audio.ctx.resume(); } }
+function togglePause() { if (state !== 'race' || finishShown || photo) return; if (!$('tut').classList.contains('hidden')) return; paused = !paused; $('pause').classList.toggle('hidden', !paused); if (audio) { if (paused) audio.ctx.suspend(); else audio.ctx.resume(); } }
 $('go').onclick = startRace; $('again').onclick = startRace; $('restart').onclick = startRace;
 $('resume').onclick = togglePause; $('toMenu').onclick = toMenu; $('finMenu').onclick = toMenu;
 document.addEventListener('visibilitychange', () => { if (document.hidden && state === 'race' && !paused && !finishShown) togglePause(); });
@@ -2994,6 +3107,50 @@ function careerResult(place) {
   return out;
 }
 try { const pend = localStorage.getItem('sr3d_pending'); if (pend) { localStorage.removeItem('sr3d_pending'); careerFocus = pend; setTimeout(() => { openCareer(); cToast('Трасса загружена — жми СТАРТ у выделенного этапа'); }, 60); } } catch (_) { }
+
+
+/* ================= SETTINGS, TUTORIAL, PHOTO MODE ================= */
+$('tutOk').onclick = () => { $('tut').classList.add('hidden'); paused = false; try { localStorage.setItem('sr3d_tut', '1'); } catch (_) { } };
+function renderPrefs() {
+  const ch = (k, list) => `<div class="opts">${list.map(([v, n]) => `<div class="opt ${String(PREFS[k]) === String(v) ? 'on' : ''}" data-pk="${k}" data-v="${v}">${n}</div>`).join('')}</div>`;
+  $('prefBody').innerHTML = `<div class="row"><label>Музыка</label>${ch('music', [[1, '🎵 Вкл'], [0, 'Выкл']])}</div>
+    <div class="row"><label>Громкость музыки</label><input type="range" min="0" max="1" step=".05" value="${PREFS.mvol}" data-pr="mvol"></div>
+    <div class="row"><label>Громкость звуков</label><input type="range" min="0" max="1" step=".05" value="${PREFS.svol}" data-pr="svol"></div>
+    <div class="row"><label>Вибрация (Android)</label>${ch('vib', [[1, 'Вкл'], [0, 'Выкл']])}</div>
+    <div class="row"><label>Камера по умолчанию</label>${ch('cam', [[0, 'Погоня'], [1, 'Дальняя'], [2, 'Салон'], [3, 'Капот']])}</div>
+    <div class="row"><label>Счётчик FPS</label>${ch('fps', [[0, 'Скрыть'], [1, 'Показать']])}</div>
+    <div class="help">Устройство: ${TIER === 'high' ? 'мощное' : TIER === 'mid' ? 'среднее' : 'экономный режим'} · разрешение подстраивается само</div>`;
+}
+$('prefBody').addEventListener('click', e => { const o = e.target.closest('[data-pk]'); if (!o) return; PREFS[o.dataset.pk] = +o.dataset.v; savePrefs(); renderPrefs(); setMusicVol(); if (!PREFS.music) stopMusic(); });
+$('prefBody').addEventListener('input', e => { const o = e.target; if (!o.dataset.pr) return; PREFS[o.dataset.pr] = +o.value; savePrefs(); if (audio) audio.master.gain.value = .55 * PREFS.svol; setMusicVol(); });
+$('btnPrefs').onclick = () => { renderPrefs(); $('prefs').classList.remove('hidden'); };
+$('prefClose').onclick = () => $('prefs').classList.add('hidden');
+let photo = false, phYaw = 2.2, phPitch = .25, phDist = 7;
+const phPads = new Map();
+function photoCam() {
+  const p = player.pos;
+  camera.position.set(p.x + Math.sin(phYaw) * phDist * Math.cos(phPitch), player.y + .7 + Math.sin(phPitch) * phDist, p.z + Math.cos(phYaw) * phDist * Math.cos(phPitch));
+  camera.lookAt(p.x, player.y + .7, p.z); camera.near = .1; camera.fov = vfovFor(70, 35, 70); camera.updateProjectionMatrix();
+  player.cockpit.g.visible = false;
+}
+function setPhoto(on) {
+  photo = on;
+  for (const id of ['hud', 'touch', 'pause', 'bPause', 'bCam', 'bReset', 'bZin', 'bZout', 'camPad']) $(id).classList.toggle('photoHide', on);
+  $('photo').classList.toggle('hidden', !on);
+}
+$('btnPhoto').onclick = () => setPhoto(true);
+$('phClose').onclick = () => setPhoto(false);
+$('photo').addEventListener('pointerdown', e => { if (e.target.id === 'phClose') return; phPads.set(e.pointerId, { x: e.clientX, y: e.clientY }); try { $('photo').setPointerCapture(e.pointerId); } catch (_) { } });
+$('photo').addEventListener('pointermove', e => {
+  const q = phPads.get(e.pointerId); if (!q) return;
+  if (phPads.size >= 2) { const a = [...phPads.values()], d0 = Math.hypot(a[0].x - a[1].x, a[0].y - a[1].y); q.x = e.clientX; q.y = e.clientY; const b = [...phPads.values()], d1 = Math.hypot(b[0].x - b[1].x, b[0].y - b[1].y); if (d0 > 10 && d1 > 10) phDist = clamp(phDist * d0 / d1, 3, 25); return; }
+  const [dx, dy] = padDelta(e.clientX - q.x, e.clientY - q.y); phYaw -= dx * .01; phPitch = clamp(phPitch + dy * .006, -.05, 1.3); q.x = e.clientX; q.y = e.clientY;
+});
+const phOff = e => phPads.delete(e.pointerId);
+$('photo').addEventListener('pointerup', phOff); $('photo').addEventListener('pointercancel', phOff);
+$('photo').addEventListener('wheel', e => { phDist = clamp(phDist * (e.deltaY > 0 ? 1.08 : .92), 3, 25); }, { passive: true });
+function showTrackBest() { let b = null; try { b = parseFloat(localStorage.getItem('sr3d_best_' + TRACK_ID)) || null; } catch (_) { } $('trkBest').textContent = TRACKS[TRACK_ID].desc + (b ? ' · рекорд круга ' + fmt(b) : ''); }
+showTrackBest();
 
 /* ================= BOOT ================= */
 setQuality('auto');
