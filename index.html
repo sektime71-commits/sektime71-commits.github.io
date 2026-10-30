@@ -16,7 +16,9 @@
 :root{--sl:max(10px,env(safe-area-inset-left));--sr:max(10px,env(safe-area-inset-right));--st:max(8px,env(safe-area-inset-top));--sb:max(8px,env(safe-area-inset-bottom))}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
 html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:"Segoe UI",Roboto,Arial,sans-serif;color:#fff;touch-action:none}
-canvas#gl{display:block;position:fixed;inset:0;width:100%;height:100%}
+canvas#gl{display:block;position:fixed;top:0;left:0;width:100vw;height:100vh;height:100lvh}
+html,body{height:100vh;height:100lvh}
+#loading,#menu,#pause,#finish,#hud,#touch,#camPad,#a2hs{top:0!important;left:0!important;right:auto!important;bottom:auto!important;width:100vw;height:100vh;height:100lvh}
 .hidden{display:none!important}
 #loading{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:14px;background:#06080f;z-index:50;font-size:18px;letter-spacing:2px;text-align:center;padding:20px}
 #loading .bar{width:220px;height:4px;background:#222;border-radius:2px;overflow:hidden}
@@ -847,13 +849,13 @@ const ELBOWS = [[.37 + .27, .75, -.44], [.37 - .27, .75, -.44]];
 const $ = id => document.getElementById(id);
 const isTouch = matchMedia('(pointer:coarse)').matches || ('ontouchstart' in window && navigator.maxTouchPoints > 0);
 if (isTouch) { document.body.classList.add('touch'); $('helpTxt').innerHTML = 'Газ — сам, нитро — само каждые 5–7 сек.<br>Крути РУЛЬ пальцем · ТОРМОЗ · ДРИФТ · двумя пальцами — зум, одним — обзор<br>🎥 камера (погоня / дальняя / салон / капот) · ↺ на трассу'; }
-function updateOrient() { const land = innerWidth > innerHeight; document.body.classList.toggle('land', land); document.body.classList.toggle('port', !land); return land; }
+function updateOrient() { const land = (document.documentElement.clientWidth || innerWidth) > (document.documentElement.clientHeight || innerHeight); document.body.classList.toggle('land', land); document.body.classList.toggle('port', !land); return land; }
 updateOrient();
 
 /* ================= RENDERER ================= */
 const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
 renderer.domElement.id = 'gl';
-renderer.setSize(innerWidth, innerHeight);
+renderer.setSize(innerWidth, innerHeight, false);
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 renderer.shadowMap.autoUpdate = false;
@@ -1873,9 +1875,11 @@ function setQuality(q) {
   if (sun.shadow.map) { sun.shadow.map.dispose(); sun.shadow.map = null; }
   renderer.setPixelRatio(pixelRatio); composer.setPixelRatio(pixelRatio); resize();
 }
-function resize() { updateOrient(); renderer.setSize(innerWidth, innerHeight); composer.setSize(innerWidth, innerHeight); camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix(); }
+function resize() { updateOrient(); const el = renderer.domElement, w = el.clientWidth || innerWidth, h = el.clientHeight || innerHeight; renderer.setSize(w, h, false); composer.setSize(w, h); camera.aspect = w / h; camera.updateProjectionMatrix(); }
 addEventListener('resize', resize);
-addEventListener('orientationchange', () => setTimeout(resize, 250));
+addEventListener('orientationchange', () => [100, 400, 1000].forEach(t => setTimeout(resize, t)));
+if (window.visualViewport) window.visualViewport.addEventListener('resize', resize);
+setTimeout(resize, 300);
 
 function frame(now) {
   requestAnimationFrame(frame);
