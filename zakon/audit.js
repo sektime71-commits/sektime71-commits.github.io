@@ -102,10 +102,14 @@ add('02.2', 'na', 'Политика на другом домене — не от
 add('02.2', 'check', 'Политика опубликована PDF-файлом', 'Проверьте вручную, что PDF открывается и содержит реквизиты оператора.', href.href, 'PDF', 'HTML-страница или PDF с реквизитами');
 } else {
 let ptext = '', status = 0;
+const probe = fetchFn ? await Promise.resolve(fetchFn(href.href)).catch(() => undefined) : null;
+if (probe === null) {
+add('02.2', 'na', 'Политика не открывалась', 'Проверялся вставленный код страницы — другие страницы сайта не открываем. Откройте политику и проверьте её тем же способом.', href.href, 'не проверялось', '—');
+} else {
 try {
-const r = await fetchFn(href.href);
-status = r.status;
-const h = await r.text();
+if (!probe) throw new Error('fetch failed');
+status = probe.status;
+const h = await probe.text();
 const d = new DOMParser().parseFromString(h, 'text/html');
 d.querySelectorAll('script,style,noscript').forEach((e) => e.remove());
 ptext = txt(d.body);
@@ -121,6 +125,7 @@ if (req) add('02.3', 'ok', 'В политике указан оператор с
 else add('02.3', 'check', 'В политике не найдены ИНН/ОГРН оператора', 'Из политики должно быть понятно, кто оператор. Без реквизитов это частая претензия РКН.', href.href, 'ИНН/ОГРН не найдены', 'наименование оператора, ИНН, ОГРН/ОГРНИП, адрес');
 if (!/(cookie|куки|метрик|аналитик)/i.test(ptext)) add('02.4', 'check', 'Политика не упоминает cookie и аналитику', 'Если на сайте стоят счётчики, политика должна описывать обработку cookie и метрических данных.', href.href, 'нет слов cookie/метрика', 'раздел о cookie и счётчиках');
 else add('02.4', 'ok', 'Политика описывает cookie/аналитику', '', href.href, 'упоминание найдено', '—');
+}
 }
 }
 }

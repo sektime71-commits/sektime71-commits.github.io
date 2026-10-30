@@ -4,222 +4,482 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Сайт по закону — проверка сайта на 152-ФЗ</title>
-<meta name="description" content="Бесплатная проверка формы заявки, согласия на обработку персональных данных, cookie и русского языка на вашем сайте. Работает в вашем браузере, ничего никуда не отправляет.">
+<meta name="description" content="Проверьте форму заявки, согласие на обработку персональных данных, cookie, иностранные сервисы и русский язык на своём сайте. Бесплатно, без регистрации, данные никуда не отправляются.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;800&family=Caveat:wght@600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700&family=Unbounded:wght@600;800&display=swap" rel="stylesheet">
 <style>
 :root{
-  --paper:#f3f5f7; --sheet:#ffffff; --ink:#172033; --muted:#566074; --rule:#d5dbe2;
-  --pen:#c4262e; --stamp:#24734a; --marker:#ffe36e; --focus:#2f5fd0;
+  --paper:#f6f7f4; --sheet:#ffffff; --ink:#14213d; --muted:#5a6377; --rule:#dcdfe5; --soft:#eef0f3;
+  --stamp:#2346a8; --bad:#c9302c; --bad-soft:#fbe4e2; --ok:#1e7a4c; --ok-soft:#ddf1e6;
+  --warn:#7a5600; --warn-soft:#fff1c2; --pinwarn:#b8860b; --focus:#2346a8;
+  --display:"Unbounded","Golos Text",system-ui,sans-serif; --body:"Golos Text",system-ui,-apple-system,"Segoe UI",sans-serif;
   color-scheme:light;
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
-  --paper:#12161d; --sheet:#1a2029; --ink:#e7ebf1; --muted:#9aa4b3; --rule:#2c3440;
-  --pen:#ff6b6b; --stamp:#5fc98f; --marker:#6b5a12; --focus:#8fb0ff; color-scheme:dark}}
-:root[data-theme="dark"]{--paper:#12161d; --sheet:#1a2029; --ink:#e7ebf1; --muted:#9aa4b3; --rule:#2c3440; --pen:#ff6b6b; --stamp:#5fc98f; --marker:#6b5a12; --focus:#8fb0ff; color-scheme:dark}
+  --paper:#0f1420; --sheet:#171d2b; --ink:#e8ecf4; --muted:#9aa3b5; --rule:#2a3245; --soft:#1e2536;
+  --stamp:#8fa8ff; --bad:#ff7b72; --bad-soft:#3a1e1f; --ok:#5fd19a; --ok-soft:#173326;
+  --warn:#ffd36b; --warn-soft:#3a2f10; --focus:#8fa8ff; color-scheme:dark}}
+:root[data-theme="dark"]{--paper:#0f1420; --sheet:#171d2b; --ink:#e8ecf4; --muted:#9aa3b5; --rule:#2a3245; --soft:#1e2536; --stamp:#8fa8ff; --bad:#ff7b72; --bad-soft:#3a1e1f; --ok:#5fd19a; --ok-soft:#173326; --warn:#ffd36b; --warn-soft:#3a2f10; --focus:#8fa8ff; color-scheme:dark}
 *{box-sizing:border-box}
-html{-webkit-text-size-adjust:100%}
-body{margin:0;background:var(--paper);color:var(--ink);font:400 17px/1.6 "Golos Text",system-ui,-apple-system,"Segoe UI",sans-serif}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{animation:none!important;transition:none!important}}
+body{margin:0;background:var(--paper);color:var(--ink);font:400 17px/1.6 var(--body)}
 a{color:inherit;text-underline-offset:3px}
 :focus-visible{outline:3px solid var(--focus);outline-offset:3px;border-radius:6px}
-.wrap{max-width:1080px;margin:0 auto;padding:0 max(16px,env(safe-area-inset-left))}
-header.top{display:flex;align-items:center;justify-content:space-between;padding:20px 0}
-.logo{font-weight:800;font-size:18px;text-decoration:none;display:flex;gap:10px;align-items:center}
-.logo b{display:inline-grid;place-items:center;width:30px;height:30px;border-radius:8px;background:var(--stamp);color:#fff;font-size:18px}
-.top nav a{color:var(--muted);text-decoration:none;margin-left:20px;font-size:15px}
+.wrap{max-width:1180px;margin:0 auto;padding:0 max(16px,env(safe-area-inset-left))}
+h1,h2,h3{font-family:var(--display);letter-spacing:-.02em;margin:0}
+h1{font-weight:800;font-size:clamp(32px,4.6vw,58px);line-height:1.04}
+h2{font-weight:800;font-size:clamp(26px,3.2vw,40px);line-height:1.1;max-width:20ch}
+h3{font-weight:600;font-size:19px;line-height:1.25}
+p{margin:0}
+.muted{color:var(--muted)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:48px;padding:0 22px;border-radius:12px;font:600 16px/1 var(--body);text-decoration:none;border:2px solid var(--ink);background:var(--ink);color:var(--paper);cursor:pointer;transition:transform .12s}
+.btn:active{transform:translateY(1px)}
+.btn.line{background:transparent;color:var(--ink)}
+.btn.stamp{background:var(--stamp);border-color:var(--stamp);color:#fff}
+.btn[disabled]{opacity:.55;cursor:default}
+
+.top{display:flex;align-items:center;justify-content:space-between;padding:18px 0}
+.logo{display:flex;align-items:center;gap:10px;font:800 17px/1 var(--display);text-decoration:none;letter-spacing:-.01em}
+.seal{display:inline-grid;place-items:center;width:34px;height:34px;border-radius:50%;border:2.5px solid var(--stamp);color:var(--stamp);font:800 17px/1 var(--display)}
+.top nav{display:flex;gap:24px}
+.top nav a{color:var(--muted);text-decoration:none;font-size:15px}
 .top nav a:hover{color:var(--ink)}
 
-/* hero */
-.hero{display:grid;grid-template-columns:1fr 1.05fr;gap:56px;align-items:center;padding:40px 0 72px}
-h1{font-size:clamp(34px,5vw,54px);line-height:1.05;letter-spacing:-.025em;font-weight:800;margin:0 0 20px;max-width:13ch}
-.lead{font-size:19px;color:var(--muted);max-width:34em;margin:0 0 28px}
-.actions{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
-.btn{display:inline-flex;align-items:center;gap:10px;padding:14px 22px;border-radius:12px;font:600 17px/1 "Golos Text",sans-serif;text-decoration:none;border:2px solid var(--ink);background:var(--ink);color:var(--paper);cursor:grab}
-.btn.ghost{background:transparent;color:var(--ink);cursor:pointer}
-.hint{font-size:14px;color:var(--muted);margin-top:14px;max-width:34em}
+.hero{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:56px;align-items:start;padding:36px 0 80px}
+.hero>div:first-child{padding-top:24px}
+.hero p.lead{font-size:19px;color:var(--muted);margin:22px 0 30px;max-width:30em}
+.hero .acts{display:flex;flex-wrap:wrap;gap:12px}
+.trust{display:flex;flex-wrap:wrap;gap:8px 20px;margin-top:26px;font-size:14px;color:var(--muted)}
+.trust span{display:inline-flex;gap:8px;align-items:center}
+.trust span:before{content:"";width:8px;height:8px;border-radius:50%;background:var(--ok)}
 
-/* specimen form with red-pen notes */
-.specimen{background:var(--sheet);border:1px solid var(--rule);border-radius:14px;padding:28px 28px 26px;box-shadow:0 1px 0 var(--rule),0 18px 40px -24px rgba(23,32,51,.35)}
-.specimen h3{margin:0 0 16px;font-size:20px}
-.field{border:1px solid var(--rule);border-radius:9px;padding:11px 13px;color:var(--muted);font-size:15px;margin-bottom:10px;background:var(--paper)}
-.agree{display:flex;gap:12px;align-items:flex-start;font-size:15px;line-height:1.45;margin:16px 0 0}
-.box{position:relative;flex:0 0 18px;height:18px;border-radius:4px;background:var(--focus);color:#fff;font-size:13px;display:grid;place-items:center;margin-top:2px}
-.box:after{content:"";position:absolute;inset:-9px -10px -8px -9px;border:2.5px solid var(--pen);border-radius:50% 46% 52% 44%;transform:rotate(-8deg)}
-.wavy{text-decoration:underline wavy var(--pen);text-decoration-thickness:2px;text-underline-offset:4px}
-.note{display:block;font:600 23px/1.1 Caveat,"Segoe Print","Comic Sans MS",cursive;color:var(--pen);margin:6px 0 14px 30px;transform:rotate(-1.5deg);transform-origin:left}
-.row{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
-.send{position:relative;display:inline-block;background:var(--ink);color:var(--sheet);border-radius:9px;padding:10px 18px;font-weight:600;font-size:15px}
-.send:after{content:"";position:absolute;inset:-8px -10px;border:2.5px solid var(--pen);border-radius:48% 52% 46% 54%;transform:rotate(3deg)}
-.row .note{margin:0 0 0 6px}
+.browser{background:var(--sheet);border:1px solid var(--rule);border-radius:16px;overflow:hidden;box-shadow:0 30px 60px -30px rgba(20,33,61,.45)}
+.bar{display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--soft);border-bottom:1px solid var(--rule)}
+.dots{display:flex;gap:6px}.dots i{width:10px;height:10px;border-radius:50%;background:var(--rule)}
+.url{flex:1;min-width:0;background:var(--sheet);border:1px solid var(--rule);border-radius:8px;padding:5px 12px;font-size:13px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.stage{position:relative;padding:18px 52px 20px 20px}
+.shop{font-size:14px}
+.shop .nav{display:flex;gap:16px;align-items:center;padding-bottom:12px;border-bottom:1px solid var(--rule);margin-bottom:16px;flex-wrap:wrap}
+.shop .brand{font-weight:700;margin-right:auto}
+.shop .nav a{text-decoration:none;color:var(--muted)}
+.shop h4{margin:0 0 12px;font:600 17px/1.2 var(--body)}
+.shop .in{display:block;width:100%;border:1px solid var(--rule);border-radius:8px;padding:9px 12px;margin-bottom:8px;color:var(--muted);background:var(--paper);font:inherit}
+.shop label{display:flex;gap:9px;align-items:flex-start;margin:10px 0;line-height:1.4}
+.shop input[type=checkbox]{width:16px;height:16px;margin:2px 0 0;accent-color:var(--stamp);flex:0 0 auto}
+.shop .send{margin-top:6px;background:var(--ink);color:var(--sheet);border:0;border-radius:8px;padding:9px 18px;font:600 14px var(--body)}
+.shop .cookie{margin-top:16px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;background:var(--soft);border-radius:10px;padding:10px 12px;font-size:13px}
+.shop .cookie button{font:600 13px var(--body);border:1px solid var(--rule);background:var(--sheet);color:var(--ink);border-radius:7px;padding:5px 10px}
+.shop .foot{margin-top:14px;font-size:12px;color:var(--muted)}
+.pin{position:absolute;z-index:2;width:24px;height:24px;margin:-12px 0 0 -12px;border-radius:50%;background:var(--bad);color:#fff;font:700 12px/24px var(--body);text-align:center;box-shadow:0 0 0 4px var(--bad-soft);animation:pop .35s ease-out both}
+.pin.check{background:var(--pinwarn);box-shadow:0 0 0 4px var(--warn-soft)}
+@keyframes pop{from{transform:scale(.2);opacity:0}to{transform:scale(1);opacity:1}}
+.verdict{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:12px 16px;border-top:1px solid var(--rule);background:var(--soft)}
+.chip{border-radius:999px;padding:4px 11px;font-weight:600;font-size:13px;white-space:nowrap;display:inline-block}
+.c-fix{background:var(--bad-soft);color:var(--bad)}.c-check{background:var(--warn-soft);color:var(--warn)}.c-ok{background:var(--ok-soft);color:var(--ok)}.c-na{background:var(--soft);color:var(--muted)}
+.verdict .btn{margin-left:auto;min-height:40px;padding:0 16px;font-size:14px}
+.notes{list-style:none;margin:16px 0 0;padding:0;display:grid;gap:7px;font-size:14px;min-height:150px}
+.notes li{display:flex;gap:10px;align-items:flex-start}
+.notes b{flex:0 0 22px;height:22px;border-radius:50%;background:var(--bad);color:#fff;font:700 11px/22px var(--body);text-align:center}
+.notes li.check b{background:var(--pinwarn)}
+.notes li.done{color:var(--ok);font-weight:600}
+.stampmark{position:absolute;right:20px;top:64px;width:156px;height:156px;color:var(--stamp);opacity:0;transform:rotate(-14deg) scale(1.6);pointer-events:none;transition:opacity .25s,transform .4s cubic-bezier(.2,1.6,.4,1)}
+.stampmark.on{opacity:.9;transform:rotate(-14deg) scale(1)}
 
-section{padding:64px 0;border-top:1px solid var(--rule)}
-h2{font-size:clamp(26px,3.4vw,36px);line-height:1.15;letter-spacing:-.015em;margin:0 0 12px;font-weight:800;max-width:24ch}
-.sub{color:var(--muted);max-width:40em;margin:0 0 32px}
+section{padding:80px 0;border-top:1px solid var(--rule)}
+.head{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:40px;align-items:end;margin-bottom:36px}
+.head p{color:var(--muted);max-width:34em}
 
-/* steps: real sequence */
-ol.steps{list-style:none;padding:0;margin:0;display:grid;grid-template-columns:repeat(3,1fr);gap:28px;counter-reset:s}
-ol.steps li{counter-increment:s;padding-top:16px;border-top:3px solid var(--ink)}
-ol.steps li:before{content:counter(s);font-weight:800;font-size:32px;display:block;margin-bottom:6px}
-ol.steps b{display:block;margin-bottom:4px}
-ol.steps p{margin:0;color:var(--muted);font-size:16px}
+.tabs{display:flex;gap:6px;border-bottom:1px solid var(--rule);margin-bottom:24px;overflow-x:auto}
+.tab{font:600 15px var(--body);background:none;border:0;border-bottom:3px solid transparent;color:var(--muted);padding:12px 14px;cursor:pointer;white-space:nowrap}
+.tab[aria-selected=true]{color:var(--ink);border-color:var(--stamp)}
+.panel[hidden]{display:none}
+.paste{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:28px}
+.field{display:block;margin-bottom:14px}
+.field span{display:block;font-weight:600;font-size:14px;margin-bottom:6px}
+.field input,.field textarea{width:100%;font:16px/1.45 var(--body);color:var(--ink);background:var(--sheet);border:1px solid var(--rule);border-radius:10px;padding:11px 13px}
+.field textarea{min-height:220px;font:13px/1.45 ui-monospace,Menlo,Consolas,monospace;resize:vertical}
+.how{font-size:14px;color:var(--muted);margin:-4px 0 14px}
+.row{display:flex;gap:10px;flex-wrap:wrap}
+.report{background:var(--sheet);border:1px solid var(--rule);border-radius:14px;padding:18px 20px;min-height:280px}
+.report .empty{color:var(--muted);display:grid;place-items:center;min-height:240px;text-align:center}
+.sum{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px}
+.f{padding:12px 0;border-top:1px solid var(--rule)}
+.f .t{display:flex;gap:10px;align-items:flex-start;font-weight:600}
+.f .t .chip{font-size:12px;padding:2px 9px;margin-top:1px;flex:0 0 auto}
+.f p{color:var(--muted);font-size:14px;margin-top:6px}
+.ev{margin-top:8px;font:12.5px/1.5 ui-monospace,Menlo,Consolas,monospace;background:var(--soft);border-radius:8px;padding:8px 10px;overflow-wrap:anywhere}
+details.more summary{cursor:pointer;color:var(--muted);padding:10px 0;font-size:14px}
+.steps{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px;counter-reset:s}
+.steps li{counter-increment:s;border-top:3px solid var(--ink);padding-top:14px}
+.steps li:before{content:counter(s);font:800 28px/1 var(--display);display:block;margin-bottom:10px}
+.steps p{color:var(--muted);font-size:15px;margin-top:4px}
+.drag{display:inline-flex;align-items:center;gap:10px;min-height:52px;padding:0 22px;border-radius:12px;background:var(--stamp);color:#fff;font:600 17px var(--body);text-decoration:none;cursor:grab;margin:22px 0 8px}
 
-/* checks table */
-.checks{width:100%;border-collapse:collapse;font-size:16px}
-.checks th{text-align:left;font-weight:600;color:var(--muted);font-size:14px;padding:0 12px 10px 0;border-bottom:2px solid var(--ink)}
-.checks td{padding:14px 12px 14px 0;border-bottom:1px solid var(--rule);vertical-align:top}
-.checks td:first-child{font-weight:600;width:34%}
-.checks td:last-child{color:var(--muted);width:24%;font-size:15px}
+.facts{list-style:none;margin:0;padding:0}
+.facts li{display:grid;grid-template-columns:220px minmax(0,1fr);gap:28px;padding:22px 0;border-top:1px solid var(--rule)}
+.facts li:last-child{border-bottom:1px solid var(--rule)}
+.facts .k{font:800 26px/1.1 var(--display);letter-spacing:-.02em}
+.facts p{max-width:44em}
+.facts small{display:block;color:var(--muted);font-size:13px;margin-top:6px}
 
-.example{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center}
-.example img{width:100%;height:auto;border-radius:14px;border:1px solid var(--rule);display:block}
-.legend{list-style:none;padding:0;margin:0}
-.legend li{display:flex;gap:12px;margin-bottom:16px}
-.tag{flex:0 0 auto;font-size:13px;font-weight:600;border-radius:999px;padding:3px 10px;height:fit-content}
-.t-fix{background:#fde2e1;color:#8a1c17}.t-check{background:#fff1c7;color:#6b4e00}.t-ok{background:#dcf2e5;color:#165a37}
+.groups{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:28px 40px}
+.group h3{padding-bottom:10px;border-bottom:2px solid var(--ink);margin-bottom:4px}
+.group ul{list-style:none;margin:0;padding:0}
+.group li{display:grid;grid-template-columns:44px minmax(0,1fr);gap:8px;padding:10px 0;border-bottom:1px solid var(--rule);font-size:15px}
+.group li code{font:600 13px/1.6 ui-monospace,Menlo,monospace;color:var(--stamp)}
+.group li small{display:block;color:var(--muted);font-size:13px}
 
-.offer{display:grid;grid-template-columns:1fr 1fr;gap:24px}
-.plan{background:var(--sheet);border:1px solid var(--rule);border-radius:14px;padding:28px}
-.plan.main{border:2px solid var(--ink)}
-.plan h3{margin:0 0 4px;font-size:21px}
-.price{font-size:34px;font-weight:800;margin:6px 0 14px;letter-spacing:-.02em}
-.plan ul{padding-left:20px;margin:0 0 20px}
+.offer{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.25fr);gap:20px}
+.plan{border:1px solid var(--rule);border-radius:16px;padding:28px;background:var(--sheet)}
+.plan.main{border:2px solid var(--stamp)}
+.price{font:800 40px/1 var(--display);letter-spacing:-.03em;margin:14px 0 18px}
+.price small{font:500 16px var(--body);color:var(--muted);letter-spacing:0}
+.plan ul{margin:0 0 22px;padding-left:20px}
 .plan li{margin-bottom:6px}
 
-details{border-bottom:1px solid var(--rule);padding:16px 0;max-width:46em}
-summary{font-weight:600;cursor:pointer;font-size:18px}
-details p{color:var(--muted);margin:10px 0 0}
-
-footer{padding:40px 0 56px;color:var(--muted);font-size:14px;border-top:1px solid var(--rule)}
-footer p{max-width:46em}
-.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--ink);color:var(--paper);padding:10px 16px;border-radius:10px;font-size:15px;opacity:0;transition:opacity .2s}
+.faq{max-width:780px}
+.faq details{border-bottom:1px solid var(--rule);padding:18px 0}
+.faq summary{cursor:pointer;font-weight:600;font-size:18px}
+.faq p{color:var(--muted);margin-top:10px}
+footer{padding:40px 0 64px;border-top:1px solid var(--rule);color:var(--muted);font-size:14px}
+footer p{max-width:50em;margin-bottom:8px}
+.toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);max-width:calc(100% - 32px);background:var(--ink);color:var(--paper);padding:11px 16px;border-radius:10px;font-size:15px;opacity:0;pointer-events:none;transition:opacity .2s;z-index:10}
 .toast.on{opacity:1}
 
-@media (max-width:860px){
-  .hero,.example,.offer{grid-template-columns:1fr}
-  .hero{gap:64px;padding-top:16px}
-  ol.steps{grid-template-columns:1fr}
+@media (max-width:920px){
+  .hero,.head,.paste,.offer{grid-template-columns:minmax(0,1fr)}
+  .hero{gap:36px;padding-top:8px}
+  .hero>div:first-child{padding-top:0}
+  .groups,.steps{grid-template-columns:minmax(0,1fr)}
+  .facts li{grid-template-columns:minmax(0,1fr);gap:6px}
   .top nav{display:none}
-  .checks td:last-child{display:none}.checks th:last-child{display:none}
+  .stampmark{width:112px;height:112px;right:10px;top:54px}
+  .verdict .btn{margin-left:0;width:100%}
 }
-@media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
 <body>
 <div class="wrap">
 <header class="top">
-  <a class="logo" href="./"><b>§</b>Сайт по закону</a>
-  <nav><a href="#how">Как проверить</a><a href="#checks">Что проверяем</a><a href="#audit">Полный аудит</a></nav>
+  <a class="logo" href="./"><span class="seal" aria-hidden="true">§</span>Сайт по закону</a>
+  <nav aria-label="Разделы"><a href="#check">Проверить</a><a href="#checks">Что проверяем</a><a href="#audit">Аудит</a></nav>
 </header>
 
 <div class="hero">
   <div>
-    <h1>Найдите нарушения на сайте раньше Роскомнадзора</h1>
-    <p class="lead">Бесплатная проверка формы заявки, согласия на обработку персональных данных, cookie и русского языка. Одна кнопка в браузере — отчёт за несколько секунд, со ссылкой на норму к каждой находке.</p>
-    <div class="actions">
-      <a class="btn" id="bm" href="#" title="Перетащите на панель закладок">§ Проверить сайт</a>
-      <button class="btn ghost" id="copy" type="button">Скопировать код для консоли</button>
+    <h1>Проверьте сайт на 152-ФЗ за минуту</h1>
+    <p class="lead">Галочка согласия, стоящая заранее, Google Analytics, кнопка «Send» — типовые ошибки сайтов малого бизнеса, за которые штрафуют. Проверка находит их на вашей странице и показывает, где именно и по какой норме.</p>
+    <div class="acts">
+      <a class="btn stamp" href="#check">Проверить свою страницу</a>
+      <a class="btn line" href="#audit">Заказать аудит сайта</a>
     </div>
-    <p class="hint">Перетащите кнопку «§ Проверить сайт» на панель закладок, откройте свою страницу с формой и нажмите закладку. Проверка работает только в вашем браузере и ничего никуда не отправляет.</p>
+    <div class="trust"><span>Без регистрации</span><span>Данные не уходят с вашего компьютера</span><span>Норма к каждой находке</span></div>
   </div>
 
-  <div class="specimen" aria-label="Пример формы заявки с тремя ошибками и пометками на полях">
-    <h3>Оставьте заявку</h3>
-    <div class="field">Имя</div>
-    <div class="field">Телефон</div>
-    <div class="agree"><span class="box" aria-hidden="true">✓</span><span>Принимаю условия <span class="wavy">оферты</span> и даю согласие на обработку персональных данных</span></div>
-    <span class="note">галочка стоит заранее, и согласие склеено с офертой</span>
-    <div class="row"><span class="send">Send</span><span class="note">кнопка только на английском</span></div>
+  <div class="demo">
+    <div class="browser">
+      <div class="bar"><span class="dots" aria-hidden="true"><i></i><i></i><i></i></span><span class="url">svechnaya-lavka.ru — пример магазина</span></div>
+      <div class="stage" id="stage">
+        <div class="shop" id="shop" aria-label="Пример страницы магазина"></div>
+        <svg class="stampmark" id="stampmark" viewBox="0 0 200 200" aria-hidden="true">
+          <defs><path id="circ" d="M100,100 m-74,0 a74,74 0 1,1 148,0 a74,74 0 1,1 -148,0"/></defs>
+          <circle cx="100" cy="100" r="94" fill="none" stroke="currentColor" stroke-width="5"/>
+          <circle cx="100" cy="100" r="58" fill="none" stroke="currentColor" stroke-width="2.5"/>
+          <text font-family="Unbounded, sans-serif" font-weight="800" font-size="15" letter-spacing="3" fill="currentColor"><textPath href="#circ">САЙТ ПО ЗАКОНУ ★ САЙТ ПО ЗАКОНУ ★</textPath></text>
+          <text x="100" y="97" text-anchor="middle" font-family="Unbounded, sans-serif" font-weight="800" font-size="18" fill="currentColor">ПРОВЕРЕНО</text>
+          <text x="100" y="120" text-anchor="middle" font-family="Golos Text, sans-serif" font-weight="600" font-size="13" fill="currentColor">0 нарушений</text>
+        </svg>
+      </div>
+      <div class="verdict" aria-live="polite">
+        <span id="demoSum" class="row"></span>
+        <button class="btn stamp" id="fixBtn" type="button">Исправить ошибки</button>
+      </div>
+    </div>
+    <ol class="notes" id="notes" aria-label="Что нашла проверка в примере"></ol>
   </div>
 </div>
 </div>
 
-<section id="how"><div class="wrap">
-  <h2>Как проверить свой сайт</h2>
-  <p class="sub">Нужен компьютер с Chrome, Яндекс Браузером, Edge или Firefox. Регистрация не нужна.</p>
-  <ol class="steps">
-    <li><b>Добавьте закладку</b><p>Перетащите кнопку «§ Проверить сайт» на панель закладок. Если панели не видно — Ctrl+Shift+B (на Mac — Cmd+Shift+B).</p></li>
-    <li><b>Откройте страницу с формой</b><p>Заявка, обратный звонок, оформление заказа или подписка — там, где посетитель оставляет имя, телефон или почту.</p></li>
-    <li><b>Нажмите закладку</b><p>Поверх страницы появится отчёт: что исправить, что проверить вручную и что уже в порядке. Его можно скопировать и отправить разработчику.</p></li>
-  </ol>
+<section id="check"><div class="wrap">
+  <div class="head">
+    <h2>Проверьте свою страницу</h2>
+    <p>Откройте страницу, где посетитель оставляет имя, телефон или почту: заявка, обратный звонок, заказ, подписка. Выберите удобный способ.</p>
+  </div>
+  <div class="tabs" role="tablist" aria-label="Способ проверки">
+    <button class="tab" role="tab" id="t1" aria-controls="p1" aria-selected="true">Вставить код страницы</button>
+    <button class="tab" role="tab" id="t2" aria-controls="p2" aria-selected="false" tabindex="-1">Закладка в браузере</button>
+    <button class="tab" role="tab" id="t3" aria-controls="p3" aria-selected="false" tabindex="-1">Через консоль</button>
+  </div>
+
+  <div class="panel" role="tabpanel" id="p1" aria-labelledby="t1">
+    <div class="paste">
+      <div>
+        <label class="field"><span>Адрес страницы</span><input id="pUrl" type="url" inputmode="url" placeholder="https://ваш-сайт.ru/contacts" autocomplete="off"></label>
+        <label class="field"><span>Код страницы</span><textarea id="pHtml" spellcheck="false" placeholder="&lt;!doctype html&gt;…"></textarea></label>
+        <p class="how">Откройте свою страницу и нажмите Ctrl+U (на Mac — Cmd+Option+U), затем Ctrl+A и Ctrl+C. Код разбирается прямо здесь: ничего не выполняется и никуда не отправляется.</p>
+        <div class="row">
+          <button class="btn stamp" id="pRun" type="button">Проверить страницу</button>
+          <button class="btn line" id="pSample" type="button">Подставить пример</button>
+        </div>
+      </div>
+      <div class="report" id="pOut" aria-live="polite"><div class="empty">Здесь появится отчёт: что исправить, что проверить и что в порядке.</div></div>
+    </div>
+  </div>
+
+  <div class="panel" role="tabpanel" id="p2" aria-labelledby="t2" hidden>
+    <p class="muted" style="max-width:40em">Самый точный способ: проверка видит страницу так же, как посетитель, вместе с баннером cookie и подгруженными скриптами. Нужен компьютер.</p>
+    <a class="drag" id="bm" href="#" title="Перетащите на панель закладок">§ Проверить сайт</a>
+    <ol class="steps" style="margin-top:20px">
+      <li><h3>Добавьте закладку</h3><p>Перетащите синюю кнопку на панель закладок. Панели не видно — нажмите Ctrl+Shift+B (на Mac — Cmd+Shift+B).</p></li>
+      <li><h3>Откройте свою страницу</h3><p>Ту, где есть форма заявки, заказа или подписки.</p></li>
+      <li><h3>Нажмите закладку</h3><p>Отчёт появится поверх страницы. Его можно скопировать и отправить разработчику.</p></li>
+    </ol>
+  </div>
+
+  <div class="panel" role="tabpanel" id="p3" aria-labelledby="t3" hidden>
+    <ol class="steps">
+      <li><h3>Скопируйте код</h3><p><button class="btn line" id="copy" type="button" style="margin-top:10px">Скопировать код проверки</button></p></li>
+      <li><h3>Откройте консоль</h3><p>На своей странице нажмите F12 (на Mac — Cmd+Option+J) и перейдите на вкладку Console.</p></li>
+      <li><h3>Вставьте и нажмите Enter</h3><p>Если браузер просит подтвердить вставку, введите allow pasting. Отчёт появится поверх страницы.</p></li>
+    </ol>
+  </div>
+</div></section>
+
+<section><div class="wrap">
+  <div class="head"><h2>Почему это стоит проверить сейчас</h2><p>Три изменения последних двух лет, которые касаются почти каждого сайта с формой заявки.</p></div>
+  <ul class="facts">
+    <li><div class="k">до 300 000 ₽</div><p>Штраф для организации за обработку персональных данных без согласия, когда оно обязательно. Для ИП — до 40 000 ₽, при повторном нарушении суммы выше.<small>ч. 2 и ч. 10 ст. 13.11 КоАП — <a href="https://vitvet.com/articles/koap/sostavy/shtraf-152-fz-2026-tablitsa/" rel="noopener">таблица штрафов</a></small></p></li>
+    <li><div class="k">с 1.09.2025</div><p>Согласие на обработку данных оформляется отдельно от других документов. Одна галочка «принимаю оферту и даю согласие» больше не подходит.<small>ч. 1 ст. 9 152-ФЗ — <a href="https://robokassa.com/blog/articles/izmeneniya-v-152-fz-s-1-sentyabrya/" rel="noopener">разбор изменений</a></small></p></li>
+    <li><div class="k">с 1.03.2026</div><p>Информация для потребителей — на русском языке. Иностранные слова допустимы как равнозначный дубль; исключение — зарегистрированные товарные знаки.<small>закон о государственном языке — <a href="https://pravo.ru/story/259589/" rel="noopener">разбор Право.ру</a></small></p></li>
+  </ul>
 </div></section>
 
 <section id="checks"><div class="wrap">
-  <h2>Что проверяем</h2>
-  <p class="sub">17 пунктов по 152-ФЗ, закону о рекламе, закону о защите прав потребителей и требованиям к русскому языку. Полный список с нормами — в <a href="checklist.html">чек-листе</a>.</p>
-  <table class="checks">
-    <thead><tr><th>Что</th><th>Как смотрим</th><th>Норма</th></tr></thead>
-    <tbody>
-      <tr><td>Согласие на обработку ПДн</td><td>У каждой формы есть своя галочка, она не проставлена заранее, не совмещена с офертой и ведёт на отдельный текст согласия.</td><td>ч. 1 ст. 9 152-ФЗ</td></tr>
-      <tr><td>Политика обработки ПДн</td><td>Ссылка есть, страница открывается, в ней указан оператор с ИНН и описаны cookie.</td><td>ч. 2 ст. 18.1 152-ФЗ</td></tr>
-      <tr><td>Cookie и счётчики</td><td>Какие счётчики стоят, есть ли уведомление и можно ли в нём отказаться.</td><td>152-ФЗ, позиция РКН</td></tr>
-      <tr><td>Иностранные сервисы</td><td>Google Analytics, Tag Manager, reCAPTCHA, пиксели, формы Google и Typeform.</td><td>ч. 5 ст. 18 152-ФЗ</td></tr>
-      <tr><td>Рекламная рассылка</td><td>Если форма — подписка, есть ли отдельная галочка на рекламу.</td><td>ч. 1 ст. 18 38-ФЗ</td></tr>
-      <tr><td>Русский язык</td><td>Меню и кнопки, написанные только латиницей.</td><td>закон о гос. языке, с 01.03.2026</td></tr>
-      <tr><td>Реквизиты продавца и HTTPS</td><td>ИНН или ОГРН на странице, защищённое соединение.</td><td>ст. 26.1 ЗоЗПП</td></tr>
-    </tbody>
-  </table>
-</div></section>
-
-<section><div class="wrap example">
-  <img src="report-example.png" width="880" height="1040" alt="Отчёт проверки поверх страницы: исправить 4, проверить 6, в порядке 5">
-  <div>
-    <h2>Отчёт показывает, где ошибка и что сделать</h2>
-    <ul class="legend">
-      <li><span class="tag t-fix">Исправить</span><span>Явное расхождение с нормой. Рядом — где найдено и как должно быть.</span></li>
-      <li><span class="tag t-check">Проверить</span><span>Риск, который зависит от деталей: например, слово латиницей может оказаться вашим товарным знаком.</span></li>
-      <li><span class="tag t-ok">В порядке</span><span>Пункт выполнен на этой странице.</span></li>
-    </ul>
-    <p class="sub" style="margin:0">Проверка смотрит одну открытую страницу. Пройдите ею по всем страницам с формами — или закажите полный аудит.</p>
+  <div class="head"><h2>Что проверяем</h2><p>17 пунктов. «Исправить» — только когда расхождение с нормой очевидно; где нужен взгляд человека — «Проверить» с объяснением. Нормы и источники — в <a href="checklist.html">полном чек-листе</a>.</p></div>
+  <div class="groups">
+    <div class="group"><h3>Формы и согласие</h3><ul>
+      <li><code>01.2</code><span>Отметка согласия у каждой формы<small>ч. 1 ст. 9 152-ФЗ</small></span></li>
+      <li><code>01.3</code><span>Галочка не стоит заранее<small>согласие — действие пользователя</small></span></li>
+      <li><code>01.4</code><span>Согласие не склеено с офертой и ведёт на отдельный текст<small>с 01.09.2025</small></span></li>
+      <li><code>01.5</code><span>Отдельное согласие на рекламную рассылку<small>ч. 1 ст. 18 38-ФЗ</small></span></li>
+      <li><code>01.6</code><span>Форма отправляет данные по HTTPS<small>ст. 19 152-ФЗ</small></span></li>
+    </ul></div>
+    <div class="group"><h3>Политика обработки данных</h3><ul>
+      <li><code>02.1</code><span>Ссылка на политику рядом с формой<small>ч. 2 ст. 18.1 152-ФЗ</small></span></li>
+      <li><code>02.2</code><span>Политика открывается, и это полноценный документ</span></li>
+      <li><code>02.3</code><span>Указан оператор с ИНН и ОГРН</span></li>
+      <li><code>02.4</code><span>Описаны cookie и счётчики</span></li>
+    </ul></div>
+    <div class="group"><h3>Cookie и сторонние сервисы</h3><ul>
+      <li><code>03.1</code><span>Какие счётчики стоят на странице</span></li>
+      <li><code>03.2</code><span>Есть уведомление о cookie</span></li>
+      <li><code>03.3</code><span>В уведомлении можно отказаться</span></li>
+      <li><code>03.4</code><span>Иностранные сервисы: Google Analytics, Tag Manager, reCAPTCHA, пиксели, формы Google<small>ч. 5 ст. 18 152-ФЗ</small></span></li>
+    </ul></div>
+    <div class="group"><h3>Язык, реквизиты, защита</h3><ul>
+      <li><code>01.1</code><span>Есть ли на странице формы с данными</span></li>
+      <li><code>04.1</code><span>Меню и кнопки только латиницей<small>с 01.03.2026</small></span></li>
+      <li><code>05.1</code><span>Реквизиты продавца на сайте<small>ст. 26.1 Закона о защите прав потребителей</small></span></li>
+      <li><code>05.2</code><span>Сайт работает по HTTPS</span></li>
+    </ul></div>
   </div>
 </div></section>
 
 <section id="audit"><div class="wrap">
-  <h2>Полный аудит сайта</h2>
-  <p class="sub">Когда страниц и форм много, а разбираться некогда, — проверим весь сайт вручную и дадим готовый список правок.</p>
+  <div class="head"><h2>Аудит всего сайта</h2><p>Бесплатная проверка смотрит одну страницу. Когда форм и страниц много, а разбираться некогда, — проверим весь сайт вручную.</p></div>
   <div class="offer">
     <div class="plan">
-      <h3>Проверка-закладка</h3>
+      <h3>Проверка страницы</h3>
       <div class="price">0 ₽</div>
       <ul><li>Одна страница за раз</li><li>17 автоматических пунктов</li><li>Отчёт можно скопировать</li></ul>
-      <a class="btn ghost" href="#how">Как проверить</a>
+      <a class="btn line" href="#check">Проверить страницу</a>
     </div>
     <div class="plan main">
       <h3>Аудит сайта</h3>
-      <div class="price">4 900 ₽</div>
-      <ul><li>До 15 страниц и все формы на них</li><li>Сторонние скрипты, cookie, счётчики, иностранные сервисы</li><li>Политика и текст согласия: что в них не хватает</li><li>Список правок для разработчика: страница, элемент, что поменять</li><li>Срок — 3 рабочих дня</li></ul>
-      <a class="btn" style="cursor:pointer" href="mailto:sektime71@gmail.com?subject=%D0%90%D1%83%D0%B4%D0%B8%D1%82%20%D1%81%D0%B0%D0%B9%D1%82%D0%B0">Заказать аудит</a>
+      <div class="price">4 900 ₽ <small>3 рабочих дня</small></div>
+      <ul>
+        <li>До 15 страниц: все формы, всплывающие окна, корзина и заказ</li>
+        <li>Все сторонние скрипты и сервисы по сетевым запросам, а не только по коду</li>
+        <li>Текст политики и согласия: чего в них не хватает</li>
+        <li>Таблица правок для разработчика: страница, элемент, что поменять</li>
+        <li>Скриншот к каждой находке</li>
+      </ul>
+      <a class="btn stamp" href="mailto:sektime71@gmail.com?subject=%D0%90%D1%83%D0%B4%D0%B8%D1%82%20%D1%81%D0%B0%D0%B9%D1%82%D0%B0&amp;body=%D0%90%D0%B4%D1%80%D0%B5%D1%81%20%D1%81%D0%B0%D0%B9%D1%82%D0%B0%3A%20">Заказать аудит</a>
     </div>
   </div>
 </div></section>
 
 <section><div class="wrap">
-  <h2>Вопросы</h2>
-  <details><summary>Это юридическая консультация?</summary><p>Нет. Это техническая проверка: мы находим на сайте то, что расходится с нормами, и показываем, где именно. Составить политику и текст согласия под ваш бизнес — работа юриста, и мы честно скажем, когда он нужен.</p></details>
-  <details><summary>Вы видите данные моего сайта или посетителей?</summary><p>Нет. Закладка выполняется в вашем браузере на вашей странице и ничего не отправляет ни нам, ни кому-то ещё. На этой странице тоже нет счётчиков, cookie и форм.</p></details>
-  <details><summary>Почему проверка не нашла баннер cookie, хотя он есть?</summary><p>Скорее всего, вы его уже закрыли, и сайт запомнил выбор. Откройте страницу в режиме инкогнито и запустите проверку ещё раз.</p></details>
-  <details><summary>Закладка не работает на телефоне</summary><p>На телефоне закладки с кодом почти не поддерживаются. Запустите проверку с компьютера или закажите аудит.</p></details>
-  <details><summary>Сайт на Тильде, Битриксе, WordPress — подойдёт?</summary><p>Да. Проверка смотрит готовую страницу так, как её видит посетитель, поэтому платформа не важна.</p></details>
+  <div class="head"><h2>Вопросы</h2></div>
+  <div class="faq">
+    <details><summary>Это юридическая консультация?</summary><p>Нет. Это техническая проверка: мы находим на сайте то, что расходится с нормами, и показываем где. Политику и текст согласия под ваш бизнес составляет юрист — мы скажем, когда он нужен.</p></details>
+    <details><summary>Вы видите мой сайт или данные посетителей?</summary><p>Нет. Проверка выполняется в вашем браузере. Вставленный код разбирается на этой странице и никуда не отправляется. На нашем сайте нет счётчиков, cookie и форм.</p></details>
+    <details><summary>Что проверка не умеет</summary><p>Не видит уведомление в Роскомнадзор, где стоит сервер, договоры с подрядчиками и внутренние документы. По вставленному коду не открывает другие страницы — политику проверьте отдельно.</p></details>
+    <details><summary>Почему не найден баннер cookie, хотя он есть?</summary><p>Скорее всего, вы его уже закрыли и сайт запомнил выбор, или баннер подгружается скриптом. Запустите закладку в режиме инкогнито.</p></details>
+    <details><summary>Подойдёт ли сайт на Тильде, Битриксе, WordPress?</summary><p>Да. Проверка смотрит готовую страницу так, как её видит посетитель, платформа не важна.</p></details>
+  </div>
 </div></section>
 
 <footer><div class="wrap">
-  <p>Сайт по закону — автоматическая проверка сайтов на типовые нарушения 152-ФЗ, закона о рекламе и требований к русскому языку. Результат проверки не является юридическим заключением. Нормы сверены по открытым источникам на 31 октября 2026 года.</p>
-  <p>Связь: <a href="mailto:sektime71@gmail.com">sektime71@gmail.com</a></p><p><a href="checklist.html">Чек-лист с нормами</a></p>
+  <p>«Сайт по закону» — автоматическая проверка сайтов на типовые нарушения 152-ФЗ, закона о рекламе и требований к русскому языку. Результат не является юридическим заключением. Нормы сверены по открытым источникам на 31 октября 2026 года.</p>
+  <p>Связь: <a href="mailto:sektime71@gmail.com">sektime71@gmail.com</a></p>
+  <p><a href="checklist.html">Чек-лист с нормами и источниками</a></p>
 </div></footer>
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script src="engine.js"></script>
 <script>
 (function(){
-  var toast=document.getElementById('toast');
-  function say(t){toast.textContent=t;toast.classList.add('on');setTimeout(function(){toast.classList.remove('on')},2600)}
-  var bm=document.getElementById('bm');
-  fetch('audit.js').then(function(r){return r.text()}).then(function(code){
-    bm.href='javascript:'+encodeURIComponent(code);
-    document.getElementById('copy').onclick=function(){
-      navigator.clipboard.writeText(code).then(function(){say('Код скопирован. Откройте свою страницу, нажмите F12 → Console, вставьте и нажмите Enter.')},function(){say('Не удалось скопировать — разрешите доступ к буферу обмена.')});
-    };
-  }).catch(function(){say('Не загрузился код проверки — обновите страницу.')});
-  bm.addEventListener('click',function(e){e.preventDefault();say('Эту кнопку нужно перетащить на панель закладок, а не нажимать здесь.')});
+'use strict';
+var $=function(s){return document.querySelector(s)};
+var esc=function(s){return String(s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})};
+var toast=$('#toast'),tt;
+function say(t){toast.textContent=t;toast.classList.add('on');clearTimeout(tt);tt=setTimeout(function(){toast.classList.remove('on')},3400)}
+var NAMES={fix:'Исправить',check:'Проверить',ok:'В порядке',na:'Неприменимо'};
+var ORDER={fix:0,check:1,ok:2,na:3};
+function summary(res){var c={fix:0,check:0,ok:0};res.forEach(function(f){if(c[f.status]!=null)c[f.status]++});return c}
+function chips(c){return ['fix','check','ok'].map(function(s){return '<span class="chip c-'+s+'">'+NAMES[s]+': '+c[s]+'</span>'}).join('')}
+
+/* ---------- живое демо: настоящий движок на примере магазина ---------- */
+var BAD={consent:false,lang:false,ga:false,banner:false,policy:false};
+var S=Object.assign({},BAD);
+function shopHtml(st){
+  var head=(st.ga?'':'<script async src="https://www.googletagmanager.com/gtag/js?id=G-DEMO1"><\/script><script>gtag("config","G-DEMO1")<\/script>')+'<script>ym(10000001,"init",{})<\/script>';
+  var nav=st.lang?'<a href="/">Главная</a><a href="/catalog">Каталог</a><a href="/sale">Распродажа</a>':'<a href="/">Home</a><a href="/catalog">Shop</a><a href="/sale">Sale</a>';
+  var consent=st.consent
+    ?'<label data-p="01.3 01.4"><input type="checkbox" name="pd"> <span>Даю <a href="/consent">согласие на обработку персональных данных</a></span></label>'
+    :'<label data-p="01.3 01.4"><input type="checkbox" name="agree" checked> <span>Принимаю условия оферты и даю согласие на обработку персональных данных</span></label>';
+  var banner=st.banner
+    ?'<div class="cookie" data-p="03.2 03.3">Мы используем cookie и Яндекс Метрику. <a href="/policy">Подробнее</a> <button type="button">Принять</button><button type="button">Отклонить</button></div>'
+    :'<div class="cookie" data-p="03.2 03.3">Мы используем cookie. <button type="button">OK</button></div>';
+  var foot='<div class="foot" data-p="02.1 02.2 02.3 05.1"><a href="/policy">Политика конфиденциальности</a>'+(st.policy?' — ИП Петрова А. С., ОГРНИП 320665800012345':'')+'</div>';
+  return '<html lang="ru"><head>'+head+'</head><body><nav class="nav" data-p="04.1 03.4"><span class="brand">Свечная лавка</span>'+nav+'</nav>'+
+    '<form id="lead" data-p="01.6" action="'+(st.consent?'/order':'http://crm.example/lead')+'" onsubmit="return false"><h4>Закажите набор свечей</h4><input class="in" name="name" placeholder="Имя" aria-label="Имя"><input class="in" type="tel" name="phone" placeholder="Телефон" aria-label="Телефон">'+consent+
+    '<button class="send" type="submit" data-p="04.1">'+(st.lang?'Отправить':'Send')+'</button></form>'+banner+foot+'</body></html>';
+}
+function policyHtml(full){
+  if(!full)return '<html><body><p>Мы бережём ваши данные.</p></body></html>';
+  var t='Политика обработки персональных данных. Оператор: ИП Петрова Анна Сергеевна, ИНН 665801234567, ОГРНИП 320665800012345. ';
+  for(var i=0;i<18;i++)t+='Цели обработки, категории данных, сроки хранения, права субъекта, меры защиты. Сайт использует cookie и Яндекс Метрику. ';
+  return '<html><body><p>'+t+'</p></body></html>';
+}
+var demoLoc={href:'https://svechnaya-lavka.ru/',protocol:'https:',origin:'https://svechnaya-lavka.ru'};
+function demoFetch(u){
+  if(/\/policy$/.test(u)){var h=policyHtml(S.policy);return Promise.resolve({status:200,text:function(){return Promise.resolve(h)}})}
+  return Promise.resolve({status:404,text:function(){return Promise.resolve('')}});
+}
+var lastDemo=[];
+function placePins(issues){
+  var stage=$('#stage'),shop=$('#shop');
+  stage.querySelectorAll('.pin').forEach(function(p){p.remove()});
+  var sr=stage.getBoundingClientRect(),marks=[];
+  issues.forEach(function(f,i){
+    var el=shop.querySelector('[data-p~="'+f.id+'"]');if(!el)return;
+    marks.push({n:i+1,f:f,y:el.getBoundingClientRect().top-sr.top+12});
+  });
+  marks.sort(function(a,b){return a.y-b.y||a.n-b.n});
+  var lastY=-99;
+  marks.forEach(function(m,k){
+    var y=Math.max(m.y,lastY+28);lastY=y;
+    var pin=document.createElement('span');pin.className='pin'+(m.f.status==='check'?' check':'');pin.textContent=m.n;
+    pin.style.left=(sr.width-26)+'px';pin.style.top=y+'px';
+    pin.style.animationDelay=(k*60)+'ms';pin.setAttribute('aria-hidden','true');
+    stage.appendChild(pin);
+  });
+}
+function renderDemo(){
+  if(!window.__zakonAudit)return Promise.resolve();
+  var html=shopHtml(S);
+  var shop=$('#shop');
+  shop.innerHTML=html.replace(/^[\s\S]*<body>/,'').replace(/<\/body>[\s\S]*$/,'');
+  var d=new DOMParser().parseFromString(html,'text/html');
+  return window.__zakonAudit(d,demoLoc,demoFetch).then(function(res){
+    var issues=res.filter(function(f){return f.status==='fix'||f.status==='check'}).sort(function(a,b){return ORDER[a.status]-ORDER[b.status]||a.id.localeCompare(b.id)});
+    lastDemo=issues;
+    placePins(issues);
+    var notes=$('#notes');notes.innerHTML='';
+    issues.forEach(function(f,i){
+      var li=document.createElement('li');if(f.status==='check')li.className='check';
+      var tt=f.title.replace(/^Форма \d+ \([^)]*\): /,'');tt=tt.charAt(0).toUpperCase()+tt.slice(1);li.innerHTML='<b>'+(i+1)+'</b><span>'+esc(tt)+'</span>';
+      notes.appendChild(li);
+    });
+    var c=summary(res),clean=!c.fix&&!c.check;
+    if(clean){var li=document.createElement('li');li.className='done';li.textContent='Нарушений нет: все пункты в порядке.';notes.appendChild(li)}
+    $('#demoSum').innerHTML=chips(c);
+    $('#stampmark').classList.toggle('on',clean);
+    $('#fixBtn').textContent=clean?'Вернуть ошибки':'Исправить ошибки';
+  });
+}
+var busy=false;
+$('#fixBtn').addEventListener('click',function(){
+  if(busy)return;
+  var keys=['consent','lang','ga','banner','policy'];
+  if(keys.every(function(k){return S[k]})){S=Object.assign({},BAD);renderDemo();return}
+  busy=true;var btn=this;btn.disabled=true;
+  var seq=keys.filter(function(k){return !S[k]});
+  var wait=window.matchMedia('(prefers-reduced-motion: reduce)').matches?0:700;
+  (function step(i){
+    if(i>=seq.length){busy=false;btn.disabled=false;return}
+    S[seq[i]]=true;
+    renderDemo().then(function(){setTimeout(function(){step(i+1)},i===seq.length-1?0:wait)});
+  })(0);
+});
+var rt;window.addEventListener('resize',function(){clearTimeout(rt);rt=setTimeout(function(){placePins(lastDemo)},120)});
+
+/* ---------- проверка вставленного кода ---------- */
+var lastRes=null,lastUrl='';
+function reportHtml(res){
+  res.sort(function(a,b){return ORDER[a.status]-ORDER[b.status]||a.id.localeCompare(b.id)});
+  var card=function(f){return '<div class="f"><div class="t"><span class="chip c-'+f.status+'">'+NAMES[f.status]+'</span><span>'+esc(f.id)+' · '+esc(f.title)+'</span></div>'+(f.why?'<p>'+esc(f.why)+'</p>':'')+((f.status==='fix'||f.status==='check')?'<div class="ev">Где: '+esc(f.evidence.where)+'<br>Найдено: '+esc(f.evidence.found)+'<br>Нужно: '+esc(f.evidence.expected)+'</div>':'')+'</div>'};
+  var main=res.filter(function(f){return f.status==='fix'||f.status==='check'});
+  var rest=res.filter(function(f){return f.status==='ok'||f.status==='na'});
+  return '<div class="sum">'+chips(summary(res))+'</div>'+(main.length?main.map(card).join(''):'<p class="f">Явных проблем на этой странице не найдено.</p>')+
+    (rest.length?'<details class="more"><summary>В порядке и неприменимо: '+rest.length+'</summary>'+rest.map(card).join('')+'</details>':'')+
+    '<div class="row" style="margin-top:14px"><button class="btn line" type="button" id="pCopy">Скопировать отчёт</button></div>';
+}
+$('#pRun').addEventListener('click',function(){
+  var html=$('#pHtml').value.trim(),raw=$('#pUrl').value.trim();
+  if(!html){say('Вставьте код страницы в поле «Код страницы».');$('#pHtml').focus();return}
+  if(!window.__zakonAudit){say('Код проверки не загрузился — обновите страницу.');return}
+  var u;try{u=new URL(raw||'https://example.ru/')}catch(e){try{u=new URL('https://'+raw)}catch(e2){say('Адрес выглядит неверно. Пример: https://ваш-сайт.ru/contacts');return}}
+  var d=new DOMParser().parseFromString(html,'text/html');
+  window.__zakonAudit(d,{href:u.href,protocol:u.protocol,origin:u.origin},function(){return null}).then(function(res){
+    lastRes=res;lastUrl=u.href;
+    $('#pOut').innerHTML=reportHtml(res);
+    $('#pCopy').onclick=copyReport;
+    if(window.innerWidth<920)$('#pOut').scrollIntoView({behavior:'smooth',block:'start'});
+  });
+});
+function copyReport(){
+  if(!lastRes)return;
+  var L=['Проверка «Сайт по закону»: '+lastUrl,'Дата: '+new Date().toLocaleString('ru-RU'),''];
+  lastRes.forEach(function(f){L.push('['+NAMES[f.status]+'] '+f.id+' '+f.title);if(f.status==='fix'||f.status==='check'){L.push('  Найдено: '+f.evidence.found,'  Нужно: '+f.evidence.expected)}});
+  L.push('','Автоматическая проверка одной страницы, не юридическое заключение. https://sektime71-commits.github.io/zakon/');
+  navigator.clipboard.writeText(L.join('\n')).then(function(){say('Отчёт скопирован.')},function(){say('Не удалось скопировать — разрешите доступ к буферу обмена.')});
+}
+$('#pSample').addEventListener('click',function(){
+  $('#pHtml').value='<!doctype html>\n'+shopHtml(BAD).replace('</head>','\n</head>\n').replace('<form','\n<form');
+  $('#pUrl').value='https://svechnaya-lavka.ru/';
+  say('Пример подставлен — нажмите «Проверить страницу».');
+});
+
+/* ---------- табы ---------- */
+var tabs=[].slice.call(document.querySelectorAll('.tab'));
+function sel(t){tabs.forEach(function(x){var on=x===t;x.setAttribute('aria-selected',String(on));x.tabIndex=on?0:-1;document.getElementById(x.getAttribute('aria-controls')).hidden=!on})}
+tabs.forEach(function(t,i){t.addEventListener('click',function(){sel(t)});t.addEventListener('keydown',function(e){var k=e.key==='ArrowRight'?1:e.key==='ArrowLeft'?-1:0;if(k){var n=tabs[(i+k+tabs.length)%tabs.length];sel(n);n.focus()}})});
+
+/* ---------- закладка и консоль ---------- */
+var bm=$('#bm');
+fetch('audit.js').then(function(r){return r.text()}).then(function(code){
+  bm.href='javascript:'+encodeURIComponent(code);
+  $('#copy').onclick=function(){navigator.clipboard.writeText(code).then(function(){say('Код скопирован. Откройте свою страницу, F12, вкладка Console, вставьте и нажмите Enter.')},function(){say('Не удалось скопировать — разрешите доступ к буферу обмена.')})};
+}).catch(function(){});
+bm.addEventListener('click',function(e){e.preventDefault();say('Эту кнопку нужно перетащить на панель закладок, а не нажимать здесь.')});
+
+renderDemo();
+if(document.fonts&&document.fonts.ready)document.fonts.ready.then(function(){placePins(lastDemo)});
 })();
 </script>
 </body>
