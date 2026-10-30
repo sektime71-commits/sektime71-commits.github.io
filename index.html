@@ -4,6 +4,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <title>Street Racer 3D</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Street Racer">
+<meta name="theme-color" content="#06080f">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" href="icon-192.png">
 <style>
 :root{--sl:max(10px,env(safe-area-inset-left));--sr:max(10px,env(safe-area-inset-right));--st:max(8px,env(safe-area-inset-top));--sb:max(8px,env(safe-area-inset-bottom))}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
@@ -111,6 +119,28 @@ body.touch.land #tB{right:var(--sr);bottom:calc(var(--sb) + 6px);width:min(30vh,
 body.touch.land #tD{right:calc(var(--sr) + min(30vh,112px) + 14px);bottom:calc(var(--sb) + 10px);width:min(21vh,78px);height:min(21vh,78px)}
 body.touch.land #msg{top:24%;font-size:72px}
 body.touch.land #sub{top:17%;font-size:17px}
+/* control modes */
+#tL,#tR{display:none;background:rgba(255,255,255,.14);font-size:28px}
+body.ctl-arrows #tL,body.ctl-arrows #tR{display:flex}
+body.ctl-arrows #wheel,body.ctl-tilt #wheel{display:none}
+#tL{left:var(--sl);bottom:calc(var(--sb) + 8px);width:min(26vh,96px);height:min(26vh,96px)}
+#tR{left:calc(var(--sl) + min(26vh,96px) + 12px);bottom:calc(var(--sb) + 8px);width:min(26vh,96px);height:min(26vh,96px)}
+/* landscape refinements */
+body.touch.land #wheel{left:var(--sl);bottom:var(--sb);width:min(44vh,168px);height:min(44vh,168px)}
+body.touch.land #speedo{left:calc(var(--sl) + min(44vh,168px) + 16px);right:auto;transform:none;bottom:calc(var(--sb) + 12px);width:min(30vh,112px);height:min(30vh,112px)}
+body.touch.land.ctl-arrows #speedo{left:calc(var(--sl) + min(26vh,96px) * 2 + 26px)}
+body.touch.land.ctl-tilt #speedo{left:var(--sl)}
+body.touch.land #nitro{left:calc(var(--sl) + min(44vh,168px) + 20px);right:auto;transform:none;bottom:var(--sb);width:min(28vh,104px)}
+body.touch.land.ctl-arrows #nitro{left:calc(var(--sl) + min(26vh,96px) * 2 + 30px)}
+body.touch.land.ctl-tilt #nitro{left:calc(var(--sl) + 4px)}
+body.touch.land #bZin{left:auto;right:calc(var(--sr) + 138px);top:var(--st);bottom:auto}
+body.touch.land #bZout{left:auto;right:calc(var(--sr) + 184px);top:var(--st);bottom:auto}
+body.touch.land #tl .box{padding:4px 9px}
+#a2hs{position:fixed;inset:0;z-index:40;background:rgba(0,0,0,.75);display:flex;align-items:center;justify-content:center;padding:16px}
+#a2hs .panel{display:block;max-width:420px;text-align:left}
+#a2hs ol{margin:10px 0 0 20px;line-height:1.7;font-size:15px}
+#a2hs b{color:#ffd28a}
+body.standalone .fullBtn{display:none!important}
 #finish table{width:100%;border-collapse:collapse;margin-top:10px;font-size:15px}
 #finish td{padding:6px 6px;border-bottom:1px solid rgba(255,255,255,.08)}
 #finish tr.me td{color:#ffd23d;font-weight:800}
@@ -132,19 +162,22 @@ body.touch.land #sub{top:17%;font-size:17px}
       <div class="opt" data-v="day">☀️ День</div><div class="opt" data-v="sunset">🌇 Закат</div><div class="opt on" data-v="night">🌃 Ночь</div></div></div>
     <div class="row"><label>Погода</label><div class="opts" id="wxo">
       <div class="opt on" data-v="auto">🔄 Меняется</div><div class="opt" data-v="clear">☀️</div><div class="opt" data-v="rain">🌧</div><div class="opt" data-v="snow">❄️</div></div></div>
+    <div class="row"><label>Управление</label><div class="opts" id="ctl">
+      <div class="opt on" data-v="wheel">🎡 Руль</div><div class="opt" data-v="arrows">◀ ▶</div><div class="opt" data-v="tilt">📱 Наклон</div></div></div>
     <div class="row"><label>Круги</label><div class="opts" id="laps">
       <div class="opt" data-v="1">1</div><div class="opt on" data-v="3">3</div><div class="opt" data-v="5">5</div></div></div>
     <div class="row"><label>Графика</label><div class="opts" id="qual">
       <div class="opt on" data-v="auto">Авто</div><div class="opt" data-v="high">Ультра</div><div class="opt" data-v="low">Быстро</div></div></div>
     <div id="rotHint">📱↻ Поверни телефон горизонтально — так удобнее рулить и лучше видно трассу</div>
     <button class="btn" id="go">СТАРТ</button>
+    <button class="btn sec fullBtn" id="full">⛶ Играть во весь экран</button>
     <div class="help" id="helpTxt">Газ — автоматически, нитро — само каждые 5–7 сек.<br>A D / ← → — руль · S / ↓ — тормоз · ПРОБЕЛ — дрифт<br>C — камера · колесо мыши / + − — зум · тяни мышью — обзор · R — на трассу · P — пауза</div>
   </div>
 </div>
 
 <div id="pause" class="hidden" style="position:fixed;inset:0;z-index:21;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.5)">
   <div class="panel" style="max-width:320px;display:block"><div class="logo" style="font-size:34px">ПАУЗА</div>
-  <button class="btn" id="resume">ПРОДОЛЖИТЬ</button><button class="btn sec" id="restart">Заново</button><button class="btn sec" id="toMenu">В меню</button></div>
+  <button class="btn" id="resume">ПРОДОЛЖИТЬ</button><button class="btn sec fullBtn" id="full2">⛶ Во весь экран</button><button class="btn sec" id="restart">Заново</button><button class="btn sec" id="toMenu">В меню</button></div>
 </div>
 
 <div id="finish" class="hidden" style="position:fixed;inset:0;z-index:21;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.45);padding:16px;overflow:auto">
@@ -152,6 +185,11 @@ body.touch.land #sub{top:17%;font-size:17px}
   <button class="btn" id="again">ЕЩЁ ЗАЕЗД</button><button class="btn sec" id="finMenu">В меню</button></div>
 </div>
 
+<div id="a2hs" class="hidden"><div class="panel">
+  <div class="logo" style="font-size:24px">БЕЗ РАМОК SAFARI</div>
+  <div style="margin-top:10px;font-size:14px;opacity:.85">На iPhone Safari не даёт сайтам открываться на весь экран. Добавь игру на экран «Домой» — она запустится как приложение, без адресной строки и вкладок:</div>
+  <ol><li>Нажми <b>Поделиться</b> (квадрат со стрелкой ↑)</li><li>Выбери <b>«На экран „Домой“»</b></li><li>Нажми <b>Добавить</b></li><li>Запускай игру с иконки <b>Street Racer</b></li></ol>
+  <button class="btn" id="a2hsOk">ПОНЯТНО</button></div></div>
 <div id="camPad" class="hidden"></div>
 
 <div id="hud" class="hidden">
@@ -182,6 +220,7 @@ body.touch.land #sub{top:17%;font-size:17px}
     <circle r="30" fill="#18181c" stroke="rgba(255,255,255,.3)" stroke-width="2"/>
     <text y="7" text-anchor="middle" font-size="18" font-weight="900" font-style="italic" fill="#ffb03d" font-family="Arial">SR</text>
   </svg></div>
+  <div class="tb" id="tL" data-k="left">◀</div><div class="tb" id="tR" data-k="right">▶</div>
   <div class="tb" id="tB" data-k="down">ТОРМОЗ</div>
   <div class="tb" id="tD" data-k="hand">ДРИФТ</div>
 </div>
@@ -1566,7 +1605,41 @@ function thump(v) { if (!audio) return; const { ctx, master } = audio; const o =
 
 /* ================= GAME STATE ================= */
 let state = 'loading', LAPS = 3, raceTime = 0, countdown = 0, paused = false, shake = 0, finishShown = false, tunnelK = 1;
-let settings = { color: PLAYER_COLORS[0], tod: 'night', laps: 3, qual: 'auto', wx: 'auto' };
+let settings = { color: PLAYER_COLORS[0], tod: 'night', laps: 3, qual: 'auto', wx: 'auto', ctl: 'wheel' };
+try { const c = localStorage.getItem('sr3d_ctl'); if (c) settings.ctl = c; } catch (_) { }
+function applyCtl() { document.body.classList.remove('ctl-wheel', 'ctl-arrows', 'ctl-tilt'); document.body.classList.add('ctl-' + settings.ctl); document.querySelectorAll('#ctl .opt').forEach(o => o.classList.toggle('on', o.dataset.v === settings.ctl)); }
+/* tilt steering (gravity angle in screen plane, self-calibrating) */
+const TILT = { ang: null, zero: null, ok: false, val: 0 };
+function onMotion(e) {
+  const g = e.accelerationIncludingGravity; if (!g || g.x == null) return;
+  const a = ((screen.orientation && screen.orientation.angle) ?? window.orientation ?? 0) * Math.PI / 180;
+  const sx = g.x * Math.cos(a) - g.y * Math.sin(a), sy = g.x * Math.sin(a) + g.y * Math.cos(a);
+  TILT.ang = Math.atan2(sx, -sy); TILT.ok = true;
+  if (TILT.zero == null) TILT.zero = TILT.ang;
+}
+function enableTilt() {
+  const add = () => addEventListener('devicemotion', onMotion);
+  try {
+    if (typeof DeviceMotionEvent !== 'undefined' && typeof DeviceMotionEvent.requestPermission === 'function')
+      DeviceMotionEvent.requestPermission().then(r => { if (r === 'granted') add(); else tiltFail(); }).catch(tiltFail);
+    else add();
+  } catch (_) { tiltFail(); }
+  setTimeout(() => { if (settings.ctl === 'tilt' && !TILT.ok) tiltFail(); }, 2500);
+}
+function tiltFail() { if (settings.ctl !== 'tilt') return; settings.ctl = 'wheel'; applyCtl(); flash('Наклон недоступен — включён руль', 2.5); }
+function tiltSteer() { if (TILT.ang == null || TILT.zero == null) return 0; let d = wrapA(TILT.ang - TILT.zero) * 180 / Math.PI; if (Math.abs(d) < 2) d = 0; else d -= Math.sign(d) * 2; return clamp(d / 26, -1, 1); }
+/* fullscreen / home-screen app */
+const isStandalone = matchMedia('(display-mode: standalone)').matches || matchMedia('(display-mode: fullscreen)').matches || navigator.standalone === true;
+if (isStandalone) document.body.classList.add('standalone');
+function goFull() {
+  const el = document.documentElement, req = el.requestFullscreen || el.webkitRequestFullscreen;
+  const enabled = document.fullscreenEnabled || document.webkitFullscreenEnabled;
+  if (req && enabled) {
+    try { const p = req.call(el, { navigationUI: 'hide' }); const lock = () => { try { const r = screen.orientation && screen.orientation.lock && screen.orientation.lock('landscape'); if (r && r.catch) r.catch(() => { }); } catch (_) { } }; if (p && p.then) p.then(lock).catch(() => $('a2hs').classList.remove('hidden')); else lock(); } catch (_) { $('a2hs').classList.remove('hidden'); }
+  } else $('a2hs').classList.remove('hidden');
+}
+$('full').onclick = goFull; $('full2').onclick = goFull; $('a2hsOk').onclick = () => $('a2hs').classList.add('hidden');
+applyCtl();
 let best = null; try { best = parseFloat(localStorage.getItem('sr3d_best')) || null; } catch (_) { }
 const GEARS = [.17, .31, .46, .62, .8, 1.0];
 function setupRace() {
@@ -1589,12 +1662,12 @@ function setupRace() {
   applyTOD(settings.tod);
   snapCamera();
 }
-function resetPlayer() { if (!player || state !== 'race') return; const q = trackQuery(player.pos.x, player.pos.z, player.q.i); player.place(q.i, clamp(q.lat, -HALF + 2, HALF - 2)); shake = 0; }
+function resetPlayer() { TILT.zero = TILT.ang; if (!player || state !== 'race') return; const q = trackQuery(player.pos.x, player.pos.z, player.q.i); player.place(q.i, clamp(q.lat, -HALF + 2, HALF - 2)); shake = 0; }
 function playerControl(dt) {
   const c = player, brake = keys.down ? 1 : 0;
   c.inp.brk = brake; c.inp.thr = brake ? 0 : 1;
   const kb = (keys.right ? 1 : 0) - (keys.left ? 1 : 0);
-  if (wheelUI.active || Math.abs(wheelUI.rot) > 2) { const v = clamp(wheelUI.rot / WHEEL_MAX, -1, 1); c.inp.steer = Math.sign(v) * Math.pow(Math.abs(v), 1.25); } else c.inp.steer = kb;
+  if (settings.ctl === 'tilt' && TILT.ok) { c.inp.steer = kb || tiltSteer(); } else if (settings.ctl === 'wheel' && (wheelUI.active || Math.abs(wheelUI.rot) > 2)) { const v = clamp(wheelUI.rot / WHEEL_MAX, -1, 1); c.inp.steer = Math.sign(v) * Math.pow(Math.abs(v), 1.25); } else c.inp.steer = kb;
   c.inp.hand = keys.hand ? 1 : 0;
   c.nitro = 1;
   if (c.nitroBurst > 0) { c.nitroBurst -= dt; c.inp.nitro = brake ? 0 : 1; }
@@ -1823,7 +1896,7 @@ function frame(now) {
   } else if (state === 'race') {
     if (countdown > 0) {
       const before = Math.ceil(countdown); countdown -= dt; const after = Math.ceil(countdown);
-      if (countdown <= 0) { showMsg('СТАРТ!'); beep(1046, .45, .35); setTimeout(() => { if ($('msg').textContent === 'СТАРТ!') showMsg(''); }, 900); }
+      if (countdown <= 0) { TILT.zero = TILT.ang; showMsg('СТАРТ!'); beep(1046, .45, .35); setTimeout(() => { if ($('msg').textContent === 'СТАРТ!') showMsg(''); }, 900); }
       else { if (after !== before) beep(523, .2, .3); showMsg(String(after)); }
     }
     racing = countdown <= 0;
@@ -1883,10 +1956,11 @@ function bindOpts(id, key, parse = v => v) {
     o.classList.add('on'); settings[key] = parse(o.dataset.v);
     if (key === 'tod') applyTOD(settings.tod);
     if (key === 'qual') setQuality(settings.qual);
+    if (key === 'ctl') { applyCtl(); try { localStorage.setItem('sr3d_ctl', settings.ctl); } catch (_) { } }
     if (key === 'wx') { const w = settings.wx === 'auto' ? 'clear' : settings.wx; setWeather(w, false); }
   });
 }
-bindOpts('tod', 'tod'); bindOpts('laps', 'laps', v => +v); bindOpts('qual', 'qual'); bindOpts('wxo', 'wx');
+bindOpts('ctl', 'ctl'); bindOpts('tod', 'tod'); bindOpts('laps', 'laps', v => +v); bindOpts('qual', 'qual'); bindOpts('wxo', 'wx');
 PLAYER_COLORS.forEach((col, k) => {
   const d = document.createElement('div'); d.className = 'opt sw' + (k ? '' : ' on'); d.style.background = '#' + col.toString(16).padStart(6, '0');
   d.onclick = () => { document.querySelectorAll('#colors .sw').forEach(x => x.classList.remove('on')); d.classList.add('on'); settings.color = col; player.paint.color.set(col); };
@@ -1903,6 +1977,8 @@ function tryLandscape() {
 }
 function startRace() {
   initAudio(); tryLandscape();
+  if (settings.ctl === 'tilt') { TILT.zero = null; enableTilt(); }
+  setTimeout(() => { if (settings.ctl === 'tilt' && state === 'race') flash('📱 НАКЛОНЯЙ ТЕЛЕФОН КАК РУЛЬ · ↺ — ВЫРОВНЯТЬ', 3); }, 100);
   $('menu').classList.add('hidden'); $('finish').classList.add('hidden'); $('pause').classList.add('hidden');
   setupRace();
   state = 'race'; paused = false;
