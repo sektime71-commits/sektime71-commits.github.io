@@ -215,47 +215,128 @@ body.touch.land #nitro.gain{animation:ngain .45s ease-out}
 @keyframes fin{from{opacity:0;transform:translateX(40px) scale(.9)}to{opacity:1;transform:none}}
 body.touch.land #feed{top:30%}
 .tutg{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}.tutg div{background:rgba(255,255,255,.06);border-radius:10px;padding:8px 10px;font-size:13px;line-height:1.35}.tutg b{display:block;font-size:14px;margin-bottom:3px}
+
+/* ===== native-style main menu ===== */
+.logo,#msg,#sub,.stat .v,.btn,.mTitle,.mLogo,.lbl,.bb span,#go,.sheetH,#mCarName,.ldLogo,.res b,.cn,#gName,.ctop .t,#gTop .t,#finish h2{font-family:'Russo One','Segoe UI',Arial,sans-serif;font-weight:400}
+#menu{display:block!important;padding:0;background:radial-gradient(ellipse at 50% 60%,transparent 40%,rgba(0,0,0,.55) 100%);overflow:hidden}
+#menu.hidden{display:none!important}
+.mTop{position:absolute;left:0;right:0;top:0;height:calc(var(--st) + 50px);padding:var(--st) var(--sr) 0 var(--sl);display:flex;align-items:center;gap:14px;background:linear-gradient(180deg,rgba(0,0,0,.85),rgba(0,0,0,.35));border-bottom:1px solid rgba(255,255,255,.08)}
+.mLogo{font-size:20px;font-style:italic;color:#fff;letter-spacing:1px;padding:4px 14px 4px 10px;background:linear-gradient(90deg,#e11d48,#ff7a1a);clip-path:polygon(0 0,100% 0,88% 100%,0 100%);margin-left:calc(-1 * var(--sl));padding-left:calc(var(--sl) + 6px)}
+.mLogo span{color:#111;margin-left:6px}
+.mTitle{flex:1;text-align:center;font-size:22px;font-style:italic;letter-spacing:2px;text-shadow:0 2px 10px rgba(0,0,0,.8)}
+.mRes{display:flex;align-items:center;gap:8px}
+.res{display:flex;align-items:center;gap:6px;background:linear-gradient(180deg,#1b2a1b,#0e1a0e);border:1px solid rgba(120,255,120,.25);border-radius:8px;padding:3px 4px 3px 8px;height:32px}
+.res i{font-style:normal;font-size:17px;color:#ffd23d;text-shadow:0 0 8px rgba(255,210,61,.6)}.res b{font-size:14px;min-width:46px;text-align:right;padding-right:4px}
+.plus{width:24px;height:24px;border-radius:6px;background:linear-gradient(180deg,#4ade80,#16a34a);display:flex;align-items:center;justify-content:center;font-weight:900;cursor:pointer;box-shadow:inset 0 -2px 0 rgba(0,0,0,.3)}
+.mGear{width:38px;height:38px;border-radius:8px;background:linear-gradient(180deg,#fcd34d,#d97706);color:#222;font-size:22px;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:inset 0 -3px 0 rgba(0,0,0,.25),0 2px 10px rgba(0,0,0,.5)}
+.mLeft,.mRight{position:absolute;top:calc(var(--st) + 64px);display:flex;flex-direction:column;gap:10px}
+.mLeft{left:var(--sl)}.mRight{right:var(--sr)}
+.side{position:relative;width:84px;text-align:center;cursor:pointer;transition:transform .12s}
+.side:active{transform:scale(.94)}
+.side .ico{width:62px;height:62px;margin:0 auto;border-radius:16px;background:radial-gradient(circle at 35% 30%,rgba(255,255,255,.35),rgba(255,255,255,.04) 60%),linear-gradient(160deg,#334155,#0f172a);border:2px solid rgba(255,255,255,.18);display:flex;align-items:center;justify-content:center;font-size:32px;box-shadow:0 6px 18px rgba(0,0,0,.55)}
+.side .lbl{margin-top:-6px;position:relative;font-size:10px;line-height:1.1;padding:4px 6px;background:linear-gradient(90deg,rgba(14,165,233,.9),rgba(37,99,235,.9));border-radius:4px;box-shadow:0 3px 8px rgba(0,0,0,.4)}
+.side.big .ico{width:70px;height:70px;font-size:36px;background:radial-gradient(circle at 35% 30%,rgba(255,255,255,.35),rgba(255,255,255,.04) 60%),linear-gradient(160deg,#9a3412,#431407)}
+.side.big .lbl{background:linear-gradient(90deg,#f97316,#dc2626);font-size:11px}
+.side.purple .ico{background:radial-gradient(circle at 35% 30%,rgba(255,255,255,.35),rgba(255,255,255,.04) 60%),linear-gradient(160deg,#6d28d9,#1e1b4b)}.side.purple .lbl{background:linear-gradient(90deg,#8b5cf6,#4f46e5)}
+.dot{position:absolute;right:10px;top:-3px;width:14px;height:14px;border-radius:50%;background:#ef4444;border:2px solid #fff;animation:pulse 1.2s infinite}
+@keyframes pulse{50%{transform:scale(1.25)}}
+.mCar{position:absolute;left:calc(var(--sl) + 100px);bottom:calc(var(--sb) + 72px);display:flex;align-items:center;gap:10px}
+.mCarInfo{min-width:170px}#mCarName{font-size:22px;font-style:italic;text-shadow:0 2px 12px rgba(0,0,0,.9)}#mCarStats{font-size:11px;opacity:.85;text-shadow:0 1px 6px #000}
+.arrow{width:36px;height:36px;border-radius:50%;background:rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.25);display:flex;align-items:center;justify-content:center;font-size:26px;cursor:pointer}
+.mBottom{position:absolute;left:0;bottom:0;height:calc(var(--sb) + 60px);right:0;padding:0 0 var(--sb) var(--sl);display:flex;align-items:center;background:linear-gradient(0deg,rgba(0,0,0,.9),rgba(0,0,0,.35));border-top:1px solid rgba(255,255,255,.08)}
+.bb{display:flex;flex-direction:column;align-items:center;gap:2px;padding:0 16px;cursor:pointer;position:relative}
+.bb+.bb::before{content:'';position:absolute;left:-2px;top:2px;bottom:2px;width:2px;background:rgba(255,255,255,.25);transform:skewX(-18deg)}
+.bb i{font-style:normal;font-size:22px}.bb span{font-size:10px;letter-spacing:1px}
+.mPlay{position:absolute;right:var(--sr);bottom:calc(var(--sb) + 10px);display:flex;flex-direction:column;align-items:flex-end;gap:6px}
+#mSummary{font-size:11px;background:rgba(0,0,0,.6);padding:4px 10px;border-radius:6px;border-left:3px solid #a3e635}
+#go{border:none;cursor:pointer;font-size:30px;font-style:italic;letter-spacing:1px;color:#0b1a05;padding:12px 30px 12px 36px;background:linear-gradient(180deg,#d9f99d,#84cc16 45%,#4d7c0f);clip-path:polygon(8% 0,100% 0,92% 100%,0 100%);box-shadow:0 0 30px rgba(163,230,53,.55);animation:playGlow 1.6s infinite;text-shadow:0 1px 0 rgba(255,255,255,.4)}
+#go b{font-size:30px;letter-spacing:-6px;margin-left:6px}
+@keyframes playGlow{50%{filter:brightness(1.15)}}
+.sheet{position:absolute;inset:0;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;z-index:5;padding:12px}
+.sheetBox{background:linear-gradient(180deg,rgba(23,27,40,.97),rgba(10,12,20,.97));border:1px solid rgba(255,255,255,.14);border-radius:16px;padding:14px 18px;width:min(440px,94%);max-height:92%;overflow:auto;box-shadow:0 20px 60px rgba(0,0,0,.6);animation:pop .18s ease-out;touch-action:pan-y}
+.sheetBox.wide{width:min(640px,96%)}
+@keyframes pop{from{transform:scale(.92);opacity:0}}
+.sheetH{display:flex;align-items:center;justify-content:space-between;font-size:18px;font-style:italic;margin-bottom:6px;color:#fde68a}
+.sheetH .x{width:32px;height:32px;border-radius:8px;background:rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;cursor:pointer;color:#fff;font-size:16px}
+.trkCards .opt{display:flex;flex-direction:column;align-items:center;gap:3px;padding:12px 8px;white-space:normal}
+.trkCards i{font-style:normal;font-size:30px}.trkCards b{font-size:14px}.trkCards small{font-size:11px;opacity:.75}
+.days{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin:8px 0}
+.day{border-radius:10px;padding:8px 2px;text-align:center;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);font-size:11px}
+.day b{display:block;font-size:13px;color:#ffd23d;margin-top:3px}.day.got{opacity:.45}.day.now{border-color:#a3e635;background:rgba(163,230,53,.15);box-shadow:0 0 14px rgba(163,230,53,.35)}
+.wheelWrap{position:relative;width:min(240px,60vh);margin:6px auto}.wheelWrap svg{width:100%;transition:transform 4.2s cubic-bezier(.12,.75,.12,1);filter:drop-shadow(0 6px 16px rgba(0,0,0,.6))}
+.pointer{position:absolute;left:50%;top:-10px;transform:translateX(-50%);z-index:2;color:#ffd23d;font-size:26px;text-shadow:0 2px 6px #000}
+.ldLogo{font-size:38px;font-style:italic;background:linear-gradient(90deg,#ff3d6e,#ffb03d);-webkit-background-clip:text;background-clip:text;color:transparent}.ldLogo span{margin-left:10px}
+.ldTip{font-size:12px;opacity:.6;letter-spacing:0;max-width:420px}
+body.port:not(.rot) .mLeft,body.port:not(.rot) .mRight{top:calc(var(--st) + 60px)}
+body.port:not(.rot) .mCar{left:var(--sl);bottom:calc(var(--sb) + 150px)}
+body.port:not(.rot) .mPlay{bottom:calc(var(--sb) + 70px)}
+body.port:not(.rot) .mTitle{display:none}
+@media (max-height:380px){.side .ico{width:50px;height:50px;font-size:26px}.side.big .ico{width:56px;height:56px}.mLeft,.mRight{gap:6px}#go{font-size:24px;padding:9px 24px 9px 30px}.mCar{bottom:calc(var(--sb) + 64px)}}
+
 #finish table{width:100%;border-collapse:collapse;margin-top:10px;font-size:15px}
 #finish td{padding:6px 6px;border-bottom:1px solid rgba(255,255,255,.08)}
 #finish tr.me td{color:#ffd23d;font-weight:800}
 #finish h2{text-align:center;font-size:32px;font-style:italic;font-weight:900}
 </style>
+<link rel="preconnect" href="https://cdn.jsdelivr.net"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Russo+One&display=swap" rel="stylesheet">
 <script type="importmap">
 {"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}
 </script>
 </head>
 <body>
 <div id="app">
-<div id="loading"><div>ЗАГРУЗКА ГОРОДА…</div><div class="bar"><i></i></div></div>
+<div id="loading"><div class="ldLogo">STREET<span>RACER</span></div><div>ЗАГРУЗКА ТРАССЫ…</div><div class="bar"><i></i></div><div class="ldTip" id="ldTip">Совет: нажми НИТРО ровно на «СТАРТ!» — получишь идеальный старт</div></div>
 
 <div id="menu" class="hidden">
-  <div class="panel">
-    <div class="logo">STREET RACER</div>
-    <div class="sub">ГОРОДСКИЕ ГОНКИ · 3D</div>
-    <div class="row"><label>Трасса</label><div class="opts" id="trk"><div class="opt" data-v="city">🌃 Неон-Сити</div><div class="opt" data-v="port">⚓ Старый порт</div><div class="opt" data-v="mountain">🏔 Перевал</div></div><div id="trkBest" class="help" style="margin-top:5px;text-align:left"></div></div>
-    <div class="row"><label>Режим</label><div class="opts" id="mode"><div class="opt" data-v="race">🏁 Гонка</div><div class="opt" data-v="elim">❌ Выбывание</div><div class="opt" data-v="time">⏱ На время</div></div></div>
-    <div class="row"><label>Время суток</label><div class="opts" id="tod">
-      <div class="opt" data-v="day">☀️ День</div><div class="opt" data-v="sunset">🌇 Закат</div><div class="opt on" data-v="night">🌃 Ночь</div></div></div>
-    <div class="row"><label>Погода</label><div class="opts" id="wxo">
-      <div class="opt on" data-v="auto">🔄 Меняется</div><div class="opt" data-v="clear">☀️</div><div class="opt" data-v="rain">🌧</div><div class="opt" data-v="snow">❄️</div></div></div>
-    <div class="row"><label>Управление</label><div class="opts" id="ctl">
-      <div class="opt on" data-v="wheel">🎡 Руль</div><div class="opt" data-v="arrows">◀ ▶</div><div class="opt" data-v="tilt">📱 Наклон</div></div></div>
-    <div class="row"><label>Круги</label><div class="opts" id="laps">
-      <div class="opt" data-v="1">1</div><div class="opt on" data-v="3">3</div><div class="opt" data-v="5">5</div></div></div>
-    <div class="row"><label>Графика</label><div class="opts" id="qual">
-      <div class="opt on" data-v="auto">Авто</div><div class="opt" data-v="high">Ультра</div><div class="opt" data-v="low">Быстро</div></div></div>
-    
-    <div id="tasks" class="row"></div>
-    <div id="mCoins">💰 0</div>
-    <button class="btn" id="go">СТАРТ</button>
-    <button class="btn sec" id="btnCareer" style="font-size:17px;font-weight:900;letter-spacing:2px;background:linear-gradient(135deg,#7c3aed,#3b82f6)">🏆 КАРЬЕРА · КУБКИ</button>
-    <button class="btn sec" id="btnGarage" style="font-size:17px;font-weight:900;letter-spacing:2px">🏁 ГАРАЖ · ТЮНИНГ · МАШИНЫ</button>
-    <button class="btn sec fullBtn" id="full">⛶ Играть во весь экран</button>
-    <button class="btn sec" id="btnPrefs">⚙️ Настройки · звук · музыка</button>
-    <div class="help" id="helpTxt">Газ — автоматически. Собирай синие баллоны — копится нитро. Тарань соперников! Нитро ровно на «СТАРТ» — идеальный старт.<br>A D / ← → — руль · S / ↓ — тормоз · ПРОБЕЛ — дрифт · SHIFT / ↑ — нитро<br>C — камера · колесо мыши / + − — зум · тяни мышью — обзор · R — на трассу · P — пауза</div>
+  <div class="mTop">
+    <div class="mLogo">STREET<span>RACER</span></div>
+    <div class="mTitle">ГЛАВНОЕ МЕНЮ</div>
+    <div class="mRes">
+      <div class="res"><i>★</i><b id="mStars">0</b></div>
+      <div class="res"><i>🪙</i><b id="mCoins">0</b><span class="plus" id="mPlus">+</span></div>
+      <div class="mGear" id="btnPrefs">⚙</div>
+    </div>
   </div>
-</div>
+  <div class="mLeft">
+    <div class="side" id="btnSpin"><div class="ico">🎡</div><div class="lbl">КОЛЕСО<br>УДАЧИ</div><em class="dot hidden"></em></div>
+    <div class="side" id="btnDaily"><div class="ico">🎁</div><div class="lbl">БОНУС<br>ДНЯ</div><em class="dot hidden"></em></div>
+    <div class="side" id="btnTasks"><div class="ico">📋</div><div class="lbl">ЗАДАНИЯ</div><em class="dot hidden"></em></div>
+  </div>
+  <div class="mRight">
+    <div class="side big purple" id="btnCareer"><div class="ico">🏆</div><div class="lbl">КАРЬЕРА</div></div>
+    <div class="side big" id="btnGarage"><div class="ico">🔧</div><div class="lbl">ГАРАЖ</div></div>
+  </div>
+  <div class="mCar"><div class="arrow" id="carPrev">‹</div><div class="mCarInfo"><div id="mCarName"></div><div id="mCarStats"></div></div><div class="arrow" id="carNext">›</div></div>
+  <div class="mBottom">
+    <div class="bb" id="bbTrack"><i>🗺</i><span>ТРАССА</span></div>
+    <div class="bb" id="bbRace"><i>🏁</i><span>ЗАЕЗД</span></div>
+    <div class="bb" id="bbCtl"><i>🎮</i><span>УПРАВЛЕНИЕ</span></div>
+    <div class="bb fullBtn" id="full"><i>⛶</i><span>ЭКРАН</span></div>
+    <div class="bb" id="bbHelp"><i>❓</i><span>ПОМОЩЬ</span></div>
+  </div>
+  <div class="mPlay"><div id="mSummary"></div><button id="go">ИГРАТЬ <b>»</b></button></div>
 
+  <div class="sheet hidden" id="shTrack"><div class="sheetBox wide"><div class="sheetH">ВЫБОР ТРАССЫ<span class="x">✕</span></div>
+    <div class="opts trkCards" id="trk"><div class="opt" data-v="city"><i>🌃</i><b>Неон-Сити</b><small>Небоскрёбы, тоннель, река с мостами</small></div><div class="opt" data-v="port"><i>⚓</i><b>Старый порт</b><small>Контейнеры, краны, шпильки</small></div><div class="opt" data-v="mountain"><i>🏔</i><b>Перевал</b><small>Серпантин в ущелье, снег</small></div></div>
+    <div id="trkBest" class="help" style="margin-top:8px"></div></div></div>
+  <div class="sheet hidden" id="shRace"><div class="sheetBox"><div class="sheetH">ПАРАМЕТРЫ ЗАЕЗДА<span class="x">✕</span></div>
+    <div class="row"><label>Режим</label><div class="opts" id="mode"><div class="opt" data-v="race">🏁 Гонка</div><div class="opt" data-v="elim">❌ Выбывание</div><div class="opt" data-v="time">⏱ На время</div></div></div>
+    <div class="row"><label>Круги</label><div class="opts" id="laps"><div class="opt" data-v="1">1</div><div class="opt on" data-v="3">3</div><div class="opt" data-v="5">5</div></div></div>
+    <div class="row"><label>Время суток</label><div class="opts" id="tod"><div class="opt" data-v="day">☀️ День</div><div class="opt" data-v="sunset">🌇 Закат</div><div class="opt on" data-v="night">🌃 Ночь</div></div></div>
+    <div class="row"><label>Погода</label><div class="opts" id="wxo"><div class="opt on" data-v="auto">🔄 Меняется</div><div class="opt" data-v="clear">☀️</div><div class="opt" data-v="rain">🌧</div><div class="opt" data-v="snow">❄️</div></div></div>
+  </div></div>
+  <div class="sheet hidden" id="shCtl"><div class="sheetBox"><div class="sheetH">УПРАВЛЕНИЕ И ГРАФИКА<span class="x">✕</span></div>
+    <div class="row"><label>Управление</label><div class="opts" id="ctl"><div class="opt on" data-v="wheel">🎡 Руль</div><div class="opt" data-v="arrows">◀ ▶</div><div class="opt" data-v="tilt">📱 Наклон</div></div></div>
+    <div class="row"><label>Графика</label><div class="opts" id="qual"><div class="opt on" data-v="auto">Авто</div><div class="opt" data-v="high">Ультра</div><div class="opt" data-v="low">Быстро</div></div></div>
+    <div class="help" id="helpTxt">Газ — автоматически. Собирай синие баллоны — копится нитро. Тарань соперников! Нитро ровно на «СТАРТ» — идеальный старт.<br>A D / ← → — руль · S / ↓ — тормоз · ПРОБЕЛ — дрифт · SHIFT / ↑ — нитро<br>C — камера · колесо мыши / + − — зум · тяни мышью — обзор · R — на трассу · P — пауза</div>
+  </div></div>
+  <div class="sheet hidden" id="shTasks"><div class="sheetBox"><div class="sheetH">ЗАДАНИЯ ДНЯ<span class="x">✕</span></div><div id="tasks"></div><div class="help">Новые задания каждый день</div></div></div>
+  <div class="sheet hidden" id="shDaily"><div class="sheetBox wide"><div class="sheetH">ЕЖЕДНЕВНЫЙ БОНУС<span class="x">✕</span></div><div id="dailyBody"></div></div></div>
+  <div class="sheet hidden" id="shSpin"><div class="sheetBox"><div class="sheetH">КОЛЕСО УДАЧИ<span class="x">✕</span></div>
+    <div class="wheelWrap"><div class="pointer">▼</div><svg id="spinSvg" viewBox="-110 -110 220 220"></svg></div>
+    <button class="btn" id="spinGo">КРУТИТЬ!</button><div class="help" id="spinInfo">Одно бесплатное вращение в день</div></div></div>
+</div>
 <div id="pause" class="hidden" style="position:fixed;inset:0;z-index:21;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.5)">
   <div class="panel" style="max-width:320px;display:block"><div class="logo" style="font-size:34px">ПАУЗА</div>
   <button class="btn" id="resume">ПРОДОЛЖИТЬ</button><button class="btn sec" id="btnPhoto">📷 Фоторежим</button><button class="btn sec fullBtn" id="full2">⛶ Во весь экран</button><button class="btn sec" id="restart">Заново</button><button class="btn sec" id="toMenu">В меню</button></div>
@@ -340,6 +421,7 @@ body.touch.land #feed{top:30%}
 <script>
 window.addEventListener('error',e=>{const el=document.getElementById('err');el.classList.remove('hidden');el.textContent+='Ошибка: '+(e.message||e)+(e.lineno?' (стр. '+e.lineno+')':'')+'\n';});
 window.addEventListener('unhandledrejection',e=>{const el=document.getElementById('err');el.classList.remove('hidden');el.textContent+='Ошибка: '+(e.reason&&e.reason.message||e.reason)+'\n';});
+if('serviceWorker' in navigator && /github\.io$/.test(location.hostname) && window.top===window){navigator.serviceWorker.register('sw.js').catch(()=>{});}
 setTimeout(()=>{if(!window.__gameReady){const l=document.getElementById('loading');l.firstElementChild.textContent='Не удаётся загрузить 3D-движок. Проверь интернет и обнови страницу.';}},25000);
 </script>
 
@@ -2657,7 +2739,7 @@ function frame(now) {
   wheelUI.svg.style.transform = `rotate(${wheelUI.rot.toFixed(1)}deg)`;
   window.__beaconMat.color.setRGB(1, .1, .1).multiplyScalar((Math.sin(timeAcc * 3) > .3 ? 1 : .15) * (preset.night ? 2 : preset.name === 'sunset' ? 1.5 : 1));
   let racing = false;
-  if (state === 'garage') { garageFrame(dt); render(); return; }
+  if (state === 'garage' || state === 'menu' || state === 'career') { garageFrame(dt); updateWeather(0, false); render(); return; }
   if (state === 'menu' || state === 'career') {
     menuCamera(dt);
     for (const c of cars) updateCarVisual(c, 0);
@@ -2715,7 +2797,7 @@ function frame(now) {
 let frameN = 0, timeScale = 1;
 function render() {
   renderer.shadowMap.needsUpdate = !isTouch || (frameN++ & 1) === 0 || state !== 'race';
-  const sc = state === 'garage' ? gScene : scene, cm = state === 'garage' ? gCam : camera;
+  const show = state === 'garage' || state === 'menu' || state === 'career', sc = show ? gScene : scene, cm = show ? gCam : camera;
   if (bloomOn) { renderPass.scene = sc; renderPass.camera = cm; try { composer.render(); } catch (e) { bloomOn = false; renderer.render(sc, cm); } }
   else renderer.render(sc, cm);
 }
@@ -2771,6 +2853,7 @@ function bindOpts(id, key, parse = v => v) {
   document.querySelectorAll('#' + id + ' .opt').forEach(o => o.onclick = () => {
     document.querySelectorAll('#' + id + ' .opt').forEach(x => x.classList.remove('on'));
     o.classList.add('on'); settings[key] = parse(o.dataset.v);
+    renderMenu();
     if (key === 'tod') applyTOD(settings.tod);
     if (key === 'qual') setQuality(settings.qual);
     if (key === 'ctl') { applyCtl(); try { localStorage.setItem('sr3d_ctl', settings.ctl); } catch (_) { } }
@@ -2811,7 +2894,8 @@ function toMenu() {
   state = 'menu'; paused = false;
   $('finish').classList.add('hidden'); $('pause').classList.add('hidden'); $('hud').classList.add('hidden'); $('touch').classList.add('hidden');
   raceUI.forEach(i => $(i).classList.add('hidden'));
-  setupRace(); showMsg('');
+  showMsg('');
+  ensureShowroom(); renderMenu();
   if (audio) for (const k of ['eg', 'skid', 'wind', 'nitroN', 'rain', 'rg', 'scrape']) audio[k].gain.value = 0;
   $('menu').classList.remove('hidden');
   if (wasCareer) openCareer();
@@ -2856,7 +2940,7 @@ function buildGarageCar() {
 }
 function garageFrame(dt) {
   if (!gCar) return;
-  const inside = gTab === 'interior';
+  const inside = state === 'garage' && gTab === 'interior';
   gCar.cockpit.g.visible = inside;
   gCar.steer = Math.sin(timeAcc * .8) * .35; updateCockpit(gCar);
   for (const s of gCar.steerers) s.rotation.y = -gCar.steer * .5;
@@ -2866,10 +2950,11 @@ function garageFrame(dt) {
     _e2.set(EYE[0] + Math.sin(gYaw * .4 - 1) * 6, EYE[1] - .35 + gPitch, EYE[2] + 6); gCar.body.localToWorld(_e2); gCam.lookAt(_e2);
     gCam.near = .03; gCam.fov = vfovFor(100, 50, 80);
   } else {
-    if (gAuto) gYaw += dt * .18;
-    const d = gDist * (gTab === 'wheels' ? .72 : 1), side = camera.aspect > 1.2 ? -1.6 : 0;
+    const menuV = state !== 'garage';
+    if (menuV) { gYaw = 2.25 + Math.sin(timeAcc * .12) * .22; gPitch = .06; } else if (gAuto) gYaw += dt * .18;
+    const d = menuV ? 6.6 : gDist * (gTab === 'wheels' ? .72 : 1), side = menuV ? (camera.aspect > 1.2 ? .35 : 0) : camera.aspect > 1.2 ? -1.6 : 0;
     gCam.position.set(Math.sin(gYaw) * d, 1.1 + gPitch * 6, Math.cos(gYaw) * d);
-    gCam.lookAt(0, gTab === 'wheels' ? .35 : .7, 0);
+    gCam.lookAt(0, menuV ? .55 : gTab === 'wheels' ? .35 : .7, 0);
     gCam.updateMatrixWorld(); tmpV.set(1, 0, 0).applyQuaternion(gCam.quaternion); gCam.position.addScaledVector(tmpV, side);
     gCam.near = .05; gCam.fov = vfovFor(52, 30, 60);
   }
@@ -2885,7 +2970,7 @@ $('gView').addEventListener('pointermove', e => {
 const gOff = e => gPads.delete(e.pointerId);
 $('gView').addEventListener('pointerup', gOff); $('gView').addEventListener('pointercancel', gOff);
 $('gView').addEventListener('wheel', e => { gDist = clamp(gDist * (e.deltaY > 0 ? 1.08 : .92), 4.2, 11); }, { passive: true });
-function updateCoins() { const t = '💰 ' + SAVE.coins.toLocaleString('ru-RU'); $('gCoins').textContent = t; $('mCoins').textContent = t; $('cCoins').textContent = t; }
+function updateCoins() { const t = '💰 ' + SAVE.coins.toLocaleString('ru-RU'); $('gCoins').textContent = t; $('cCoins').textContent = t; $('mCoins').textContent = SAVE.coins >= 100000 ? (SAVE.coins / 1000).toFixed(1) + 'K' : SAVE.coins.toLocaleString('ru-RU'); try { $('mStars').textContent = CUPS.reduce((a, _, ci) => a + cupStars(ci), 0); } catch (_) { } }
 function swatches(list, cur, key, extra = '') { return `<div class="opts sws">${list.map(c => `<div class="opt sw ${c === cur ? 'on' : ''}" style="background:${hex6(c)}" data-k="${key}" data-v="${c}"></div>`).join('')}${extra}</div>`; }
 function choices(list, cur, key) { return `<div class="opts">${list.map(([v, n]) => `<div class="opt ${String(cur) === String(v) ? 'on' : ''}" data-k="${key}" data-v="${v}">${n}</div>`).join('')}</div>`; }
 function slider(key, label, min, max, step, val, fmtV) { return `<div class="row"><label>${label}: <b id="lbl_${key}">${fmtV(val)}</b></label><input type="range" min="${min}" max="${max}" step="${step}" value="${val}" data-k="${key}" data-fmt="${key}"></div>`; }
@@ -2950,13 +3035,13 @@ $('gAct').onclick = () => {
 let toastT = 0;
 function gToast(t) { const el = $('gToast'); el.textContent = t; el.classList.remove('hidden'); clearTimeout(toastT); toastT = setTimeout(() => el.classList.add('hidden'), 1800); }
 function openGarage() {
-  state = 'garage'; gModel = SAVE.sel; gTab = 'cars'; gAuto = true;
+  state = 'garage'; gModel = SAVE.sel; gTab = 'cars'; gAuto = true; gYaw = 2.4; gPitch = .18;
   $('menu').classList.add('hidden'); $('garage').classList.remove('hidden');
-  buildGarageCar(); renderGarage();
+  if (!gCar || gCar.cfg.model !== gModel) buildGarageCar(); renderGarage();
 }
 function closeGarage() {
   $('garage').classList.add('hidden');
-  if (gCar) { gScene.remove(gCar.root); gCar.dispose(); gCar = null; }
+  if (gCar && gModel !== SAVE.sel) { gModel = SAVE.sel; buildGarageCar(); }
 }
 $('gBack').onclick = () => { closeGarage(); toMenu(); };
 $('btnGarage').onclick = openGarage;
@@ -3051,7 +3136,7 @@ $('tasks').addEventListener('click', e => { const o = e.target.closest('.tclaim'
 renderTasks();
 // track & mode selectors
 document.querySelectorAll('#trk .opt').forEach(o => { o.classList.toggle('on', o.dataset.v === TRACK_ID); o.onclick = () => { if (o.dataset.v === TRACK_ID) return; try { localStorage.setItem('sr3d_track', o.dataset.v); } catch (_) { } $('loading').classList.remove('hidden'); $('loading').firstElementChild.textContent = 'ЗАГРУЗКА ТРАССЫ…'; setTimeout(() => location.reload(), 50); }; });
-document.querySelectorAll('#mode .opt').forEach(o => { o.classList.toggle('on', o.dataset.v === settings.mode); o.onclick = () => { settings.mode = o.dataset.v; try { localStorage.setItem('sr3d_mode', settings.mode); } catch (_) { } document.querySelectorAll('#mode .opt').forEach(x => x.classList.toggle('on', x === o)); setupRace(); }; });
+document.querySelectorAll('#mode .opt').forEach(o => { o.classList.toggle('on', o.dataset.v === settings.mode); o.onclick = () => { settings.mode = o.dataset.v; try { localStorage.setItem('sr3d_mode', settings.mode); } catch (_) { } document.querySelectorAll('#mode .opt').forEach(x => x.classList.toggle('on', x === o)); renderMenu(); }; });
 
 
 /* ================= CAREER ================= */
@@ -3152,11 +3237,109 @@ $('photo').addEventListener('wheel', e => { phDist = clamp(phDist * (e.deltaY > 
 function showTrackBest() { let b = null; try { b = parseFloat(localStorage.getItem('sr3d_best_' + TRACK_ID)) || null; } catch (_) { } $('trkBest').textContent = TRACKS[TRACK_ID].desc + (b ? ' · рекорд круга ' + fmt(b) : ''); }
 showTrackBest();
 
+
+/* ================= MAIN MENU (native style) ================= */
+{ // showroom props
+  const toCam = new THREE.Vector2(Math.sin(2.25), Math.cos(2.25)), d = toCam.clone().multiplyScalar(-1), right = new THREE.Vector2(-d.y, d.x);
+  const at = (back, side) => [d.x * back + right.x * side, d.y * back + right.y * side];
+  const face = Math.atan2(toCam.x, toCam.y);
+  const doorTex = canvasTex(256, 256, (g, w, h) => { g.fillStyle = '#2a2f38'; g.fillRect(0, 0, w, h); for (let y = 0; y < h; y += 10) { g.fillStyle = 'rgba(255,255,255,.07)'; g.fillRect(0, y, w, 3); g.fillStyle = 'rgba(0,0,0,.35)'; g.fillRect(0, y + 7, w, 3); } });
+  const [dx, dz] = at(13, -2);
+  const door = new THREE.Mesh(new THREE.PlaneGeometry(9, 6.5), new THREE.MeshStandardMaterial({ map: doorTex, roughness: .6, metalness: .5 })); door.position.set(dx, 3.25, dz); door.rotation.y = face; gScene.add(door);
+  const frameM = new THREE.MeshStandardMaterial({ color: 0x14171d, roughness: .8 });
+  for (const sx of [-4.8, 4.8]) { const p = new THREE.Mesh(new THREE.BoxGeometry(.6, 7, .6), frameM); p.position.set(dx + right.x * sx, 3.5, dz + right.y * sx); gScene.add(p); }
+  const lamp = new THREE.Mesh(new THREE.BoxGeometry(1.4, .25, .3), new THREE.MeshBasicMaterial({ color: 0xffd9a0 })); lamp.position.set(dx, 7.2, dz); lamp.rotation.y = face; gScene.add(lamp);
+  // shelves with glowing edge strips and boxes
+  const shM = new THREE.MeshStandardMaterial({ color: 0x1f2937, metalness: .6, roughness: .5 }), glowO = new THREE.MeshBasicMaterial({ color: 0xff9a3c }), boxM = new THREE.MeshStandardMaterial({ color: 0xc8c2b4, roughness: .9 });
+  for (let u = 0; u < 2; u++) {
+    const [sx, sz] = at(11.5, 6.5 + u * 5.2), g = new THREE.Group(); g.position.set(sx, 0, sz); g.rotation.y = face; gScene.add(g);
+    for (const px of [-2.4, 2.4]) for (const pz of [-.6, .6]) { const p = new THREE.Mesh(new THREE.BoxGeometry(.12, 6, .12), shM); p.position.set(px, 3, pz); g.add(p); }
+    for (let lv = 0; lv < 4; lv++) {
+      const y = .4 + lv * 1.7, b = new THREE.Mesh(new THREE.BoxGeometry(5, .08, 1.4), shM); b.position.y = y; g.add(b);
+      const st = new THREE.Mesh(new THREE.BoxGeometry(5, .05, .05), glowO); st.position.set(0, y + .06, .7); g.add(st);
+      for (let k = 0; k < 4; k++) if (rnd() < .75) { const bx = new THREE.Mesh(new THREE.BoxGeometry(.6 + rnd() * .5, .4 + rnd() * .6, .7), boxM); bx.position.set(-1.9 + k * 1.25, y + .3, -.1); g.add(bx); }
+    }
+  }
+  // tyre stacks & tool chest
+  const tyreG = new THREE.TorusGeometry(.42, .2, 10, 24).rotateX(Math.PI / 2), tyreM = new THREE.MeshStandardMaterial({ color: 0x121212, roughness: .85 });
+  for (let st = 0; st < 3; st++) { const [tx, tz] = at(10, -8.5 - st * 1.2); for (let k = 0; k < 3 + st; k++) { const t = new THREE.Mesh(tyreG, tyreM); t.position.set(tx, .2 + k * .4, tz); gScene.add(t); } }
+  const [cx, cz] = at(9.5, -5); const chest = new THREE.Mesh(new THREE.BoxGeometry(1.8, 1.2, .8), new THREE.MeshStandardMaterial({ color: 0xb91c1c, metalness: .5, roughness: .35 })); chest.position.set(cx, .6, cz); chest.rotation.y = face; gScene.add(chest);
+  // ceiling light bars
+  const barM = new THREE.MeshBasicMaterial({ color: 0xbfe3ff });
+  for (let k = -2; k <= 2; k++) for (const r of [-1, 1]) { const b = new THREE.Mesh(new THREE.BoxGeometry(5, .12, .3), barM); const [bx, bz] = at(k * 3.5, r * 3.2); b.position.set(bx, 9.2, bz); b.rotation.y = face + Math.PI / 2; gScene.add(b); }
+}
+function ensureShowroom() { if (!gCar || gCar.cfg.model !== SAVE.sel) { gModel = SAVE.sel; buildGarageCar(); } }
+function renderMenu() {
+  if (!$('mSummary')) return;
+  const m = MODEL[SAVE.sel], st = statsOf(SAVE.sel);
+  $('mCarName').innerHTML = `${m.name} <span class="cls c${m.cls}">${m.cls}</span>`;
+  $('mCarStats').textContent = `${Math.round(st.vmax * 3.6 * 1.2)} км/ч на нитро · разгон ${st.pow.toFixed(1)} · сцепление ${st.grip.toFixed(2)}`;
+  $('mSummary').textContent = `${TRACK_ICON[TRACK_ID]} ${TRACKS[TRACK_ID].name} · ${MODE_N[settings.mode]}${settings.mode === 'race' ? ' · ' + settings.laps + ' кр.' : ''} · ${TOD_I[settings.tod]} ${settings.wx === 'auto' ? '🔄' : WX_I[settings.wx] || '☀️'}`;
+  $('btnDaily').querySelector('.dot').classList.toggle('hidden', !bonusAvail());
+  $('btnSpin').querySelector('.dot').classList.toggle('hidden', SAVE.spinDay === dayNum());
+  $('btnTasks').querySelector('.dot').classList.toggle('hidden', !dailyTasks().some(t => !t.c && t.p >= TASK_DEFS.find(x => x.id === t.id).g));
+  $('carPrev').style.visibility = $('carNext').style.visibility = SAVE.owned.length > 1 ? 'visible' : 'hidden';
+  updateCoins();
+}
+const openSheet = id => { $(id).classList.remove('hidden'); if (audio) beep(900, .04, .05); };
+document.querySelectorAll('.sheet').forEach(sh => sh.addEventListener('click', e => { if (e.target === sh || e.target.classList.contains('x')) sh.classList.add('hidden'); }));
+$('bbTrack').onclick = () => openSheet('shTrack'); $('bbRace').onclick = () => openSheet('shRace'); $('bbCtl').onclick = () => openSheet('shCtl');
+$('bbHelp').onclick = () => { $('tut').classList.remove('hidden'); };
+$('btnTasks').onclick = () => { renderTasks(); openSheet('shTasks'); };
+$('tasks').addEventListener('click', () => setTimeout(renderMenu, 0));
+function cycleCar(dir) { const o = SAVE.owned, i = o.indexOf(SAVE.sel); SAVE.sel = o[(i + dir + o.length) % o.length]; saveSave(); ensureShowroom(); renderMenu(); if (audio) beep(700, .05, .06); }
+$('carPrev').onclick = () => cycleCar(-1); $('carNext').onclick = () => cycleCar(1);
+// tutorial button outside race
+const _tutOk = $('tutOk').onclick; $('tutOk').onclick = () => { $('tut').classList.add('hidden'); if (state === 'race') _tutOk(); else try { localStorage.setItem('sr3d_tut', '1'); } catch (_) { } };
+// ---- daily bonus ----
+const DAILY = [500, 800, 1200, 1600, 2200, 3000, 5000];
+function dayNum(d = new Date()) { return Math.floor((d.getTime() - d.getTimezoneOffset() * 60000) / 86400000); }
+if (!SAVE.bonus) SAVE.bonus = { day: -1, streak: 0 };
+const bonusAvail = () => SAVE.bonus.day !== dayNum();
+function renderDaily() {
+  const b = SAVE.bonus, today = dayNum(), cont = b.day === today - 1 || b.day === today, cur = b.day === today ? b.streak : cont ? b.streak % 7 + 1 : 1;
+  $('dailyBody').innerHTML = `<div class="days">${DAILY.map((r, k) => `<div class="day ${k + 1 < cur || (k + 1 === cur && !bonusAvail()) ? 'got' : ''} ${k + 1 === cur && bonusAvail() ? 'now' : ''}">День ${k + 1}<b>${r >= 1000 ? r / 1000 + 'K' : r}</b>${k === 6 ? '👑' : '🪙'}</div>`).join('')}</div>` +
+    (bonusAvail() ? `<button class="btn" id="dailyGo">ЗАБРАТЬ ${DAILY[cur - 1].toLocaleString('ru-RU')} 🪙</button>` : '<div class="help">Сегодня бонус получен. Заходи завтра — награда вырастет!</div>') + '<div class="help">Заходи каждый день подряд — на 7-й день 5 000 монет. Пропуск сбрасывает серию.</div>';
+  const go = $('dailyGo'); if (go) go.onclick = () => { const today2 = dayNum(); SAVE.bonus.streak = SAVE.bonus.day === today2 - 1 ? SAVE.bonus.streak % 7 + 1 : 1; SAVE.bonus.day = today2; const r = DAILY[SAVE.bonus.streak - 1]; SAVE.coins += r; saveSave(); renderDaily(); renderMenu(); if (audio) { beep(1200, .1, .12); setTimeout(() => beep(1600, .15, .12), 100); } vib(30); };
+}
+$('btnDaily').onclick = () => { renderDaily(); openSheet('shDaily'); };
+// ---- lucky wheel ----
+const SPIN = [500, 1500, 300, 3000, 800, 2000, 400, 1000], SPIN_W = [18, 8, 22, 3, 16, 5, 20, 10];
+{
+  const cols = ['#e11d48', '#f59e0b', '#2563eb', '#16a34a', '#9333ea', '#0891b2', '#ea580c', '#db2777'];
+  let svg = '<circle r="106" fill="#111" stroke="#ffd23d" stroke-width="5"/>';
+  SPIN.forEach((v, k) => {
+    const a0 = (k * 45 - 90 - 22.5) * Math.PI / 180, a1 = ((k + 1) * 45 - 90 - 22.5) * Math.PI / 180;
+    svg += `<path d="M0 0 L${Math.cos(a0) * 100} ${Math.sin(a0) * 100} A100 100 0 0 1 ${Math.cos(a1) * 100} ${Math.sin(a1) * 100} Z" fill="${cols[k]}" stroke="#111" stroke-width="2"/>`;
+    const am = (k * 45 - 90) * Math.PI / 180;
+    svg += `<text x="${Math.cos(am) * 66}" y="${Math.sin(am) * 66}" fill="#fff" font-size="15" font-family="Russo One,Arial" text-anchor="middle" dominant-baseline="middle" transform="rotate(${k * 45} ${Math.cos(am) * 66} ${Math.sin(am) * 66})">${v >= 1000 ? v / 1000 + 'K' : v}</text>`;
+  });
+  svg += '<circle r="16" fill="#ffd23d" stroke="#111" stroke-width="3"/>';
+  for (let k = 0; k < 16; k++) { const a = k / 16 * Math.PI * 2; svg += `<circle cx="${Math.cos(a) * 103}" cy="${Math.sin(a) * 103}" r="2.5" fill="#fff"/>`; }
+  $('spinSvg').innerHTML = svg;
+}
+let spinRot = 0, spinning = false;
+function renderSpin() { const used = SAVE.spinDay === dayNum(); $('spinGo').classList.toggle('dis', used || spinning); $('spinInfo').textContent = used ? 'Сегодня колесо уже крутилось — возвращайся завтра' : 'Одно бесплатное вращение в день'; }
+$('btnSpin').onclick = () => { renderSpin(); openSheet('shSpin'); };
+$('mPlus').onclick = () => { if (bonusAvail()) { renderDaily(); openSheet('shDaily'); } else { renderSpin(); openSheet('shSpin'); } };
+$('spinGo').onclick = () => {
+  if (spinning || SAVE.spinDay === dayNum()) return;
+  let r = Math.random() * SPIN_W.reduce((a, b) => a + b), idx = 0; while (r > SPIN_W[idx]) { r -= SPIN_W[idx]; idx++; }
+  spinning = true; renderSpin();
+  spinRot += 360 * 6 + ((360 - idx * 45 - (spinRot % 360)) % 360 + 360) % 360 + (Math.random() - .5) * 30;
+  $('spinSvg').style.transform = `rotate(${spinRot}deg)`;
+  let ticks = 0; const tk = setInterval(() => { if (audio) beep(1800 - ticks * 25, .02, .04); if (++ticks > 40) clearInterval(tk); }, 90);
+  setTimeout(() => { spinning = false; SAVE.spinDay = dayNum(); SAVE.coins += SPIN[idx]; saveSave(); renderSpin(); renderMenu(); $('spinInfo').textContent = '🎉 Выигрыш: ' + SPIN[idx].toLocaleString('ru-RU') + ' монет!'; if (audio) { beep(1300, .12, .14); setTimeout(() => beep(1750, .2, .14), 120); } vib([20, 40, 60]); }, 4300);
+};
+const TIPS = ['Совет: нажми НИТРО ровно на «СТАРТ!» — идеальный старт', 'Совет: держись в потоке за соперником — слипстрим даёт разгон', 'Совет: обгон впритирку без удара даёт нитро', 'Совет: дрифт в повороте заряжает нитро', 'Совет: в дождь и снег тормози раньше', 'Совет: колесо удачи и бонус дня — бесплатные монеты каждый день'];
+$('ldTip').textContent = TIPS[Math.floor(Math.random() * TIPS.length)];
+
 /* ================= BOOT ================= */
 setQuality('auto');
 setupRace();
 state = 'menu';
-updateCoins();
+ensureShowroom(); renderMenu();
+if (renderer.compileAsync) renderer.compileAsync(scene, camera).catch(() => { });
 $('loading').classList.add('hidden');
 $('menu').classList.remove('hidden');
 window.__gameReady = true;
