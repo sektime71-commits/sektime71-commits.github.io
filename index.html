@@ -336,7 +336,7 @@ body.street #heat{display:block}#heat span{display:block;font-size:9px;letter-sp
 #heat.chase{animation:cop .5s steps(2) infinite}@keyframes cop{0%{box-shadow:0 0 18px #ff2020}50%{box-shadow:0 0 18px #2050ff}}
 #score{display:none;position:absolute;left:50%;transform:translateX(-50%);top:calc(var(--st,0px) + 64px);text-align:center;pointer-events:none}
 body.scoremode #score{display:block}#score b{display:block;font:italic 900 34px/1 system-ui;color:#fff;text-shadow:0 0 18px rgba(255,61,110,.9),0 2px 4px #000}#score span{font:800 11px system-ui;letter-spacing:2px;color:#ffd23d;text-shadow:0 1px 3px #000}
-body.cruise #pos,body.cruise #board,body.scoremode #board{display:none}
+body.solo .box.stat:first-child,body.cruise #pos,body.cruise #board,body.scoremode #board{display:none}
 .gcard.on{outline:2px solid #ffd23d}.tshot.onl{display:flex!important;align-items:center;justify-content:center;font-size:54px;background:linear-gradient(135deg,#1d4ed8,#7c3aed)}
 .trkCards{grid-template-columns:repeat(4,1fr)!important}@media (max-width:700px){.trkCards{grid-template-columns:repeat(3,1fr)!important}}
 .onMe{display:flex;align-items:center;gap:12px;background:rgba(255,255,255,.05);border-radius:14px;padding:10px 12px;margin-bottom:10px}
@@ -2676,7 +2676,7 @@ function updatePuffs(dt) {
     p.s.position.x += p.vx * dt; p.s.position.y += p.vy * dt; p.s.position.z += p.vz * dt; p.vx *= .97; p.vz *= .97;
     const sc = (.8 + t * 3.2) * p.size; p.s.scale.set(sc, sc, sc);
     const dc = p.s.position.distanceTo(camera.position);
-    p.s.material.opacity = (1 - t) * p.op * clamp((dc - 2.5) / 5, 0, 1);
+    p.s.material.opacity = (1 - t) * p.op * clamp((dc - sc * .7 - 2) / 6, 0, 1);
   }
 }
 const SPARK_N = 160, sparkPos = new Float32Array(SPARK_N * 3), sparkVel = new Float32Array(SPARK_N * 3), sparkLife = new Float32Array(SPARK_N);
@@ -2880,7 +2880,7 @@ function setupRace() {
   raceTime = 0; countdown = 3; finishShown = false; LAPS = TRK.sprint ? 1 : ['elim', 'derby', 'hunt', 'cruise'].includes(settings.mode) ? 99 : ['drift', 'stunt', 'touge'].includes(settings.mode) ? 2 : settings.laps;
   if (settings.mode === 'hunt' && !NET.race) setupHunt();
   if (player.policeBar) { player.policeBar.visible = settings.mode === 'hunt'; } else if (settings.mode === 'hunt') addPoliceBar(player);
-  document.body.classList.toggle('scoremode', SCORE_MODES.includes(settings.mode)); document.body.classList.toggle('cruise', settings.mode === 'cruise');
+  document.body.classList.toggle('scoremode', SCORE_MODES.includes(settings.mode)); document.body.classList.toggle('cruise', settings.mode === 'cruise'); document.body.classList.toggle('solo', SOLO.includes(settings.mode) || settings.mode === 'hunt');
   if (TRK.sprint && settings.mode === 'elim') settings.mode = 'race';
   setupStreet();
   RP.buf = []; RP.best = null; RP.active = false;
@@ -2945,7 +2945,7 @@ function updateCarVisual(c, dt) {
   c.tailMat.emissiveIntensity = c.inp.brk > 0 ? 5 : (preset.night ? 1.6 : .8);
   c.wetTail.material.opacity = WX.rain * (c.inp.brk > 0 ? .7 : .35) * (preset.night ? 1 : .35);
   for (const f of c.flames) { f.visible = c.nitroOn; if (c.nitroOn) { const s = .5 + Math.random() * .5; f.scale.set(s, s * .8, s); f.material.color.copy(c.flameC || tmpC.setHex(0x4aa3ff)).offsetHSL(Math.random() * .04, 0, Math.random() * .15); } }
-  if (dt > 0 && (c.dmg > 45 || c.boom > 0) && Math.random() < (c.boom > 0 ? .9 : (c.dmg - 40) / 90)) { const fx2 = Math.sin(c.h), fz2 = Math.cos(c.h); puff(c.pos.x + fx2 * 1.7, 1.1, c.pos.z + fz2 * 1.7, c.vel.x * .4, c.vel.z * .4, 1 + Math.random(), c.boom > 0 ? 0x1a1a1a : 0x6b6b6b, c.boom > 0 ? .6 : .35, 1.6); }
+  if (dt > 0 && (c.dmg > 55 || c.boom > 0) && Math.random() < (c.boom > 0 ? .6 : (c.dmg - 50) / 160)) { const fx2 = Math.sin(c.h), fz2 = Math.cos(c.h); puff(c.pos.x + fx2 * 1.7, 1.1, c.pos.z + fz2 * 1.7, c.vel.x * .4, c.vel.z * .4, 1 + Math.random(), c.boom > 0 ? 0x1a1a1a : 0x6b6b6b, c.boom > 0 ? .45 : .18, 1.2); }
   const sp = Math.abs(c.vF), slip = !c.air && (Math.abs(c.vS) > 3 || (c.hk > .5 && sp > 8) || c.slipR);
   const fx = Math.sin(c.h), fz = Math.cos(c.h);
   for (let k = 0; k < 2; k++) {
@@ -3002,6 +3002,11 @@ function updateCamera(dt) {
     const z = zoom * (camMode === 1 ? 1.6 : 1) * (1 + .35 * airCam), port = camera.aspect < 1;
     const back = (port ? 6.6 : 5.4) * z + spd * .016, up = .85 + 1.35 * z + orbitPitch;
     camPos.lerp(tmpV.set(c.pos.x - rx * back, Math.max(.5, up) + c.y * .85, c.pos.z - rz * back), 1 - Math.exp(-dt * 8));
+    { // keep the chase camera out of walls, ramps and buildings
+      const cq = trackQuery(camPos.x, camPos.z, c.q.i), lim2 = HALF + 1.1;
+      if (!(c.offT > 0) && Math.abs(cq.lat) > lim2 && Math.abs(c.q.lat) <= HALF + 2) { const dl = Math.sign(cq.lat) * lim2 - cq.lat; camPos.x += NX[cq.i] * dl; camPos.z += NZ[cq.i] * dl; }
+      const rr = rampAt({ pos: camPos }, cq); if (rr) camPos.y = Math.max(camPos.y, rr.r.H * rr.s / rr.r.L + 1.3);
+    }
     camera.position.copy(camPos);
     camLook.lerp(tmpV.set(c.pos.x + fx * 3, .95 + .25 * z + c.y * .9, c.pos.z + fz * 3), 1 - Math.exp(-dt * 14));
     camera.lookAt(camLook);
@@ -3446,6 +3451,11 @@ function frame(now) {
     if (player.impact > 3) { shake = Math.min(1, player.impact * .05); thump(player.impact); }
     if (racing) { for (const c of live) if (!c.remote) lapCheck(c); modeTick(dt); recordGhost(dt); }
     raceStats.maxSpeed = Math.max(raceStats.maxSpeed, player.vF * 3.6);
+    if (racing && player.finish == null && !player.air && !(player.boom > 0)) { // auto-recover when stuck or driving the wrong way
+      const stuck = (player.inp.thr > 0 && Math.abs(player.vF) < 2.5) || player.wrong > 6;
+      player.stuckT = stuck ? (player.stuckT || 0) + dt : 0;
+      if (player.stuckT > 3.5) { player.stuckT = 0; resetPlayer(); flash('↺ АВТОВОЗВРАТ НА ТРАССУ', 1.4); }
+    }
     for (const c of live) updateCarVisual(c, sdt);
     for (const c of npcs) updateCarVisual(c, sdt);
     updatePeds(dt);
