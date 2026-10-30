@@ -40,12 +40,13 @@ body.rot{--sl:max(10px,env(safe-area-inset-top));--sr:max(10px,env(safe-area-ins
 #gPanel .row{margin:8px 0}
 .sws .sw{width:28px;height:28px}
 .sw.pick{position:relative;overflow:hidden}.sw.pick input{position:absolute;inset:0;opacity:0;width:100%;height:100%}
+input.txt{width:100%;padding:9px 10px;border-radius:9px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.08);color:#fff;font-size:16px;font-weight:800;letter-spacing:2px;text-transform:uppercase;user-select:text;-webkit-user-select:text}
 input[type=range]{width:100%;accent-color:#ff3d6e;touch-action:pan-x}
 .card{padding:10px 12px;border-radius:12px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);margin:6px 0;cursor:pointer}
 .card.on{border-color:#ff7a3d;background:rgba(255,122,61,.15)}
 .cn{font-weight:900;font-style:italic;font-size:16px}.cd{font-size:12px;opacity:.7;margin:3px 0}.cp{font-size:13px;font-weight:700;color:#ffd23d}
 .cls{display:inline-block;padding:1px 7px;border-radius:6px;font-size:11px;font-style:normal;vertical-align:middle;background:#555}
-.cB{background:#2563eb}.cA{background:#9333ea}.cS{background:#dc2626}
+.cC{background:#16a34a}.cB{background:#2563eb}.cA{background:#9333ea}.cS{background:#dc2626}
 .upg{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.07)}
 .upg .lv{color:#3dd5ff;letter-spacing:2px;font-size:14px}.upg .opt{flex:none;min-width:96px}
 .opt.dis,.btn.dis{opacity:.45}
@@ -246,7 +247,7 @@ body.touch.land #nitro.gain{animation:ngain .45s ease-out}
   <button class="btn" id="a2hsOk">ПОНЯТНО</button></div></div>
 <div id="garage" class="hidden">
   <div id="gTop"><button id="gBack">← Меню</button><div class="t">ГАРАЖ</div><div id="gCoins">💰 0</div></div>
-  <div id="gSide"><div id="gTabs"><div class="gt on" data-t="cars">🚗 Машины</div><div class="gt" data-t="paint">🎨 Окраска</div><div class="gt" data-t="vinyl">🔥 Узоры</div><div class="gt" data-t="body">🛠 Обвес</div><div class="gt" data-t="wheels">🛞 Колёса</div><div class="gt" data-t="interior">💺 Салон</div><div class="gt" data-t="perf">⚡ Улучшения</div></div><div id="gPanel"></div></div>
+  <div id="gSide"><div id="gTabs"><div class="gt on" data-t="cars">🚗 Машины</div><div class="gt" data-t="paint">🎨 Окраска</div><div class="gt" data-t="vinyl">🔥 Узоры</div><div class="gt" data-t="body">🛠 Обвес</div><div class="gt" data-t="wheels">🛞 Колёса</div><div class="gt" data-t="lights">💡 Свет</div><div class="gt" data-t="interior">💺 Салон</div><div class="gt" data-t="perf">⚡ Улучшения</div></div><div id="gPanel"></div></div>
   <div id="gView"></div>
   <div id="gBottom"><div id="gInfo"><div id="gName"></div><div id="gStats"></div></div><button class="btn" id="gAct">В ГОНКУ</button></div>
   <div id="gToast" class="hidden"></div>
@@ -395,7 +396,7 @@ class SimCar {
   place(i, lat) {
     this.q = { i, lat };
     this.pos.x = PX[i] + NX[i] * lat; this.pos.z = PZ[i] + NZ[i] * lat;
-    this.h = Math.atan2(TX[i], TZ[i]); this.vel.x = 0; this.vel.z = 0; this.r = 0; this.steer = 0; this.y = 0; this.vy = 0; this.air = false;
+    this.h = Math.atan2(TX[i], TZ[i]); this.vel.x = 0; this.vel.z = 0; this.r = 0; this.steer = 0; this.y = 0; this.vy = 0; this.air = false; this.fly = null;
   }
 }
 /* ---------- RIVER (straight band crossing the loop twice -> two bridges) ---------- */
@@ -539,13 +540,25 @@ function stepCar(c, dt) {
   const gy = rr ? rr.r.H * rr.s / rr.r.L : 0;
   if (c.air) {
     c.vy -= GRAV * dt; c.y += c.vy * dt; c.airT += dt;
-    if (c.y <= gy) { c.evLand = Math.max(c.evLand || 0, -c.vy); c.y = gy; c.vy = 0; c.air = false; c.r *= .5; }
+    if (c.fly) {
+      // programmed flight: follow the track direction, glide to a safe lane, never touch barriers
+      const th = Math.atan2(TX[q.i], TZ[q.i]), spd = Math.max(8, Math.hypot(c.vel.x, c.vel.z));
+      c.h = th + wrapA(c.h - th) * Math.exp(-dt * 5); c.r = 0;
+      const latV = clamp((c.fly.latT - q.lat) * 2.2, -7, 7);
+      c.vel.x = TX[q.i] * spd + NX[q.i] * latV; c.vel.z = TZ[q.i] * spd + NZ[q.i] * latV;
+      c.vF = spd; c.vS = 0;
+    }
+    if (c.y <= gy) {
+      c.evLand = Math.max(c.evLand || 0, -c.vy); c.y = gy; c.vy = 0; c.air = false; c.r *= .5;
+      if (c.fly) { const th = Math.atan2(TX[q.i], TZ[q.i]); c.h = th + wrapA(c.h - th) * .3; const sp = Math.hypot(c.vel.x, c.vel.z); c.vel.x = Math.sin(c.h) * sp; c.vel.z = Math.cos(c.h) * sp; c.vF = sp; c.vS = 0; c.fly = null; }
+    }
   } else {
     if (gy < c.y - .05) {
       c.air = true; c.airT = 0;
       const sl = c.slope || 0;
       c.vy = Math.max(0, c.vF) * sl / Math.sqrt(1 + sl * sl) + (c.rampType === 'roll' ? 3.2 : sl > 0 ? 1.4 : 0);
       c.evLaunch = sl > 0 ? (c.rampType || 'jump') : 'drop';
+      if (sl > 0) c.fly = { latT: clamp(q.lat, -HALF + 2.6, HALF - 2.6) };
     } else c.y = gy;
     c.slope = rr ? rr.r.H / rr.r.L : 0; c.rampType = rr ? rr.r.type : null;
   }
@@ -560,7 +573,7 @@ function stepCar(c, dt) {
   c.curb = !c.air && Math.abs(q.lat) > HALF - 1.0 ? 1 : 0;
   const lim = HALF + .5;
   c.scrape = Math.max(0, c.scrape - dt * 4);
-  if (!SIMENV.noWalls && Math.abs(q.lat) > lim) {
+  if (!SIMENV.noWalls && !c.fly && Math.abs(q.lat) > lim) {
     const s = Math.sign(q.lat), over = Math.abs(q.lat) - lim, nx = -NX[q.i] * s, nz = -NZ[q.i] * s;
     c.pos.x += nx * over; c.pos.z += nz * over;
     const vn = c.vel.x * nx + c.vel.z * nz;
@@ -583,7 +596,7 @@ function collideCars(cars) {
   for (let a = 0; a < cars.length; a++) for (let b = a + 1; b < cars.length; b++) {
     const A = cars[a], B = cars[b];
     const dx0 = B.pos.x - A.pos.x, dz0 = B.pos.z - A.pos.z;
-    if (dx0 * dx0 + dz0 * dz0 > 36 || Math.abs(A.y - B.y) > 1.3) continue;
+    if (dx0 * dx0 + dz0 * dz0 > 36 || Math.abs(A.y - B.y) > 1.3 || A.fly || B.fly) continue;
     for (const oa of [-1.15, 1.15]) for (const ob of [-1.15, 1.15]) {
       const ax = A.pos.x + Math.sin(A.h) * oa, az = A.pos.z + Math.cos(A.h) * oa;
       const bx = B.pos.x + Math.sin(B.h) * ob, bz = B.pos.z + Math.cos(B.h) * ob;
@@ -769,7 +782,9 @@ const STYLES = [
   { name: 'GT', z0: -2.36, z1: 2.42, wid: 1.0, n: 3.2, top: [[-2.36, .8], [-2.24, .93], [-2.0, .99], [-1.4, 1.01], [-.6, 1.0], [.3, .975], [.95, .95], [1.6, .885], [2.05, .78], [2.3, .66], [2.42, .56]], cab: [-1.72, -.55, .22, 1.02], roof: 1.385, hips: .035 },
   { name: 'HYPER', z0: -2.38, z1: 2.45, wid: 1.03, n: 2.8, top: [[-2.38, .78], [-2.25, .9], [-1.9, .95], [-1.2, .97], [-.5, .96], [.4, .93], [1.0, .88], [1.6, .8], [2.1, .7], [2.35, .6], [2.45, .5]], cab: [-1.45, -.35, .35, 1.25], roof: 1.27, hips: .06 },
   { name: 'MUSCLE', z0: -2.4, z1: 2.45, wid: .99, n: 4.2, top: [[-2.4, .86], [-2.3, .98], [-2.0, 1.02], [-1.3, 1.02], [-.7, 1.02], [.5, 1.0], [.9, .99], [1.6, .97], [2.1, .93], [2.35, .86], [2.45, .7]], cab: [-1.5, -.75, .05, .85], roof: 1.43, hips: .02 },
-  { name: 'SEDAN', z0: -2.32, z1: 2.38, wid: 1.0, n: 3.0, top: [[-2.32, .86], [-2.22, .99], [-2.0, 1.04], [-1.78, 1.05], [-1.2, 1.04], [.4, 1.0], [1.0, .975], [1.6, .93], [2.0, .86], [2.26, .74], [2.38, .62]], cab: [-1.78, -1.12, .3, 1.0], roof: 1.47, hips: .05, flare: .05, doors: 4 }
+  { name: 'SEDAN', z0: -2.32, z1: 2.38, wid: 1.0, n: 3.0, top: [[-2.32, .86], [-2.22, .99], [-2.0, 1.04], [-1.78, 1.05], [-1.2, 1.04], [.4, 1.0], [1.0, .975], [1.6, .93], [2.0, .86], [2.26, .74], [2.38, .62]], cab: [-1.78, -1.12, .3, 1.0], roof: 1.47, hips: .05, flare: .05, doors: 4 },
+  { name: 'HATCH', z0: -1.98, z1: 2.08, wid: .97, n: 3.2, top: [[-1.98, .9], [-1.93, 1.02], [-1.8, 1.06], [-1.2, 1.06], [.3, 1.0], [.95, .97], [1.45, .9], [1.85, .78], [2.08, .62]], cab: [-1.86, -1.62, .32, 1.02], roof: 1.53, hips: .05, flare: .05, hatch: true },
+  { name: 'WEDGE', z0: -2.3, z1: 2.48, wid: 1.02, n: 6, top: [[-2.3, .82], [-2.24, .9], [-1.6, .93], [-1.0, .93], [.2, .87], [1.0, .79], [1.8, .66], [2.3, .52], [2.48, .45]], cab: [-1.45, -.85, .2, 1.25], roof: 1.16, hips: .03 }
 ];
 const ARCH_R = .47, WHEEL_Z = 1.42, SILL = .27;
 function bodyParams(st, z) {
@@ -818,7 +833,8 @@ function cabinRing(st, z, M, inflate = 0, t0 = 0, t1 = Math.PI) {
   return ring;
 }
 function buildCarKit(styleIdx, opts = {}) {
-  const st = STYLES[styleIdx], kit = new Kit();
+  let st = STYLES[styleIdx]; const kit = new Kit();
+  if (opts.wide) st = Object.assign({}, st, { hips: st.hips + .07, flare: (st.flare || .015) + .07 });
   const NS = 84, M = 40, rings = [];
   for (let j = 0; j <= NS; j++) { const z = lerp(st.z0, st.z1, j / NS); rings.push(bodyRing(st, z, M)); }
   let skip = null;
@@ -829,7 +845,7 @@ function buildCarKit(styleIdx, opts = {}) {
   kit.add('paintS', G3.fan(rings[NS], [0, (pN.yt + pN.yb) / 2, st.z1], false));
   // chassis tub (dark wheel wells)
   if (opts.cockpit) for (const zc of [WHEEL_Z, -WHEEL_Z]) kit.add('dark', G3.box(1.52, .5, 1.2), makeXf([0, .5, zc]));
-  else kit.add('dark', G3.box(1.52, .5, 4.3), makeXf([0, .5, 0]));
+  else kit.add('dark', G3.box(1.52, .3, st.z1 - st.z0 - .8), makeXf([0, .42, (st.z0 + st.z1) / 2 - .05]));
   // greenhouse
   const [zr, , , zf] = st.cab, CN = 44, CM = 22, crings = [];
   for (let j = 0; j <= CN; j++) crings.push(cabinRing(st, lerp(zr, zf, j / CN), CM));
@@ -871,14 +887,16 @@ function buildCarKit(styleIdx, opts = {}) {
     // lower intakes
     kit.add('honey', G3.box(.36, .12, .04), makeXf([sx * .6, .42, fr - .02]));
     // side skirts & intakes
-    kit.add('carbon', G3.box(.07, .07, 1.9), makeXf([sx * (bodyParams(st, 0).W - .02), SILL + .01, 0]));
+    if (opts.skirt !== 0) kit.add(opts.skirt === 2 ? 'paintS' : 'carbon', G3.box(opts.skirt === 2 ? .1 : .07, opts.skirt === 2 ? .1 : .07, 1.9), makeXf([sx * (bodyParams(st, 0).W - .02), SILL + (opts.skirt === 2 ? 0 : .01), 0]));
+    if (opts.wide) for (const zc of [WHEEL_Z, -WHEEL_Z]) kit.add('dark', G3.torus(ARCH_R + .02, .025, 6, 20, Math.PI), makeXf([sx * (bodyParams(st, zc).W - .01), .31, zc], [0, Math.PI / 2, 0]));
     kit.add('honey', G3.box(.03, .16, .42), makeXf([sx * (bodyParams(st, -.8).W - .005), .58, -.8]));
     // tail lights
     const pr = bodyParams(st, rear + .02);
     kit.add('tail', G3.box(.44, .09, .04), makeXf([sx * .6, pr.yt - .12, rear - .01]));
     kit.add('lens', G3.box(.5, .13, .025), makeXf([sx * .6, pr.yt - .12, rear + .005]));
     // exhausts
-    for (const ex of [.3, .44]) { kit.add('chrome', G3.cyl(.055, .055, .2, 14), makeXf([sx * ex, .4, rear], [Math.PI / 2, 0, 0])); kit.add('dark', G3.cyl(.04, .04, .01, 12), makeXf([sx * ex, .4, rear - .1], [Math.PI / 2, 0, 0])); }
+    const exs = opts.exhaust === 1 ? (sx > 0 ? [.08] : [-.08].map(v => -v)) : opts.exhaust === 2 ? [.42] : [.3, .44], er = opts.exhaust === 2 ? .085 : opts.exhaust === 1 ? .07 : .055;
+    for (const ex of exs) { kit.add('chrome', G3.cyl(er, er, .2, 16), makeXf([sx * ex, .4, rear], [Math.PI / 2, 0, 0])); kit.add('dark', G3.cyl(er - .015, er - .015, .01, 12), makeXf([sx * ex, .4, rear - .1], [Math.PI / 2, 0, 0])); }
     // mirrors
     const zm = st.cab[3] - .3, wm = bodyParams(st, zm).W, ym = bodyParams(st, zm).yt + .1;
     kit.add('paintS', G3.sphere(1, 12, 8), makeXf([sx * (wm + .02), ym, zm], [0, 0, 0], [.11, .055, .08]));
@@ -895,18 +913,19 @@ function buildCarKit(styleIdx, opts = {}) {
   const pr = bodyParams(st, rear + .02);
   kit.add('tail', G3.box(1.55, .025, .02), makeXf([0, pr.yt - .06, rear - .02]));
   kit.add('honey', G3.box(1.0, .15, .04), makeXf([0, .44, fr - .015]));
-  kit.add('carbon', G3.box(1.55, .035, .34), makeXf([0, .3, fr - .2]));
+  if (opts.splitter !== 0) kit.add('carbon', G3.box(opts.splitter === 2 ? 1.95 : 1.55, .035, opts.splitter === 2 ? .5 : .34), makeXf([0, opts.splitter === 2 ? .27 : .3, fr - (opts.splitter === 2 ? .14 : .2)]));
+  if (opts.splitter === 2) for (const sx of [-1, 1]) kit.add('carbon', G3.box(.03, .12, .3), makeXf([sx * .96, .32, fr - .12]));
   kit.add('carbon', G3.box(1.5, .17, .36), makeXf([0, .34, rear + .18]));
   for (let k = -2; k <= 2; k++) kit.add('carbon', G3.box(.02, .15, .36), makeXf([k * .28, .32, rear + .16]));
   kit.add('plate', G3.box(.52, .12, .02), makeXf([0, (pr.yt + pr.yb) / 2 + .02, rear - .01]));
   // wing
-  const zw = rear + .3;
+  const zw = st.hatch ? st.cab[0] + .22 : rear + .3;
   if (opts.wing === 1) {
-    const yw = bodyParams(st, zw).yt;
+    const yw = st.hatch ? st.roof - .43 : bodyParams(st, zw).yt;
     kit.add('carbon', G3.box(1.75, .035, .34), makeXf([0, yw + .38, zw], [.08, 0, 0]));
     for (const sx of [-1, 1]) { kit.add('carbon', G3.box(.02, .24, .42), makeXf([sx * .88, yw + .33, zw])); kit.add('dark', G3.box(.04, .38, .1), makeXf([sx * .45, yw + .18, zw + .03], [-.15, 0, 0])); }
   } else if (opts.wing === 3) {
-    const yw = bodyParams(st, zw).yt;
+    const yw = st.hatch ? st.roof - .43 : bodyParams(st, zw).yt;
     kit.add('carbon', G3.box(1.85, .04, .4), makeXf([0, yw + .46, zw - .05], [.12, 0, 0]));
     kit.add('carbon', G3.box(1.85, .03, .14), makeXf([0, yw + .53, zw - .26], [.4, 0, 0]));
     for (const sx of [-1, 1]) { kit.add('carbon', G3.box(.025, .26, .5), makeXf([sx * .93, yw + .44, zw - .08])); kit.add('dark', G3.box(.05, .46, .09), makeXf([sx * .38, yw + .22, zw + .02], [-.25, 0, 0])); }
@@ -946,6 +965,8 @@ function buildWheelKit(side, style = 0) { // spinning part, axis = X
     k.add('rim', G3.torus(.248, style === 3 ? .02 : .014, 6, 32), makeXf([side * .112, 0, 0], [0, Math.PI / 2, 0]));
     if (style === 1) for (let s = 0; s < 5; s++) { const a = s / 5 * Math.PI * 2; k.add('rim', G3.box(.04, .2, .07), makeXf([side * .1, Math.cos(a) * .14, Math.sin(a) * .14], [a, 0, 0])); }
     if (style === 2) for (let s = 0; s < 16; s++) { const a = s / 16 * Math.PI * 2; k.add('rim', G3.box(.02, .22, .018), makeXf([side * .1, Math.cos(a) * .13, Math.sin(a) * .13], [a + (s % 2 ? .45 : -.45), 0, 0])); }
+    if (style === 4) for (let s = 0; s < 14; s++) { const a = s / 14 * Math.PI * 2; k.add('rim', G3.box(.025, .2, .045), makeXf([side * .1, Math.cos(a) * .14, Math.sin(a) * .14], [a, 0, side * .5])); }
+    if (style === 5) for (let s = 0; s < 7; s++) { const a = s / 7 * Math.PI * 2; k.add('rim', G3.box(.035, .1, .045), makeXf([side * .1, Math.cos(a) * .09, Math.sin(a) * .09], [a, 0, 0])); for (const d of [-.17, .17]) k.add('rim', G3.box(.03, .12, .035), makeXf([side * .1, Math.cos(a + d) * .19, Math.sin(a + d) * .19], [a + d * 1.6, 0, 0])); }
     if (style === 3) { for (let s = 0; s < 6; s++) { const a = s / 6 * Math.PI * 2; k.add('rim', G3.box(.03, .14, .05), makeXf([side * .04, Math.cos(a) * .11, Math.sin(a) * .11], [a, 0, 0])); } k.add('rim', G3.cyl(.25, .19, .06, 24, false), makeXf([side * .085, 0, 0], [0, 0, side * Math.PI / 2])); }
     k.add('rim', G3.cyl(.055, .055, .05, 16), makeXf([side * (.11 - dish), 0, 0], [0, 0, Math.PI / 2]));
     k.add('dark', G3.cyl(.252, .252, .01, 24), makeXf([side * .02, 0, 0], [0, 0, Math.PI / 2]));
@@ -973,8 +994,13 @@ function buildBrakeKit(side) {
 /* ---------- COCKPIT (style 0) ---------- */
 const EYE = [.37, 1.15, -.3];
 const SW_POS = [.37, .91, .2], SW_TILT = .38;
-function buildCockpitKit() {
+function buildCockpitKit(opts = {}) {
   const k = new Kit(), B = (m, s, p, r) => k.add(m, G3.box(...s), makeXf(p, r));
+  if (opts.cage) {
+    const tube = (a, b) => { const d = [b[0] - a[0], b[1] - a[1], b[2] - a[2]], L = Math.hypot(...d); k.add('cage', G3.cyl(.025, .025, L, 8), makeXf([(a[0] + b[0]) / 2, (a[1] + b[1]) / 2, (a[2] + b[2]) / 2], [Math.atan2(d[2], d[1]), 0, -Math.atan2(d[0], Math.hypot(d[1], d[2]))])); };
+    for (const sx of [-1, 1]) { tube([sx * .66, .36, -.9], [sx * .58, 1.32, -.9]); tube([sx * .58, 1.32, -.9], [sx * .6, 1.33, .15]); tube([sx * .6, 1.33, .15], [sx * .72, .95, .9]); tube([sx * .7, .5, .55], [sx * .64, .62, -.85]); tube([sx * .7, .78, .5], [sx * .64, .5, -.85]); }
+    tube([-.58, 1.32, -.9], [.58, 1.32, -.9]); tube([-.6, 1.33, .15], [.6, 1.33, .15]); tube([-.62, .4, -.9], [.58, 1.3, -.9]);
+  }
   B('leather', [1.56, .2, .5], [0, .84, .74]);
   B('leather', [1.56, .03, .56], [0, .955, .72], [.08, 0, 0]);
   B('stitch', [1.5, .006, .006], [0, .972, .45]);
@@ -1743,9 +1769,11 @@ const WHEEL_KITS = { 1: buildWheelKit(1), [-1]: buildWheelKit(-1) }, BRAKE_KITS 
 
 /* ================= MODELS, SAVE, TUNING ================= */
 const MODELS = [
+  { id: 'pico', name: 'PICO R', style: 4, price: 4000, cls: 'C', base: { pow: 15.4, vmax: 79, grip: 1.16, nit: 1.05 }, def: { wing: 1, rim: 1 }, desc: 'Злой хот-хэтч: лёгкий, цепкий, юркий' },
   { id: 'veloce', name: 'VELOCE GT', style: 0, price: 0, cls: 'B', base: { pow: 16, vmax: 84, grip: 1.0, nit: 1.0 }, def: { wing: 1, rim: 0 }, desc: 'Сбалансированное купе GT' },
   { id: 'kaze', name: 'KAZE RS', style: 3, price: 7500, cls: 'B', base: { pow: 16.4, vmax: 82, grip: 1.13, nit: 1.0 }, def: { wing: 3, rim: 1, scoop: 1 }, desc: 'Полноприводный раллийный седан: лучшее сцепление, 4 двери' },
   { id: 'iron', name: 'IRON V8', style: 2, price: 12000, cls: 'A', base: { pow: 18.6, vmax: 87, grip: .96, nit: 1.1 }, def: { wing: 2, rim: 3 }, desc: 'Маслкар: зверский разгон, валкий в поворотах' },
+  { id: 'nova', name: 'NOVA 84', style: 5, price: 15000, cls: 'A', base: { pow: 18.2, vmax: 90, grip: 1.03, nit: 1.12 }, def: { wing: 3, rim: 4 }, desc: 'Клиновидный суперкар в духе 80-х' },
   { id: 'apex', name: 'APEX HYPER', style: 1, price: 22000, cls: 'S', base: { pow: 19.6, vmax: 93, grip: 1.1, nit: 1.15 }, def: { wing: 1, rim: 2 }, desc: 'Гиперкар: максимум всего' },
 ];
 const MODEL = Object.fromEntries(MODELS.map(m => [m.id, m]));
@@ -1757,10 +1785,11 @@ const UPG = [
 ];
 const PAINTS = [0xd10f2f, 0xff5a1f, 0xffb000, 0xf7e017, 0x18b866, 0x0fb5a6, 0x1f5fff, 0x1b2b6b, 0x9b30ff, 0xff3fa4, 0xf4f4f4, 0x9aa0a8, 0x3a3d42, 0x111111, 0x6b3a1f, 0xc9a24a];
 const FINISHES = [['metal', 'Металлик'], ['gloss', 'Глянец'], ['matte', 'Матовый'], ['pearl', 'Перламутр'], ['chrome', 'Хром']];
-const PATTERNS = [['none', 'Без узора'], ['stripes', 'Полосы'], ['side', 'Боковая линия'], ['twotone', 'Двухцвет'], ['race', 'Гоночный №'], ['flames', 'Пламя'], ['tiger', 'Тигр'], ['split', 'Диагональ']];
+const PATTERNS = [['none', 'Без узора'], ['stripes', 'Полосы'], ['side', 'Боковая линия'], ['twotone', 'Двухцвет'], ['race', 'Гоночный №'], ['sponsor', 'Спонсоры'], ['flames', 'Пламя'], ['tiger', 'Тигр'], ['camo', 'Камуфляж'], ['checker', 'Шахматка'], ['fade', 'Градиент'], ['split', 'Диагональ']];
 const WINGS = [['0', 'Нет'], ['2', 'Губа'], ['1', 'GT-крыло'], ['3', 'Большое']];
-const RIMS = [['0', '10 спиц'], ['1', '5 спиц'], ['2', 'Сетка'], ['3', 'Глубокие']];
-function defTune(m) { return { color: 0xd10f2f, finish: 'metal', pattern: 'none', patColor: 0xffffff, wing: m.def.wing, scoop: m.def.scoop || 0, rim: m.def.rim, rimColor: 0xd7d9dd, caliper: 0xd11b1b, camber: 0, height: 0, tint: .5, glow: 0x00e5ff, interior: 0x1c1c20, stitch: 0xff2d55, carbonRoof: 0, num: 7, up: { eng: 0, tyr: 0, sus: 0, nit: 0 } }; }
+const RIMS = [['0', '10 спиц'], ['1', '5 спиц'], ['2', 'Сетка'], ['3', 'Глубокие'], ['4', 'Турбина'], ['5', 'Y-спицы']];
+const HEADS = { white: 0xeaf3ff, xenon: 0x8fbaff, gold: 0xffcf6b };
+function defTune(m) { return { color: 0xd10f2f, finish: 'metal', pattern: 'none', patColor: 0xffffff, wing: m.def.wing, scoop: m.def.scoop || 0, rim: m.def.rim, rimColor: 0xd7d9dd, caliper: 0xd11b1b, camber: 0, height: 0, tint: .5, glow: 0x00e5ff, interior: 0x1c1c20, stitch: 0xff2d55, carbonRoof: 0, num: 7, wide: 0, splitter: 1, skirt: 1, exhaust: 0, head: 'white', flame: 0x4aa3ff, cage: 0, plate: 'SR 777', up: { eng: 0, tyr: 0, sus: 0, nit: 0 } }; }
 let SAVE = null;
 function loadSave() {
   try { SAVE = JSON.parse(localStorage.getItem('sr3d_save') || 'null'); } catch (_) { SAVE = null; }
@@ -1794,6 +1823,16 @@ function patternTex(t) {
       }
     } else if (t.pattern === 'tiger') {
       for (let k = 0; k < 40; k++) { const z = -2.3 + k * .12, c = (k % 2 ? .25 : .75) + (Math.sin(k * 3.7) * .06); g.beginPath(); g.moveTo(U(c - .1), Y(z)); g.lineTo(U(c), Y(z + .05)); g.lineTo(U(c + .1), Y(z - .02)); g.lineTo(U(c), Y(z + .02)); g.fill(); }
+    } else if (t.pattern === 'camo') {
+      const shades = [pc, '#' + new THREE.Color(t.color).lerp(new THREE.Color(t.patColor), .5).getHexString(), 'rgba(0,0,0,.35)'];
+      for (let k = 0; k < 160; k++) { g.fillStyle = shades[k % 3]; g.beginPath(); const x = (k * 97 % 512), y = (k * 211 % 512); g.ellipse(x, y, 18 + k % 23, 10 + k % 13, k, 0, 7); g.fill(); }
+    } else if (t.pattern === 'checker') {
+      for (const c of [.25, .75]) for (let i = 0; i < 26; i++) for (let j = 0; j < 3; j++) if ((i + j) % 2) g.fillRect(U(c - .03 + j * .02), Y(2.4 - i * .19), U(.02), (h / 5) * .19);
+    } else if (t.pattern === 'fade') {
+      const gr = g.createLinearGradient(0, Y(2.4), 0, Y(-1)); gr.addColorStop(0, pc); gr.addColorStop(1, hex6(t.color)); g.fillStyle = gr; g.fillRect(0, 0, w, h);
+    } else if (t.pattern === 'sponsor') {
+      g.fillRect(U(.2), 0, U(.012), h); g.fillRect(U(.788), 0, U(.012), h); g.fillRect(U(.47), 0, U(.06), h);
+      for (const [c, r] of [[.25, -1], [.75, 1]]) { g.save(); g.translate(U(c + (r < 0 ? .015 : -.015)), Y(.2)); g.rotate(r * Math.PI / 2); g.fillStyle = pc; g.font = 'italic 900 40px Arial'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('TURBO', 0, -18); g.font = 'bold 22px Arial'; g.fillText('NEXUS · VOLT', 0, 18); g.restore(); }
     } else if (t.pattern === 'split') { g.beginPath(); g.moveTo(0, Y(.6)); g.lineTo(w, Y(-.6)); g.lineTo(w, h); g.lineTo(0, h); g.fill(); }
   });
   tex.repeat.set(1, .2); tex.offset.set(0, .5);
@@ -1820,12 +1859,14 @@ class Car extends SimCar {
     this.headMat = new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0xeaf3ff, emissiveIntensity: 1 });
     this.tailMat = new THREE.MeshStandardMaterial({ color: 0x400000, emissive: 0xff1020, emissiveIntensity: .8 });
     const glass = regEnv(M.glass.clone(), 1.6); glass.color.setHex(0x1a2633).lerp(new THREE.Color(0x020304), t.tint);
-    const mats = { paint: this.paint, paintS: this.paintS, glass, head: this.headMat, tail: this.tailMat, plate: new THREE.MeshStandardMaterial({ map: plateTex(cfg.plate || 'SR 777'), roughness: .5 }) };
-    kitToMeshes(buildCarKit(md.style, { cockpit: isPlayer, wing: +t.wing, scoop: t.scoop, carbonRoof: t.carbonRoof }), mats, this.body);
+    const mats = { paint: this.paint, paintS: this.paintS, glass, head: this.headMat, tail: this.tailMat, plate: new THREE.MeshStandardMaterial({ map: plateTex(cfg.plate || t.plate || 'SR 777'), roughness: .5 }) };
+    kitToMeshes(buildCarKit(md.style, { cockpit: isPlayer, wing: +t.wing, scoop: t.scoop, carbonRoof: t.carbonRoof, wide: t.wide, splitter: t.splitter, skirt: t.skirt, exhaust: t.exhaust }), mats, this.body);
+    this.headMat.emissive.setHex(HEADS[t.head] || HEADS.white); this.flameC = new THREE.Color(t.flame || 0x4aa3ff);
     this.rideH = t.height || 0;
     this.wheels = []; this.steerers = []; this.pivots = [];
     const wm = { rim: regEnv(new THREE.MeshStandardMaterial({ color: t.rimColor, metalness: 1, roughness: .22, side: THREE.DoubleSide })), caliper: new THREE.MeshStandardMaterial({ color: t.caliper, roughness: .35 }) };
-    for (const [wx, wz, front] of [[-.89, WHEEL_Z, 1], [.89, WHEEL_Z, 1], [-.89, -WHEEL_Z, 0], [.89, -WHEEL_Z, 0]]) {
+    const tw = t.wide ? .95 : .89;
+    for (const [wx, wz, front] of [[-tw, WHEEL_Z, 1], [tw, WHEEL_Z, 1], [-tw, -WHEEL_Z, 0], [tw, -WHEEL_Z, 0]]) {
       const side = wx > 0 ? 1 : -1;
       const pivot = new THREE.Group(); pivot.position.set(wx, .36, wz); pivot.rotation.z = side * (t.camber || 0) * Math.PI / 180; this.tilt.add(pivot);
       const spin = new THREE.Group(); pivot.add(spin);
@@ -1871,7 +1912,8 @@ const EYE_V = new THREE.Vector3(...EYE);
 function buildCockpit(car) {
   const g = new THREE.Group(); g.visible = false; car.body.add(g);
   const t = car.cfg.tune, im = { leather: new THREE.MeshStandardMaterial({ color: t.interior, roughness: .6 }), stitch: new THREE.MeshBasicMaterial({ color: t.stitch }), amb: new THREE.MeshBasicMaterial({ color: t.glow || 0x22d3ee }) };
-  kitToMeshes(buildCockpitKit(), im, g, false);
+  im.cage = regEnv(new THREE.MeshStandardMaterial({ color: t.cage === 2 ? t.color : 0xb0b4ba, metalness: .8, roughness: .35 }));
+  kitToMeshes(buildCockpitKit({ cage: t.cage }), im, g, false);
   const cl = new THREE.Mesh(new THREE.PlaneGeometry(.36, .158), new THREE.MeshBasicMaterial({ map: clusterTex, toneMapped: false }));
   cl.position.set(.37, .98, .5); cl.lookAt(EYE_V); g.add(cl);
   const nav = new THREE.Mesh(new THREE.PlaneGeometry(.19, .19), new THREE.MeshBasicMaterial({ map: navTex, toneMapped: false, color: 0xaaaaaa }));
@@ -1900,10 +1942,10 @@ function updateCockpit(c) {
 
 const AI_DEF = [
   ['Вектор', 'apex', { color: 0x1a1a1a, pattern: 'stripes', patColor: 0xff6a00, rim: 2, rimColor: 0xc9a24a, glow: 0xff6a00, caliper: 0xffcc00, finish: 'gloss' }, 'VK 001'],
-  ['Молния', 'iron', { color: 0xffd400, pattern: 'race', patColor: 0x111111, num: 3, rim: 3, rimColor: 0x1a1a1c, glow: 0xffd400, finish: 'gloss' }, 'ML 220'],
-  ['Барон', 'kaze', { color: 0x1b2b6b, pattern: 'side', patColor: 0xffffff, rim: 1, rimColor: 0xd7d9dd, glow: 0x3b82f6, caliper: 0x1d4ed8, finish: 'metal' }, 'BR 007'],
-  ['Призрак', 'veloce', { color: 0xe8e8e8, pattern: 'tiger', patColor: 0x2b2b30, rim: 1, rimColor: 0x1a1a1c, glow: 0x7c3aed, carbonRoof: 1, finish: 'pearl' }, 'PZ 666'],
-  ['Тайфун', 'apex', { color: 0xff6a00, pattern: 'flames', patColor: 0x111111, rim: 0, rimColor: 0x9aa0a8, glow: 0x39ff88, caliper: 0xffcc00, finish: 'metal' }, 'TF 300'],
+  ['Молния', 'iron', { color: 0xffd400, pattern: 'race', patColor: 0x111111, num: 3, rim: 3, rimColor: 0x1a1a1c, glow: 0xffd400, finish: 'gloss', wide: 1 }, 'ML 220'],
+  ['Барон', 'kaze', { color: 0x1b2b6b, wide: 1, splitter: 2, pattern: 'sponsor', patColor: 0xffffff, rim: 1, rimColor: 0xd7d9dd, glow: 0x3b82f6, caliper: 0x1d4ed8, finish: 'metal' }, 'BR 007'],
+  ['Призрак', 'nova', { color: 0xe8e8e8, pattern: 'tiger', patColor: 0x2b2b30, rim: 1, rimColor: 0x1a1a1c, glow: 0x7c3aed, carbonRoof: 1, finish: 'pearl' }, 'PZ 666'],
+  ['Тайфун', 'pico', { color: 0xff6a00, wide: 1, splitter: 2, exhaust: 2, pattern: 'flames', patColor: 0x111111, rim: 0, rimColor: 0x9aa0a8, glow: 0x39ff88, caliper: 0xffcc00, finish: 'metal' }, 'TF 300'],
 ];
 let cars = [], player = null;
 
@@ -2078,7 +2120,7 @@ function setupRace() {
   seed = 99;
   for (const c of cars) c.dispose && c.dispose();
   const pst = statsOf(SAVE.sel);
-  player = new Car({ model: SAVE.sel, tune: SAVE.cars[SAVE.sel], stats: pst, plate: 'ТЫ 001' }, 'ТЫ', true);
+  player = new Car({ model: SAVE.sel, tune: SAVE.cars[SAVE.sel], stats: pst }, 'ТЫ', true);
   player.spots = [];
   const rating = (pst.vmax / 84 + pst.pow / 16) / 2, aiK = clamp(.95 + .6 * (rating - 1), .95, 1.13);
   raceStats = { jumps: 0, rolls: 0, drift: 0, picks: 0 };
@@ -2142,7 +2184,7 @@ function updateCarVisual(c, dt) {
   c.glow.material.opacity = (preset.night ? .55 : preset.name === 'sunset' ? .3 : 0) * hk;
   c.tailMat.emissiveIntensity = c.inp.brk > 0 ? 5 : (preset.night ? 1.6 : .8);
   c.wetTail.material.opacity = WX.rain * (c.inp.brk > 0 ? .7 : .35) * (preset.night ? 1 : .35);
-  for (const f of c.flames) { f.visible = c.nitroOn; if (c.nitroOn) { const s = .5 + Math.random() * .5; f.scale.set(s, s * .8, s); f.material.color.setHSL(.58 + Math.random() * .06, 1, .6); } }
+  for (const f of c.flames) { f.visible = c.nitroOn; if (c.nitroOn) { const s = .5 + Math.random() * .5; f.scale.set(s, s * .8, s); f.material.color.copy(c.flameC || tmpC.setHex(0x4aa3ff)).offsetHSL(Math.random() * .04, 0, Math.random() * .15); } }
   const sp = Math.abs(c.vF), slip = !c.air && (Math.abs(c.vS) > 3 || (c.hk > .5 && sp > 8) || c.slipR);
   const fx = Math.sin(c.h), fz = Math.cos(c.h);
   for (let k = 0; k < 2; k++) {
@@ -2518,7 +2560,7 @@ const gCam = new THREE.PerspectiveCamera(40, 1, .05, 200);
 let gCar = null, gModel = SAVE.sel, gTab = 'cars', gYaw = 2.4, gPitch = .18, gDist = 7.2, gAuto = true;
 function buildGarageCar() {
   if (gCar) { gScene.remove(gCar.root); gCar.dispose(); }
-  gCar = new Car({ model: gModel, tune: SAVE.cars[gModel], stats: statsOf(gModel), plate: MODEL[gModel].name.split(' ')[0] }, '', true, gScene);
+  gCar = new Car({ model: gModel, tune: SAVE.cars[gModel], stats: statsOf(gModel) }, '', true, gScene);
   gCar.root.position.y = .12; gCar.cockpit = buildCockpit(gCar);
   gCar.root.traverse(o => { if (o.isMesh) o.castShadow = true; });
   gCar.setNight(PRESETS.night); for (const b of gCar.beams) b.visible = false;
@@ -2572,9 +2614,10 @@ function renderGarage() {
   if (gTab === 'cars') h = MODELS.map(md => `<div class="card ${md.id === gModel ? 'on' : ''}" data-model="${md.id}"><div class="cn">${md.name} <span class="cls c${md.cls}">${md.cls}</span></div><div class="cd">${md.desc}</div><div class="cp">${SAVE.owned.includes(md.id) ? (SAVE.sel === md.id ? '✅ Выбрана' : 'Куплена') : '💰 ' + md.price.toLocaleString('ru-RU')}</div></div>`).join('');
   else if (gTab === 'paint') h = `<div class="row"><label>Цвет кузова</label>${swatches(PAINTS, t.color, 'color', `<label class="opt sw pick" style="background:conic-gradient(red,yellow,lime,cyan,blue,magenta,red)"><input type="color" data-k="color" value="${hex6(t.color)}"></label>`)}</div><div class="row"><label>Покрытие</label>${choices(FINISHES, t.finish, 'finish')}</div><div class="row"><label>Крыша</label>${choices([[0, 'В цвет'], [1, 'Карбон']], t.carbonRoof, 'carbonRoof')}</div>`;
   else if (gTab === 'vinyl') h = `<div class="row"><label>Узор</label>${choices(PATTERNS, t.pattern, 'pattern')}</div><div class="row"><label>Цвет узора</label>${swatches(PAINTS, t.patColor, 'patColor')}</div>` + (t.pattern === 'race' ? `<div class="row"><label>Номер</label>${choices([[1, '1'], [7, '7'], [13, '13'], [27, '27'], [77, '77'], [99, '99']], t.num, 'num')}</div>` : '');
-  else if (gTab === 'body') h = `<div class="row"><label>Спойлер</label>${choices(WINGS, t.wing, 'wing')}</div><div class="row"><label>Воздухозаборник на капоте</label>${choices([[0, 'Нет'], [1, 'Есть']], t.scoop, 'scoop')}</div>` + slider('height', 'Занижение', 0, .06, .005, t.height, SLFMT.height);
+  else if (gTab === 'body') h = `<div class="row"><label>Спойлер</label>${choices(WINGS, t.wing, 'wing')}</div><div class="row"><label>Передний сплиттер</label>${choices([[0, 'Нет'], [1, 'Губа'], [2, 'Гоночный']], t.splitter, 'splitter')}</div><div class="row"><label>Пороги</label>${choices([[0, 'Нет'], [1, 'Карбон'], [2, 'В цвет']], t.skirt, 'skirt')}</div><div class="row"><label>Широкий кузов</label>${choices([[0, 'Стандарт'], [1, 'Widebody']], t.wide, 'wide')}</div><div class="row"><label>Воздухозаборник на капоте</label>${choices([[0, 'Нет'], [1, 'Есть']], t.scoop, 'scoop')}</div><div class="row"><label>Выхлоп</label>${choices([[0, '4 трубы'], [1, 'По центру'], [2, '2 больших']], t.exhaust, 'exhaust')}</div>` + slider('height', 'Занижение', 0, .06, .005, t.height, SLFMT.height) + `<div class="row"><label>Номер</label><input class="txt" maxlength="8" data-k="plate" value="${String(t.plate).replace(/"/g, '')}"></div>`;
+  else if (gTab === 'lights') h = `<div class="row"><label>Фары</label>${choices([['white', 'Белые'], ['xenon', 'Ксенон'], ['gold', 'Жёлтые']], t.head, 'head')}</div><div class="row"><label>Неон под днищем и подсветка салона</label>${swatches([0x00e5ff, 0xff2d95, 0x7c3aed, 0x39ff88, 0xffb000, 0xff3030], t.glow, 'glow', `<div class="opt ${t.glow ? '' : 'on'}" data-k="glow" data-v="0">Выкл</div>`)}</div><div class="row"><label>Пламя нитро</label>${swatches([0x4aa3ff, 0xa855f7, 0x39ff88, 0xff4a1a, 0xff2d95, 0xffffff], t.flame, 'flame')}</div>`;
   else if (gTab === 'wheels') h = `<div class="row"><label>Диски</label>${choices(RIMS, t.rim, 'rim')}</div><div class="row"><label>Цвет дисков</label>${swatches([0xd7d9dd, 0x1a1a1c, 0xc9a24a, 0x9aa0a8, 0xd10f2f, 0x1f5fff, 0xffb000, 0xf4f4f4], t.rimColor, 'rimColor')}</div>` + slider('camber', 'Развал', 0, 8, .5, t.camber, SLFMT.camber) + `<div class="row"><label>Суппорты</label>${swatches([0xd11b1b, 0xffcc00, 0x1d4ed8, 0x18b866, 0x111111, 0xff5a1f], t.caliper, 'caliper')}</div>`;
-  else if (gTab === 'interior') h = `<div class="row"><label>Кожа салона</label>${swatches([0x1c1c20, 0x5a1a1a, 0x6b4a32, 0xd8cbb0, 0x1b2b4b, 0x3a3d42], t.interior, 'interior')}</div><div class="row"><label>Строчка и акценты</label>${swatches([0xff2d55, 0xffb000, 0x22d3ee, 0x39ff88, 0xffffff, 0xa855f7], t.stitch, 'stitch')}</div>` + slider('tint', 'Тонировка', 0, 1, .05, t.tint, SLFMT.tint) + `<div class="row"><label>Неон под днищем и подсветка салона</label>${swatches([0x00e5ff, 0xff2d95, 0x7c3aed, 0x39ff88, 0xffb000, 0xff3030], t.glow, 'glow', `<div class="opt ${t.glow ? '' : 'on'}" data-k="glow" data-v="0">Выкл</div>`)}</div>`;
+  else if (gTab === 'interior') h = `<div class="row"><label>Кожа салона</label>${swatches([0x1c1c20, 0x5a1a1a, 0x6b4a32, 0xd8cbb0, 0x1b2b4b, 0x3a3d42], t.interior, 'interior')}</div><div class="row"><label>Строчка и акценты</label>${swatches([0xff2d55, 0xffb000, 0x22d3ee, 0x39ff88, 0xffffff, 0xa855f7], t.stitch, 'stitch')}</div><div class="row"><label>Каркас безопасности</label>${choices([[0, 'Нет'], [1, 'Сталь'], [2, 'В цвет кузова']], t.cage, 'cage')}</div>` + slider('tint', 'Тонировка', 0, 1, .05, t.tint, SLFMT.tint);
   else if (gTab === 'perf') h = UPG.map(u => { const lv = t.up[u.id], cost = u.cost[lv]; return `<div class="upg"><div><b>${u.icon} ${u.name}</b><div class="lv">${'▰'.repeat(lv)}${'▱'.repeat(5 - lv)}</div></div>${lv >= 5 ? '<div class="opt on">МАКС</div>' : `<div class="opt buy ${owned && SAVE.coins >= cost ? '' : 'dis'}" data-up="${u.id}">💰 ${cost.toLocaleString('ru-RU')}</div>`}</div>`; }).join('') + (owned ? '' : '<div class="help">Сначала купи машину</div>');
   $('gPanel').innerHTML = h;
   $('gName').innerHTML = `${m.name} <span class="cls c${m.cls}">${m.cls}</span>`;
@@ -2585,11 +2628,11 @@ function renderGarage() {
   else { act.textContent = '✅ В ГОНКУ'; act.classList.remove('dis'); }
   updateCoins();
 }
-const NEEDS_REBUILD = new Set(['color', 'finish', 'pattern', 'patColor', 'num', 'wing', 'scoop', 'rim', 'rimColor', 'camber', 'caliper', 'interior', 'stitch', 'tint', 'glow', 'carbonRoof', 'height']);
+const NEEDS_REBUILD = new Set(['splitter', 'skirt', 'wide', 'exhaust', 'head', 'flame', 'cage', 'plate', 'color', 'finish', 'pattern', 'patColor', 'num', 'wing', 'scoop', 'rim', 'rimColor', 'camber', 'caliper', 'interior', 'stitch', 'tint', 'glow', 'carbonRoof', 'height']);
 let rebuildT = 0;
 function setTune(k, v) {
   const t = SAVE.cars[gModel];
-  t[k] = ['finish', 'pattern'].includes(k) ? v : +v;
+  t[k] = ['finish', 'pattern', 'head', 'plate'].includes(k) ? (k === 'plate' ? String(v).toUpperCase().slice(0, 8) || 'SR 777' : v) : +v;
   saveSave();
   if (NEEDS_REBUILD.has(k)) { clearTimeout(rebuildT); rebuildT = setTimeout(() => { buildGarageCar(); }, k === 'camber' || k === 'height' || k === 'tint' ? 60 : 0); }
 }
@@ -2605,6 +2648,7 @@ $('gPanel').addEventListener('click', e => {
 });
 $('gPanel').addEventListener('input', e => {
   const o = e.target; if (!o.dataset.k) return;
+  if (o.dataset.k === 'plate') { clearTimeout(rebuildT); SAVE.cars[gModel].plate = (o.value || 'SR 777').toUpperCase().slice(0, 8); saveSave(); rebuildT = setTimeout(buildGarageCar, 500); return; }
   const v = o.type === 'color' ? parseInt(o.value.slice(1), 16) : o.value;
   if (o.dataset.fmt) $('lbl_' + o.dataset.k).textContent = SLFMT[o.dataset.fmt](o.value);
   setTune(o.dataset.k, v);
