@@ -3976,7 +3976,7 @@ $('gView').addEventListener('pointermove', e => {
 const gOff = e => { gPads.delete(e.pointerId); gResumeT = performance.now() + 1500; };
 $('gView').addEventListener('pointerup', gOff); $('gView').addEventListener('pointercancel', gOff);
 $('gView').addEventListener('wheel', e => { gDist = clamp(gDist * (e.deltaY > 0 ? 1.08 : .92), 4.2, 11); }, { passive: true });
-function updateCoins() { const t = '💰 ' + SAVE.coins.toLocaleString('ru-RU'); $('gCoins').textContent = t; $('cCoins').textContent = t; $('mCoins').textContent = SAVE.coins >= 100000 ? (SAVE.coins / 1000).toFixed(1) + 'K' : SAVE.coins.toLocaleString('ru-RU'); try { $('mStars').textContent = CUPS.reduce((a, _, ci) => a + cupStars(ci), 0); } catch (_) { } try { const L = league(SAVE.rating || 1000); $('mRank').textContent = L.i + ' ' + (SAVE.rating || 1000); } catch (_) { } }
+function updateCoins() { const t = '💰 ' + SAVE.coins.toLocaleString('ru-RU'); $('gCoins').textContent = t; $('cCoins').textContent = t; $('mCoins').textContent = SAVE.coins >= 100000 ? (SAVE.coins / 1000).toFixed(1) + 'K' : SAVE.coins.toLocaleString('ru-RU'); try { const st = CUPS.reduce((a, _, ci) => a + cupStars(ci), 0) + (SAVE.bonusStars || 0); $('mStars').textContent = st >= 1e6 ? (st / 1e6).toFixed(st % 1e6 ? 1 : 0) + ' млн' : st.toLocaleString('ru-RU'); } catch (_) { } try { const L = league(SAVE.rating || 1000); $('mRank').textContent = L.i + ' ' + (SAVE.rating || 1000); } catch (_) { } }
 function swatches(list, cur, key, extra = '') {
   if (!extra) extra = `<label class="opt sw pick ${list.includes(cur) ? '' : 'on'}" style="background:conic-gradient(red,yellow,lime,cyan,blue,magenta,red)"><input type="color" data-k="${key}" value="${hex6(cur)}"></label>`;
   return `<div class="opts sws">${list.map(c => `<div class="opt sw ${c === cur ? 'on' : ''}" style="background:${hex6(c)}" data-k="${key}" data-v="${c}"></div>`).join('')}${extra}</div>`;
@@ -4197,7 +4197,7 @@ let careerEv = null, savedSettings = null, careerFocus = null;
 if (!SAVE.career) SAVE.career = {};
 const evStars = (ci, k) => SAVE.career[ci + ':' + k] || 0;
 const cupStars = ci => CUPS[ci].events.reduce((a, _, k) => a + evStars(ci, k), 0);
-const cupUnlocked = ci => CUPS[ci].need == null || cupStars(CUPS[ci].need) >= 5;
+const cupUnlocked = ci => CUPS[ci].need == null || (SAVE.bonusStars || 0) > 0 || cupStars(CUPS[ci].need) >= 5;
 function renderCareer() {
   const m = MODEL[SAVE.sel];
   $('cCar').innerHTML = `Твоя машина: <b>${m.name}</b> <span class="cls c${m.cls}">${m.cls}</span>`;
@@ -4336,11 +4336,13 @@ document.querySelectorAll('.rt').forEach(o => o.onclick = () => openRewards(o.da
 $('btnRewards').onclick = () => openRewards(bonusAvail() ? 'daily' : SAVE.spinDay !== dayNum() ? 'spin' : 'tasks');
 $('promoGo').onclick = () => {
   const code = $('promoIn').value.trim().toUpperCase(); SAVE.promos = SAVE.promos || [];
-  const PROMO = { GGH: 100000 };
-  if (!PROMO[code]) { $('promoInfo').textContent = '❌ Такого промокода нет'; return; }
+  const PROMO = { GGH: { coins: 100000 }, GGG: { stars: 1000000 } };
+  const P = PROMO[code];
+  if (!P) { $('promoInfo').textContent = '❌ Такого промокода нет'; return; }
   if (SAVE.promos.includes(code)) { $('promoInfo').textContent = '⚠ Этот промокод уже активирован'; return; }
-  SAVE.promos.push(code); SAVE.coins += PROMO[code]; saveSave(); renderMenu(); netSendCar && netSendCar();
-  $('promoInfo').textContent = '🎉 Промокод активирован: +' + PROMO[code].toLocaleString('ru-RU') + ' монет!'; $('promoIn').value = '';
+  SAVE.promos.push(code); if (P.coins) SAVE.coins += P.coins; if (P.stars) SAVE.bonusStars = (SAVE.bonusStars || 0) + P.stars;
+  saveSave(); renderMenu(); netSendCar && netSendCar();
+  $('promoInfo').textContent = '🎉 Промокод активирован: +' + (P.coins ? P.coins.toLocaleString('ru-RU') + ' монет' : P.stars.toLocaleString('ru-RU') + ' ★ — все чемпионаты карьеры открыты') + '!'; $('promoIn').value = '';
   if (audio) { beep(1300, .12, .14); setTimeout(() => beep(1750, .25, .14), 120); } vib([30, 50, 80]);
 };
 $('tasks').addEventListener('click', () => setTimeout(renderMenu, 0));
