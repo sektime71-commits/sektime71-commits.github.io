@@ -2513,6 +2513,9 @@ let SAVE = null;
 function loadSave() {
   try { SAVE = JSON.parse(localStorage.getItem('sr3d_save') || 'null'); } catch (_) { SAVE = null; }
   if (!SAVE || !SAVE.cars) SAVE = { coins: 3000, owned: ['veloce'], sel: 'veloce', cars: {} };
+  if (SAVE.promos && SAVE.promos.includes('GGG') && !SAVE.unlimited) { SAVE.unlimited = true; SAVE.coins += 1000000000; }   // earlier GGG (stars) → coins + unlimited
+  delete SAVE.bonusStars;
+  if (SAVE.unlimited) SAVE.owned = MODELS.map(m => m.id);
   for (const m of MODELS) { const d = defTune(m); SAVE.cars[m.id] = Object.assign(d, SAVE.cars[m.id] || {}); SAVE.cars[m.id].up = Object.assign(d.up, (SAVE.cars[m.id] || {}).up || {}); }
 }
 function saveSave() { try { localStorage.setItem('sr3d_save', JSON.stringify(SAVE)); } catch (_) { } }
@@ -3976,7 +3979,7 @@ $('gView').addEventListener('pointermove', e => {
 const gOff = e => { gPads.delete(e.pointerId); gResumeT = performance.now() + 1500; };
 $('gView').addEventListener('pointerup', gOff); $('gView').addEventListener('pointercancel', gOff);
 $('gView').addEventListener('wheel', e => { gDist = clamp(gDist * (e.deltaY > 0 ? 1.08 : .92), 4.2, 11); }, { passive: true });
-function updateCoins() { const t = '💰 ' + SAVE.coins.toLocaleString('ru-RU'); $('gCoins').textContent = t; $('cCoins').textContent = t; $('mCoins').textContent = SAVE.coins >= 100000 ? (SAVE.coins / 1000).toFixed(1) + 'K' : SAVE.coins.toLocaleString('ru-RU'); try { const st = CUPS.reduce((a, _, ci) => a + cupStars(ci), 0) + (SAVE.bonusStars || 0); $('mStars').textContent = st >= 1e6 ? (st / 1e6).toFixed(st % 1e6 ? 1 : 0) + ' млн' : st.toLocaleString('ru-RU'); } catch (_) { } try { const L = league(SAVE.rating || 1000); $('mRank').textContent = L.i + ' ' + (SAVE.rating || 1000); } catch (_) { } }
+function updateCoins() { const t = '💰 ' + SAVE.coins.toLocaleString('ru-RU'); $('gCoins').textContent = t; $('cCoins').textContent = t; $('mCoins').textContent = SAVE.unlimited ? '∞' : SAVE.coins >= 1e9 ? +(SAVE.coins / 1e9).toFixed(2) + ' млрд' : SAVE.coins >= 1e6 ? +(SAVE.coins / 1e6).toFixed(1) + ' млн' : SAVE.coins >= 100000 ? (SAVE.coins / 1000).toFixed(1) + 'K' : SAVE.coins.toLocaleString('ru-RU'); try { $('mStars').textContent = CUPS.reduce((a, _, ci) => a + cupStars(ci), 0); } catch (_) { } try { const L = league(SAVE.rating || 1000); $('mRank').textContent = L.i + ' ' + (SAVE.rating || 1000); } catch (_) { } }
 function swatches(list, cur, key, extra = '') {
   if (!extra) extra = `<label class="opt sw pick ${list.includes(cur) ? '' : 'on'}" style="background:conic-gradient(red,yellow,lime,cyan,blue,magenta,red)"><input type="color" data-k="${key}" value="${hex6(cur)}"></label>`;
   return `<div class="opts sws">${list.map(c => `<div class="opt sw ${c === cur ? 'on' : ''}" style="background:${hex6(c)}" data-k="${key}" data-v="${c}"></div>`).join('')}${extra}</div>`;
@@ -4007,7 +4010,7 @@ function renderGarage() {
   else if (gTab === 'lights') h = `<div class="row"><label>Фары</label>${choices([['white', 'Белые'], ['xenon', 'Ксенон'], ['gold', 'Жёлтые']], t.head, 'head')}</div><div class="row"><label>Неон под днищем и подсветка салона</label>${swatches([0x00e5ff, 0xff2d95, 0x7c3aed, 0x39ff88, 0xffb000, 0xff3030], t.glow, 'glow', `<div class="opt ${t.glow ? '' : 'on'}" data-k="glow" data-v="0">Выкл</div>`)}</div><div class="row"><label>Пламя нитро</label>${swatches([0x4aa3ff, 0xa855f7, 0x39ff88, 0xff4a1a, 0xff2d95, 0xffffff], t.flame, 'flame')}</div>`;
   else if (gTab === 'wheels') h = `<div class="row"><label>Диски</label>${choices(RIMS, t.rim, 'rim')}</div><div class="row"><label>Цвет дисков</label>${swatches([0xd7d9dd, 0x1a1a1c, 0xc9a24a, 0x9aa0a8, 0xd10f2f, 0x1f5fff, 0xffb000, 0xf4f4f4], t.rimColor, 'rimColor')}</div>` + slider('camber', 'Развал', 0, 8, .5, t.camber, SLFMT.camber) + `<div class="row"><label>Суппорты</label>${swatches([0xd11b1b, 0xffcc00, 0x1d4ed8, 0x18b866, 0x111111, 0xff5a1f], t.caliper, 'caliper')}</div>`;
   else if (gTab === 'interior') h = `<div class="row"><label>Кожа салона</label>${swatches([0x1c1c20, 0x5a1a1a, 0x6b4a32, 0xd8cbb0, 0x1b2b4b, 0x3a3d42], t.interior, 'interior')}</div><div class="row"><label>Строчка и акценты</label>${swatches([0xff2d55, 0xffb000, 0x22d3ee, 0x39ff88, 0xffffff, 0xa855f7], t.stitch, 'stitch')}</div><div class="row"><label>Каркас безопасности</label>${choices([[0, 'Нет'], [1, 'Сталь'], [2, 'В цвет кузова']], t.cage, 'cage')}</div>` + slider('tint', 'Тонировка', 0, 1, .05, t.tint, SLFMT.tint);
-  else if (gTab === 'perf') h = UPG.map(u => { const lv = t.up[u.id], cost = u.cost[lv]; return `<div class="upg"><div><b>${u.icon} ${u.name}</b><div class="lv">${'▰'.repeat(lv)}${'▱'.repeat(5 - lv)}</div></div>${lv >= 5 ? '<div class="opt on">МАКС</div>' : `<div class="opt buy ${owned && SAVE.coins >= cost ? '' : 'dis'}" data-up="${u.id}">💰 ${cost.toLocaleString('ru-RU')}</div>`}</div>`; }).join('') + (owned ? '' : '<div class="help">Сначала купи машину</div>');
+  else if (gTab === 'perf') h = UPG.map(u => { const lv = t.up[u.id], cost = u.cost[lv]; return `<div class="upg"><div><b>${u.icon} ${u.name}</b><div class="lv">${'▰'.repeat(lv)}${'▱'.repeat(5 - lv)}</div></div>${lv >= 5 ? '<div class="opt on">МАКС</div>' : `<div class="opt buy ${owned && (SAVE.unlimited || SAVE.coins >= cost) ? '' : 'dis'}" data-up="${u.id}">${SAVE.unlimited ? '♾ БЕСПЛАТНО' : '💰 ' + cost.toLocaleString('ru-RU')}</div>`}</div>`; }).join('') + (owned ? '' : '<div class="help">Сначала купи машину</div>');
   $('gPanel').innerHTML = h;
   $('gName').innerHTML = `${m.name} <span class="cls c${m.cls}">${m.cls}</span>`;
   $('gStats').innerHTML = statBars(gModel);
@@ -4031,8 +4034,8 @@ $('gPanel').addEventListener('click', e => {
   if (o.dataset.model) { gModel = o.dataset.model; buildGarageCar(); renderGarage(); return; }
   if (o.dataset.up) {
     const t = SAVE.cars[gModel], u = UPG.find(x => x.id === o.dataset.up), cost = u.cost[t.up[u.id]];
-    if (!SAVE.owned.includes(gModel) || SAVE.coins < cost) { gToast('Не хватает монет — выигрывай гонки!'); return; }
-    SAVE.coins -= cost; t.up[u.id]++; saveSave(); renderGarage(); gToast(u.name + ': уровень ' + t.up[u.id]); if (audio) beep(1200, .1, .1); return;
+    if (!SAVE.owned.includes(gModel) || (!SAVE.unlimited && SAVE.coins < cost)) { gToast('Не хватает монет — выигрывай гонки!'); return; }
+    if (!SAVE.unlimited) SAVE.coins -= cost; t.up[u.id]++; saveSave(); renderGarage(); gToast(u.name + ': уровень ' + t.up[u.id]); if (audio) beep(1200, .1, .1); return;
   }
   setTune(o.dataset.k, o.dataset.v); renderGarage();
 });
@@ -4197,7 +4200,7 @@ let careerEv = null, savedSettings = null, careerFocus = null;
 if (!SAVE.career) SAVE.career = {};
 const evStars = (ci, k) => SAVE.career[ci + ':' + k] || 0;
 const cupStars = ci => CUPS[ci].events.reduce((a, _, k) => a + evStars(ci, k), 0);
-const cupUnlocked = ci => CUPS[ci].need == null || (SAVE.bonusStars || 0) > 0 || cupStars(CUPS[ci].need) >= 5;
+const cupUnlocked = ci => CUPS[ci].need == null || cupStars(CUPS[ci].need) >= 5;
 function renderCareer() {
   const m = MODEL[SAVE.sel];
   $('cCar').innerHTML = `Твоя машина: <b>${m.name}</b> <span class="cls c${m.cls}">${m.cls}</span>`;
@@ -4336,13 +4339,13 @@ document.querySelectorAll('.rt').forEach(o => o.onclick = () => openRewards(o.da
 $('btnRewards').onclick = () => openRewards(bonusAvail() ? 'daily' : SAVE.spinDay !== dayNum() ? 'spin' : 'tasks');
 $('promoGo').onclick = () => {
   const code = $('promoIn').value.trim().toUpperCase(); SAVE.promos = SAVE.promos || [];
-  const PROMO = { GGH: { coins: 100000 }, GGG: { stars: 1000000 } };
+  const PROMO = { GGH: { coins: 100000 }, GGG: { coins: 1000000000, unlimited: true } };
   const P = PROMO[code];
   if (!P) { $('promoInfo').textContent = '❌ Такого промокода нет'; return; }
   if (SAVE.promos.includes(code)) { $('promoInfo').textContent = '⚠ Этот промокод уже активирован'; return; }
-  SAVE.promos.push(code); if (P.coins) SAVE.coins += P.coins; if (P.stars) SAVE.bonusStars = (SAVE.bonusStars || 0) + P.stars;
+  SAVE.promos.push(code); if (P.coins) SAVE.coins += P.coins; if (P.unlimited) { SAVE.unlimited = true; SAVE.owned = MODELS.map(m => m.id); }
   saveSave(); renderMenu(); netSendCar && netSendCar();
-  $('promoInfo').textContent = '🎉 Промокод активирован: +' + (P.coins ? P.coins.toLocaleString('ru-RU') + ' монет' : P.stars.toLocaleString('ru-RU') + ' ★ — все чемпионаты карьеры открыты') + '!'; $('promoIn').value = '';
+  $('promoInfo').textContent = '🎉 Промокод активирован: +' + P.coins.toLocaleString('ru-RU') + ' монет' + (P.unlimited ? ' и безлимитный гараж: все машины и улучшения бесплатно' : '') + '!'; $('promoIn').value = '';
   if (audio) { beep(1300, .12, .14); setTimeout(() => beep(1750, .25, .14), 120); } vib([30, 50, 80]);
 };
 $('tasks').addEventListener('click', () => setTimeout(renderMenu, 0));
