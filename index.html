@@ -3582,7 +3582,7 @@ function jetTick(dt, racing) {
   const prevY = J.y; J.y = lerp(J.y, J.alt + (J.v < 60 ? 0 : 0), 1 - Math.exp(-dt * 2.5));
   J.pitch = lerp(J.pitch, clamp((J.y - prevY) / Math.max(dt, 1e-3) / Math.max(30, J.v), -.5, .5), 1 - Math.exp(-dt * 5));
   J.x += Math.sin(J.h) * J.v * dt; J.z += Math.cos(J.h) * J.v * dt;
-  J.g.position.set(J.x, J.y, J.z); J.g.rotation.set(-J.pitch, J.h, -J.roll, 'YXZ');
+  J.g.position.set(J.x, J.y, J.z); J.g.rotation.set(-J.pitch, J.h, J.roll, 'YXZ');
   J.flame.scale.set(1, (thr ? 1 + J.v / JET_MAX * .9 : .25) * (.85 + Math.random() * .3), 1); J.flame.material.color.setHex(J.v > 1500 ? 0x7fb8ff : 0xff8a3d);
   if (!J.boom && J.v > 343) { J.boom = true; flash('💥 ЗВУКОВОЙ БАРЬЕР!', 1.8); shake = 1; vib([40, 30, 80]); if (audio) boomSnd(1); moment(40, 'Звуковой барьер'); }
   if (J.boom && J.v < 320) J.boom = false;
