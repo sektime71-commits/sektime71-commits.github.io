@@ -357,6 +357,14 @@ body.solo .box.stat:first-child,body.cruise #pos,body.cruise #board,body.scoremo
 #keyHint.fade{opacity:0}#keyHint kbd{display:inline-block;min-width:18px;padding:2px 6px;margin-right:3px;border-radius:5px;background:#2a2f3a;border-bottom:2px solid #11141a;font:800 11px system-ui;color:#fff;text-align:center}
 body.touch #keyHint{display:none!important}
 body.heli #tN{background:radial-gradient(circle,#ff6a3d,#b91c1c)!important}body.heli #tD{background:radial-gradient(circle,#ffb03d,#b45309)!important}
+#airHint{position:fixed;z-index:9999;left:50%;top:calc(var(--st,0px) + 110px);transform:translateX(-50%);max-width:92%;text-align:center;padding:9px 14px;border-radius:14px;background:rgba(10,12,18,.85);font:600 13px/1.5 system-ui;color:#e6edf6;transition:opacity .8s;pointer-events:none}
+#airHint b{color:#ffd23d}#airHint.fade{opacity:0}
+#reticle{display:none;position:fixed;left:0;top:0;width:56px;height:56px;z-index:12;pointer-events:none;border:2px solid #ff3d3d;border-radius:50%;box-shadow:0 0 10px #ff3d3d}
+#reticle::before,#reticle::after{content:'';position:absolute;background:#ff3d3d}#reticle::before{left:26px;top:-10px;width:2px;height:74px}#reticle::after{top:26px;left:-10px;height:2px;width:74px}
+.tb.air{display:none!important}
+body.touch.heli .tb.air,body.touch.jet .tb.air{display:flex!important;position:absolute;bottom:calc(var(--sb,0px) + min(52vh,190px) + 14px)!important;width:min(16vh,60px);height:min(16vh,60px);border-radius:50%;font-size:22px;background:rgba(61,213,255,.3)}
+body.touch.heli #tUp,body.touch.jet #tUp{left:calc(var(--sl,0px) + 14px)}body.touch.heli #tDn,body.touch.jet #tDn{left:calc(var(--sl,0px) + 14px + min(16vh,60px) + 12px)}body.heli #wDeg,body.jet #wDeg{display:none!important}
+body.jet #tN{background:radial-gradient(circle,#ff6a3d,#b91c1c)!important}body.jet #tD{background:radial-gradient(circle,#ffb03d,#b45309)!important}
 </style>
 <link rel="preconnect" href="https://cdn.jsdelivr.net"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Russo+One&display=swap" rel="stylesheet">
@@ -495,12 +503,14 @@ body.heli #tN{background:radial-gradient(circle,#ff6a3d,#b91c1c)!important}body.
   </svg></div>
   <div class="tb" id="tL" data-k="left">◀</div><div class="tb" id="tR" data-k="right">▶</div>
   <div class="tb" id="tB" data-k="down">ТОРМОЗ</div>
-  <div class="tb" id="tG" data-k="up">ГАЗ</div><div id="wDeg">0°</div>
+  <div class="tb" id="tG" data-k="up">ГАЗ</div>
+  <div class="tb air" id="tUp" data-k="climb">▲</div><div class="tb air" id="tDn" data-k="dive">▼</div><div id="wDeg">0°</div>
   <div class="tb" id="tD" data-k="hand">ДРИФТ</div>
   <div class="tb" id="tN" data-k="nitro"><span>НИТРО</span></div>
 </div>
 <div class="ib hidden" id="bPause">⏸</div><div class="ib hidden" id="bCam">🎥</div><div class="ib hidden" id="bReset">↺</div>
 <div class="ib hidden" id="bZin">＋</div><div class="ib hidden" id="bZout">－</div>
+<div id="airHint" class="hidden"></div><div id="reticle"></div>
 <div id="keyHint" class="hidden"><span><kbd>W</kbd><kbd>↑</kbd> газ</span><span><kbd>S</kbd><kbd>↓</kbd> тормоз</span><span><kbd>A</kbd><kbd>D</kbd> руль</span><span><kbd>Space</kbd> дрифт</span><span><kbd>Shift</kbd><kbd>Q</kbd> нитро</span><span><kbd>C</kbd> камера</span><span><kbd>R</kbd> на трассу</span><span><kbd>H</kbd> сигнал</span><span><kbd>Esc</kbd> пауза</span></div>
 <div id="err" class="hidden"></div>
 </div>
@@ -2789,10 +2799,10 @@ function addSkid(a, b) {
 
 /* ================= INPUT ================= */
 const keys = {};
-const KM = { ArrowDown: 'down', KeyS: 'down', ArrowLeft: 'left', KeyA: 'left', ArrowRight: 'right', KeyD: 'right', Space: 'hand', ShiftLeft: 'nitro', ShiftRight: 'nitro', KeyQ: 'nitro', KeyN: 'nitro', ArrowUp: 'up', KeyW: 'up' };
+const KM = { ArrowDown: 'down', KeyS: 'down', ArrowLeft: 'left', KeyA: 'left', ArrowRight: 'right', KeyD: 'right', Space: 'hand', ShiftLeft: 'nitro', ShiftRight: 'nitro', KeyQ: 'nitro', KeyN: 'nitro', KeyE: 'climb', KeyX: 'dive', ArrowUp: 'up', KeyW: 'up' };
 const CAM_NAMES = ['ПОГОНЯ', 'ДАЛЬНЯЯ', 'САЛОН', 'КАПОТ'];
 let camMode = 0;
-function nextCam() { camMode = (camMode + 1) % 4; flash('КАМЕРА: ' + CAM_NAMES[camMode], 1.2); }
+function nextCam() { if (HELI.on || JET.on) { AIR.view = (AIR.view + 1) % 2; flash('КАМЕРА: ' + (AIR.view ? 'КАБИНА' : 'СНАРУЖИ'), 1.2); orbitYaw = 0; orbitPitch = 0; return; } camMode = (camMode + 1) % 4; flash('КАМЕРА: ' + CAM_NAMES[camMode], 1.2); }
 const typing = e => e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA');
 function openSheetVisible() { return [...document.querySelectorAll('.sheet,.ovl')].find(x => !x.classList.contains('hidden')); }
 addEventListener('keydown', e => {
@@ -2913,7 +2923,7 @@ const GAMES = [
 let GAME = null; try { GAME = GAMES.find(g => g.id === localStorage.getItem('sr3d_game')); } catch (_) { }
 if (!GAME || GAME.track !== TRACK_ID) GAME = GAMES.find(g => g.track === TRACK_ID) || GAMES[0];
 settings.mode = GAME.mode;
-const SOLO = ['time', 'drift', 'stunt', 'cruise', 'jet', 'snail'], SCORE_MODES = ['drift', 'stunt', 'derby', 'hunt', 'heli'];
+const SOLO = ['time', 'drift', 'stunt', 'cruise', 'jet', 'snail'], SCORE_MODES = ['drift', 'stunt', 'derby', 'hunt', 'heli', 'jet'];
 const GS = { score: 0, combo: 0, mult: 1, dT: 0, offT: 0, hits: 0, timer: 0, target: null };
 settings.ctl = 'wheel';
 function applyCtl() { document.body.classList.remove('ctl-wheel', 'ctl-arrows', 'ctl-tilt'); document.body.classList.add('ctl-' + settings.ctl); document.querySelectorAll('#ctl .opt').forEach(o => o.classList.toggle('on', o.dataset.v === settings.ctl)); }
@@ -2975,7 +2985,9 @@ function setupRace() {
   for (const p of PICKUPS) p.t = 0;
   raceTime = 0; countdown = 3; finishShown = false; LAPS = TRK.sprint ? 1 : TRK.flats || ['elim', 'derby', 'hunt', 'cruise', 'heli'].includes(settings.mode) ? 99 : ['drift', 'stunt', 'touge'].includes(settings.mode) ? 2 : settings.laps;
   if (settings.mode === 'hunt' && !NET.race) setupHunt();
-  setupHeli(); setupJet();
+  setupHeli(); setupJet(); setupFlatCars(); AIR.view = 0; AIR.camP = null; orbitYaw = 0; orbitPitch = 0;
+  if (HELI.on || JET.on) { const ah = $('airHint'); ah.innerHTML = isTouch ? '<b>ОГОНЬ</b> — пулемёт · <b>РАКЕТА</b> — ракета · <b>▲ ▼</b> — высота · руль — поворот · <b>ГАЗ/ТОРМОЗ</b> — скорость · 🎥 — вид из кабины · проведи по экрану — осмотреться' : '<b>Shift / Q</b> — пулемёт · <b>Пробел</b> — ракета · <b>W / S</b> — газ / тормоз · <b>A D</b> — поворот · <b>E / X</b> — вверх / вниз · <b>C</b> — кабина · <b>мышь</b> — осмотреться, колесо — зум'; ah.classList.remove('hidden', 'fade'); clearTimeout(setupRace.ah); setupRace.ah = setTimeout(() => ah.classList.add('fade'), 9000); }
+  else $('airHint').classList.add('hidden');
   ODO.m = 0; ODO.lx = player.pos.x;
   if (settings.mode === 'snail' && !NET.race) { player.rocket = 1030 / 3.6; player.vmax = 1030 / 3.6; player.gripMul = 3; player.nitro = 1; player.nitroMul = 0; flash('🚀 Суперкар: жми ГАЗ и НИТРО — до 1 000 км/ч', 2.5); }
   if (player.policeBar) { player.policeBar.visible = settings.mode === 'hunt'; } else if (settings.mode === 'hunt') addPoliceBar(player);
@@ -3201,7 +3213,7 @@ function drawHUD(dt) {
   if (heavy) {
   dial.clearRect(0, 0, W, W);
   dial.beginPath(); dial.arc(cx, cy, R + 14, 0, Math.PI * 2); dial.fillStyle = 'rgba(0,0,0,.5)'; dial.fill();
-  const a0 = Math.PI * .75, a1 = Math.PI * 2.25, MAXK = settings.mode === 'snail' ? 1080 : JET.on ? 3240 : 360;
+  const a0 = Math.PI * .75, a1 = Math.PI * 2.25, MAXK = settings.mode === 'snail' ? 1080 : JET.on ? 10800 : 360;
   dial.lineWidth = 14; dial.lineCap = 'round';
   dial.beginPath(); dial.arc(cx, cy, R - 10, a0, a1); dial.strokeStyle = 'rgba(255,255,255,.12)'; dial.stroke();
   const frac = Math.min(1, kmh / MAXK), gr = dial.createLinearGradient(0, W, W, 0); gr.addColorStop(0, '#ffb03d'); gr.addColorStop(1, '#ff3d6e');
@@ -3443,7 +3455,7 @@ function heliTick(dt, racing) {
   H.x += Math.sin(H.h) * H.v * dt; H.z += Math.cos(H.h) * H.v * dt;
   // stay near the city: soft pull back towards the track
   const q = trackQuery(H.x, H.z, player.q.i), far = Math.abs(q.lat) - 220; if (far > 0) { H.x -= NX[q.i] * Math.sign(q.lat) * far * dt; H.z -= NZ[q.i] * Math.sign(q.lat) * far * dt; }
-  H.y = lerp(H.y, 40 + Math.sin(timeAcc * .7) * 1.5, dt);
+  H.alt = clamp((H.alt || 40) + ((k.climb ? 1 : 0) - (k.dive ? 1 : 0)) * 18 * dt, 8, 140); H.y = lerp(H.y, H.alt + Math.sin(timeAcc * .7) * 1.2, 1 - Math.exp(-dt * 2));
   H.g.position.set(H.x, H.y, H.z); H.g.rotation.set(clamp(H.v / 62, -.2, 1) * .22, H.h, -H.yr * .35, 'YXZ');
   H.rotor.rotation.y += dt * 38; H.tail.rotation.x += dt * 60; H.beacon.visible = Math.floor(timeAcc * 2) % 2 === 0;
   // keep the hidden player car under the helicopter so minimap / distance logic follows it
@@ -3476,26 +3488,51 @@ function heliTick(dt, racing) {
   // rotor sound
   if (audio) { if (!audio.rotorG) { const A = audio, src = A.ctx.createBufferSource(); src.buffer = A.buf; src.loop = true; const f = A.ctx.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = 260; const g = A.ctx.createGain(), lfo = A.ctx.createOscillator(), lg = A.ctx.createGain(); lfo.frequency.value = 11; lg.gain.value = .12; lfo.connect(lg); lg.connect(g.gain); g.gain.value = 0; src.connect(f); f.connect(g); g.connect(A.master); src.start(); lfo.start(); A.rotorG = g; } audio.rotorG.gain.setTargetAtTime(.18, audio.ctx.currentTime, .3); }
 }
+const AIR = { view: 0 };
+// shared orbit camera for aircraft: drag with mouse/finger to look around 360°, wheel/pinch to zoom
+function aircraftCam(dt, P, h, back, up, lookAhead, lookDown, fov, cockpitOfs, pitch = 0, roll = 0) {
+  if (AIR.view === 1) { // cockpit
+    const fx = Math.sin(h), fz = Math.cos(h);
+    camera.position.set(P.x + fx * cockpitOfs[1], P.y + cockpitOfs[0], P.z + fz * cockpitOfs[1]);
+    const ly = Math.sin(orbitPitch * .25) * 60, la = h + orbitYaw;
+    camera.up.set(Math.sin(-roll) * Math.cos(h) * 0 + Math.sin(roll) * -Math.cos(h) * 0, 1, 0);
+    camera.lookAt(camera.position.x + Math.sin(la) * 100, camera.position.y - pitch * 100 + ly - 4, camera.position.z + Math.cos(la) * 100);
+    camera.rotateZ(-roll * .6);
+    camera.fov = vfovFor(fov + 8, 50, 95); camera.updateProjectionMatrix(); return;
+  }
+  const yaw = h + Math.PI + orbitYaw, pt = clamp(.35 + orbitPitch * .22, -.25, 1.45), d = back * zoom;
+  const tp = _e1.set(P.x + Math.sin(yaw) * Math.cos(pt) * d, P.y + up * .4 + Math.sin(pt) * d, P.z + Math.cos(yaw) * Math.cos(pt) * d);
+  AIR.camP = AIR.camP || tp.clone(); if (AIR.camP.distanceTo(tp) > 120) AIR.camP.copy(tp); else AIR.camP.lerp(tp, 1 - Math.exp(-dt * 6)); camera.position.copy(AIR.camP); camera.up.set(0, 1, 0);
+  const la = Math.abs(orbitYaw) > .3 ? 0 : lookAhead;
+  camera.lookAt(P.x + Math.sin(h) * la, P.y - (Math.abs(orbitYaw) > .3 ? 0 : lookDown), P.z + Math.cos(h) * la); camera.fov = vfovFor(fov, 40, 95); camera.updateProjectionMatrix();
+}
 function heliCam(dt) {
-  const H = HELI, back = 24, up = 11, tp = _e1.set(H.x - Math.sin(H.h) * back, H.y + up, H.z - Math.cos(H.h) * back);
-  H.camP.lerp(tp, 1 - Math.exp(-dt * 3)); camera.position.copy(H.camP);
-  camera.lookAt(H.x + Math.sin(H.h) * 30, H.y - 14, H.z + Math.cos(H.h) * 30); camera.fov = vfovFor(78, 46, 74); camera.updateProjectionMatrix();
-  if (player.cockpit) player.cockpit.g.visible = false;
+  const H = HELI; aircraftCam(dt, H.g.position, H.h, 26, 22, 30, 12, 76, [-.2, 2.3], 0, -H.yr * .35);
+  H.g.children.forEach(o => { if (o.material && o.material.opacity === .8) o.visible = AIR.view === 0; });
+  if (player.cockpit) player.cockpit.g.visible = false; drawReticle(H.target);
+}
+// target reticle on screen + "how to shoot" hint
+function drawReticle(t) {
+  const r = $('reticle'); if (!r) return;
+  if (!t || t.boom > 0 || !(state === 'race')) { r.style.display = 'none'; return; }
+  const v = _e2.set(t.pos.x, 1 + (t.y || 0), t.pos.z).project(camera); if (v.z > 1) { r.style.display = 'none'; return; }
+  const W = APP.clientWidth || innerWidth, Hh = APP.clientHeight || innerHeight; r.style.display = 'block'; r.style.transform = `translate(${(v.x * .5 + .5) * W - 28}px,${(-v.y * .5 + .5) * Hh - 28}px)`;
 }
 /* ================= INFINITE STRAIGHT: odometer + seamless wrap ================= */
 const ODO = { m: 0, lx: 0 };
 function flatsTick() {
-  const p = player, x = JET.on ? JET.x : p.pos.x; ODO.m += Math.max(0, x - ODO.lx); ODO.lx = x;
+  const p = player, x = JET.on ? JET.x : p.pos.x; if (JET.on) ODO.m += JET.v * (frame.dtL || 0); else ODO.m += Math.max(0, x - ODO.lx); ODO.lx = x;
+  if (JET.on && x < 2200) { const D = -10000; JET.x -= D; camera.position.x -= D; if (AIR.camP) AIR.camP.x -= D; for (const c of FLATCARS) c.pos.x -= D; for (const r of JET.rockets) r.m.position.x -= D; ODO.lx -= D; for (const pf of puffs) pf.s.position.x -= D; }
   if (x > 15000) { // jump back 10 km: the plain, posts and mountains repeat, so the move is invisible
     const D = 10000; for (const c of cars) { c.pos.x -= D; c.q = trackQuery(c.pos.x, c.pos.z, Math.max(0, c.q.i - Math.round(D / DS))); }
-    if (JET.on) { JET.x -= D; JET.camP.x -= D; } camera.position.x -= D; if (typeof camPos !== 'undefined') camPos.x -= D; if (typeof camLook !== 'undefined') camLook.x -= D; ODO.lx -= D;
+    if (JET.on) { JET.x -= D; if (AIR.camP) AIR.camP.x -= D; for (const r of JET.rockets) r.m.position.x -= D; } for (const c of FLATCARS) c.pos.x -= D; camera.position.x -= D; if (typeof camPos !== 'undefined') camPos.x -= D; if (typeof camLook !== 'undefined') camLook.x -= D; ODO.lx -= D;
     for (const pf of puffs) pf.s.position.x -= D;
   }
   if (flatGround) { flatGround.position.set(Math.round(camera.position.x / 81) * 81, 0, Math.round(camera.position.z / 81) * 81); }
   if (flatRing) flatRing.position.set(camera.position.x, 0, camera.position.z);
 }
 /* ================= FIGHTER JET: up to 3 000 km/h ================= */
-const JET = { on: false, g: null, x: 0, z: 0, y: 6, h: 0, v: 0, lat: 0, roll: 0, flame: null, boom: false, camP: new THREE.Vector3() };
+const JET = { on: false, g: null, x: 0, z: 0, y: 6, h: 0, v: 0, lat: 0, roll: 0, flame: null, boom: false, rockets: [], tracers: [], marks: {} };
 function buildJet() {
   const g = new THREE.Group(), body = new THREE.MeshStandardMaterial({ color: 0x5b6470, metalness: .6, roughness: .35 }), dark = new THREE.MeshStandardMaterial({ color: 0x23272e, metalness: .5, roughness: .5 }), glass = new THREE.MeshStandardMaterial({ color: 0xc9a227, metalness: 1, roughness: .05 });
   const f = new THREE.Mesh(new THREE.CylinderGeometry(.75, .95, 11, 14), body); f.rotation.x = Math.PI / 2; g.add(f);
@@ -3518,35 +3555,95 @@ function setupJet() {
   JET.on = settings.mode === 'jet' && !NET.race; document.body.classList.toggle('jet', JET.on);
   if (!JET.on) { jetOff(); return; }
   if (!JET.g) { JET.g = buildJet(); scene.add(JET.g); }
-  JET.g.visible = true; JET.x = player.pos.x; JET.z0 = PZ[player.q.i]; JET.z = JET.z0; JET.y = 6; JET.h = Math.atan2(TX[player.q.i], TZ[player.q.i]); JET.v = 0; JET.lat = 0; JET.boom = false;
-  JET.camP.set(JET.x - Math.sin(JET.h) * 26, JET.y + 6, JET.z - Math.cos(JET.h) * 26);
+  JET.g.visible = true; JET.x = player.pos.x; JET.z = PZ[player.q.i]; JET.y = 4; JET.alt = 6; JET.h = Math.atan2(TX[player.q.i], TZ[player.q.i]); JET.v = 0; JET.yr = 0; JET.roll = 0; JET.pitch = 0;
+  JET.boom = false; JET.marks = {}; JET.gunCD = 0; JET.rkCD = 0; JET.rockets = JET.rockets || []; JET.tracers = JET.tracers || []; JET.target = null;
   player.elim = true; player.root.visible = false;
-  const tn = $('tN').querySelector('span'); if (tn) tn.textContent = 'ФОРСАЖ';
+  const tn = $('tN').querySelector('span'); if (tn) tn.textContent = 'ОГОНЬ'; $('tD').textContent = 'РАКЕТА';
 }
-function jetOff() { if (JET.g) JET.g.visible = false; if (JET.on && player) { player.elim = false; player.root.visible = true; } const tn = $('tN') && $('tN').querySelector('span'); if (tn && JET.on) tn.textContent = 'НИТРО'; JET.on = false; document.body.classList.remove('jet'); if (audio && audio.jetG) audio.jetG.gain.value = 0; }
+function jetOff() {
+  if (JET.g) JET.g.visible = false; for (const r of JET.rockets || []) scene.remove(r.m); JET.rockets = []; for (const t of JET.tracers || []) scene.remove(t.l); JET.tracers = [];
+  if (JET.on && player) { player.elim = false; player.root.visible = true; const tn = $('tN').querySelector('span'); if (tn) tn.textContent = 'НИТРО'; $('tD').textContent = 'ДРИФТ'; }
+  JET.on = false; document.body.classList.remove('jet'); if (audio && audio.jetG) audio.jetG.gain.value = 0;
+}
+const JET_MAX = 10000 / 3.6;
 function jetTick(dt, racing) {
   const J = JET, k = keys, steerIn = clamp((wheelUI && (wheelUI.active || Math.abs(wheelUI.rot) > 2) ? clamp(wheelUI.rot / 300, -1, 1) : 0) + (k.right ? 1 : 0) - (k.left ? 1 : 0) + (GP.on ? GP.steer : 0), -1, 1);
-  const thr = racing && (k.up || settings.autoGas || (GP.on && GP.gas > .1)) ? 1 : 0, ab = racing && k.nitro, brk = k.down || (GP.on && GP.brk > .1);
-  const vmax = ab ? 880 : 570, a = thr * (ab ? 62 : 34) * Math.max(0, 1 - Math.pow(J.v / vmax, 3)) - (brk ? 60 : 0) - .000012 * J.v * J.v - (thr ? 0 : 2);
-  J.v = clamp(J.v + a * dt, 0, 3000 / 3.6);
-  J.lat = clamp(J.lat - steerIn * dt * (14 + J.v * .02), -HALF * 2.5, HALF * 2.5); J.roll = lerp(J.roll, steerIn * .9, 1 - Math.exp(-dt * 4));
-  J.x += J.v * dt; J.z = J.z0 + J.lat; J.y = lerp(J.y, 3.5 + Math.min(32, J.v / 22), 1 - Math.exp(-dt * 1.5));
-  J.g.position.set(J.x, J.y, J.z); J.g.rotation.set(-Math.min(.12, a / 600), Math.PI / 2, -J.roll, 'YXZ');
-  const burn = thr ? (ab ? 1.7 : 1) : .25; J.flame.scale.set(1, burn * (.85 + Math.random() * .3), 1); J.flame.material.color.setHex(ab ? 0x7fb8ff : 0xff8a3d);
-  // sonic boom
+  const thr = racing && (k.up || settings.autoGas || (GP.on && GP.gas > .1)) ? 1 : 0, brk = k.down || (GP.on && GP.brk > .1);
+  // thrust to 10 000 km/h without afterburner: strong at low speed, tapering near the top
+  const a = thr * 175 * Math.max(0, 1 - Math.pow(J.v / (JET_MAX * 1.02), 3)) - (brk ? 220 : 0) - (thr ? 0 : 6 + J.v * .01);
+  J.v = clamp(J.v + a * dt, 0, JET_MAX);
+  // flight model: steering banks the jet and turns the heading; slower turns at high speed
+  const turn = 1.3 / (1 + J.v / 400);
+  J.yr = lerp(J.yr, -steerIn * turn, 1 - Math.exp(-dt * 3.5)); J.h += J.yr * dt;
+  J.roll = lerp(J.roll, steerIn * 1.1, 1 - Math.exp(-dt * 3.5));
+  const climb = (k.climb ? 1 : 0) - (k.dive ? 1 : 0);
+  if (J.v > 60) J.alt = clamp(J.alt + climb * (25 + J.v * .05) * dt, 4, 1500); else J.alt = Math.max(4, J.alt - 20 * dt);
+  const prevY = J.y; J.y = lerp(J.y, J.alt + (J.v < 60 ? 0 : 0), 1 - Math.exp(-dt * 2.5));
+  J.pitch = lerp(J.pitch, clamp((J.y - prevY) / Math.max(dt, 1e-3) / Math.max(30, J.v), -.5, .5), 1 - Math.exp(-dt * 5));
+  J.x += Math.sin(J.h) * J.v * dt; J.z += Math.cos(J.h) * J.v * dt;
+  J.g.position.set(J.x, J.y, J.z); J.g.rotation.set(-J.pitch, J.h, -J.roll, 'YXZ');
+  J.flame.scale.set(1, (thr ? 1 + J.v / JET_MAX * .9 : .25) * (.85 + Math.random() * .3), 1); J.flame.material.color.setHex(J.v > 1500 ? 0x7fb8ff : 0xff8a3d);
   if (!J.boom && J.v > 343) { J.boom = true; flash('💥 ЗВУКОВОЙ БАРЬЕР!', 1.8); shake = 1; vib([40, 30, 80]); if (audio) boomSnd(1); moment(40, 'Звуковой барьер'); }
   if (J.boom && J.v < 320) J.boom = false;
   J.cone.material.opacity = J.v > 320 && J.v < 380 ? .35 * (1 - Math.abs(J.v - 350) / 30) : 0;
-  if (J.v > 830 && !J.max) { J.max = true; feed('🛩 3 000 КМ/Ч!', 'gold'); }
+  for (const m of [3000, 5000, 7500, 10000]) if (J.v * 3.6 >= m - 2 && !J.marks[m]) { J.marks[m] = 1; feed('🛩 ' + m.toLocaleString('ru-RU') + ' КМ/Ч!', 'gold'); if (m === 10000) flash('🚀 10 000 КМ/Ч!', 2); }
   player.pos.x = J.x; player.pos.z = J.z; player.q = trackQuery(J.x, J.z, player.q.i);
+  // weapons: cannon + homing missiles against the traffic below
+  let best = null, bs = 1e9; const fx = Math.sin(J.h), fz = Math.cos(J.h);
+  for (const c of FLATCARS) { if (c.boom > 0) continue; const dx = c.pos.x - J.x, dz = c.pos.z - J.z, d = Math.hypot(dx, dz, J.y); if (d > 900) continue; const dot = (dx * fx + dz * fz) / Math.max(1, Math.hypot(dx, dz)); if (dot < .7) continue; const sc = d * (1.8 - dot); if (sc < bs) { bs = sc; best = c; } }
+  J.target = best; J.gunCD -= dt; J.rkCD = Math.max(0, J.rkCD - dt);
+  if (racing && k.nitro && J.gunCD <= 0) {
+    J.gunCD = .06; const o = new THREE.Vector3(0, -.4, 8).applyEuler(J.g.rotation).add(J.g.position);
+    const tgt = best ? new THREE.Vector3(best.pos.x, 1, best.pos.z) : o.clone().add(new THREE.Vector3(0, 0, 400).applyEuler(J.g.rotation));
+    const l = new THREE.Line(new THREE.BufferGeometry().setFromPoints([o, tgt]), tracerMat); scene.add(l); J.tracers.push({ l, t: .05 });
+    if (best) jetHit(best, 6, false); if (audio) beep(140 + Math.random() * 40, .03, .08); shake = Math.max(shake, .06);
+  }
+  if (racing && k.hand && J.rkCD <= 0) {
+    J.rkCD = 1.6; const m = new THREE.Mesh(rocketGeo, rocketMat); m.position.copy(J.g.position).add(new THREE.Vector3(4.8 * (J.side = -(J.side || 1)), -.4, -1).applyEuler(J.g.rotation)); scene.add(m);
+    J.rockets.push({ m, tgt: best, v: J.v + 120, dir: new THREE.Vector3(fx, 0, fz), t: 0 }); flash('🚀 РАКЕТА!', .6); if (audio) beep(320, .3, .15);
+  }
+  for (let i = J.rockets.length - 1; i >= 0; i--) { const r = J.rockets[i]; r.t += dt; r.v += 400 * dt;
+    if (r.tgt && !(r.tgt.boom > 0)) { const d = _e1.set(r.tgt.pos.x, .8, r.tgt.pos.z).sub(r.m.position).normalize(); r.dir.lerp(d, 1 - Math.exp(-dt * 6)).normalize(); }
+    r.m.position.addScaledVector(r.dir, r.v * dt); r.m.lookAt(_e2.copy(r.m.position).add(r.dir));
+    puff(r.m.position.x, r.m.position.y, r.m.position.z, 0, 0, .9, 0xcccccc, .25, .6);
+    const hit = r.tgt && r.m.position.distanceTo(_e1.set(r.tgt.pos.x, .8, r.tgt.pos.z)) < 6;
+    if (hit || r.m.position.y < .5 || r.t > 5) { const X = r.m.position;
+      for (let q2 = 0; q2 < 18; q2++) puff(X.x + (Math.random() - .5) * 6, 1 + Math.random() * 3, X.z + (Math.random() - .5) * 6, (Math.random() - .5) * 10, (Math.random() - .5) * 10, 3 + Math.random() * 2, q2 % 3 ? 0xff7a1a : 0x222222, .7, 1.4);
+      for (const c of FLATCARS) if (Math.hypot(c.pos.x - X.x, c.pos.z - X.z) < 10) jetHit(c, 150, true);
+      if (audio) boomSnd(.6); shake = Math.max(shake, .3); scene.remove(r.m); J.rockets.splice(i, 1); }
+  }
+  for (let i = J.tracers.length - 1; i >= 0; i--) { const t = J.tracers[i]; t.t -= dt; if (t.t <= 0) { scene.remove(t.l); t.l.geometry.dispose(); J.tracers.splice(i, 1); } }
   if (audio) { if (!audio.jetG) { const A = audio, src = A.ctx.createBufferSource(); src.buffer = A.buf; src.loop = true; const f = A.ctx.createBiquadFilter(); f.type = 'lowpass'; f.Q.value = .7; const g = A.ctx.createGain(); g.gain.value = 0; src.connect(f); f.connect(g); g.connect(A.master); src.start(); A.jetG = g; A.jetF = f; }
-    audio.jetF.frequency.setTargetAtTime(300 + J.v * 3 + (ab ? 900 : 0), audio.ctx.currentTime, .1); audio.jetG.gain.setTargetAtTime(.08 + (thr ? .18 : 0) + (ab ? .12 : 0), audio.ctx.currentTime, .15); }
+    audio.jetF.frequency.setTargetAtTime(300 + Math.min(4000, J.v * 1.5), audio.ctx.currentTime, .1); audio.jetG.gain.setTargetAtTime(.08 + (thr ? .2 : 0), audio.ctx.currentTime, .15); }
+}
+function jetHit(c, dmg, big) {
+  if (c.boom > 0) return; c.hp = (c.hp ?? 100) - dmg; for (let k = 0; k < (big ? 24 : 3); k++) spark(c.pos.x, 1, c.pos.z, (Math.random() - .5) * 14, (Math.random() - .5) * 14);
+  if (c.hp <= 0) { c.boom = 2; c.bvy = 9; c.spin = (Math.random() - .5) * 8; for (let q = 0; q < 20; q++) puff(c.pos.x, 1.5, c.pos.z, (Math.random() - .5) * 8, (Math.random() - .5) * 8, 2.5 + Math.random() * 2, q % 3 ? 0xff7a1a : 0x222222, .7, 1.5); GS.hits++; feed('💥 ЦЕЛЬ ПОРАЖЕНА · +200', 'gold'); SAVE.coins += 200; if (audio) boomSnd(.5); }
 }
 function jetCam(dt) {
-  const J = JET, back = 24 + J.v * .012, tp = _e1.set(J.x - back, J.y + 5.5, J.z0 + J.lat * .85);
-  J.camP.lerp(tp, 1 - Math.exp(-dt * 5)); camera.position.copy(J.camP); camera.position.x = J.x - back;
-  camera.position.y += (Math.random() - .5) * Math.min(.25, J.v / 3000); camera.lookAt(J.x + 40, J.y, J.z0 + J.lat * .9);
-  camera.fov = vfovFor(78 + Math.min(22, J.v / 40), 40, 90); camera.updateProjectionMatrix();
+  const J = JET; aircraftCam(dt, J.g.position, J.h, 26 + Math.min(30, J.v * .004), 12, 60, 4, 72 + Math.min(26, J.v / 100), [1.1, 3.6], J.pitch, J.roll);
+  JET.g.children.forEach(o => { if (o.geometry && o.geometry.type === 'SphereGeometry') o.visible = AIR.view === 0; });
+  if (AIR.view === 1) camera.position.y += (Math.random() - .5) * Math.min(.06, J.v / 40000);
+  drawReticle(J.target);
+}
+// ordinary traffic on the infinite straight, so the jet's speed is visible
+const FLATCARS = [];
+function setupFlatCars() {
+  for (const c of FLATCARS) { scene.remove(c.root); c.dispose(); } FLATCARS.length = 0;
+  if (!TRK.flats || !['jet', 'snail'].includes(settings.mode)) return;
+  const lanes = [-8, -3, 3, 8], dull = [0x8a8f96, 0x2b2f36, 0xe6e6e6, 0x1d3557, 0x6b1f1f, 0x355e3b, 0xb8a98c, 0xd0a020];
+  for (let k = 0; k < 14; k++) { const md = MODELS[k % MODELS.length]; const t = Object.assign(defTune(md), { color: dull[k % dull.length], wing: 0, pattern: 'none', glow: 0 });
+    const c = new Car({ model: md.id, tune: t, plate: 'A ' + (300 + k) + ' AA' }, 'Трафик', false); c.lane = lanes[k % 4]; c.fv = (c.lane > 0 ? 1 : -1) * (22 + Math.random() * 10); c.hp = 100;
+    c.pos.x = player.pos.x + 150 + k * 140; c.pos.z = PZ[player.q.i] + c.lane; c.h = c.fv > 0 ? Math.PI / 2 : -Math.PI / 2; FLATCARS.push(c); }
+}
+function flatCarsTick(dt) {
+  if (!FLATCARS.length) return; const cx = JET.on ? JET.x : player.pos.x, ahead = JET.on ? Math.max(1500, JET.v * 4) : 1500;
+  for (const c of FLATCARS) {
+    if (c.boom > 0) { c.boom -= dt; c.bvy -= 22 * dt; c.y = Math.max(0, (c.y || 0) + c.bvy * dt); c.h += c.spin * dt; if (Math.random() < .5) puff(c.pos.x, 1 + c.y, c.pos.z, 0, 0, 1.6, 0x222222, .4, 1.2); if (c.boom <= 0) { c.hp = 100; c.y = 0; c.pos.x = cx + ahead * (.6 + Math.random() * .6); c.h = c.fv > 0 ? Math.PI / 2 : -Math.PI / 2; } }
+    else { c.pos.x += c.fv * dt; c.vF = Math.abs(c.fv); c.vel.x = c.fv; c.vel.z = 0; }
+    if (c.pos.x < cx - 400) { c.pos.x = cx + ahead * (.4 + Math.random() * .8); c.hp = 100; c.y = 0; c.h = c.fv > 0 ? Math.PI / 2 : -Math.PI / 2; }
+    c.q = { i: player.q.i, lat: c.lane }; c.air = (c.y || 0) > .05; updateCarVisual(c, dt);
+  }
 }
 /* ================= REPLAY: best moment ================= */
 const RP = { buf: [], best: null, active: false, t: 0, t0: 0, t1: 0, cb: null, k: 0, ang: 0 };
@@ -3611,7 +3708,7 @@ function showFinish() {
   let placeR = mode === 'time' ? 600 + (newGhost ? 900 : 0) : ([2500, 1600, 1100, 700, 500, 300][myPlace - 1] || 300) * (mode === 'elim' ? 1.3 : TRK.sprint ? 1.2 : Math.min(LAPS, 5) / 3);
   if (SCORE_MODES.includes(mode)) {
     const sc = mode === 'derby' || mode === 'hunt' || mode === 'heli' ? GS.hits : Math.round(GS.score + GS.combo);
-    const TH = { drift: [4000, 10000, 18000], stunt: [6000, 12000, 20000], derby: [2, 4, 6], hunt: [2, 4, 5], heli: [5, 10, 16] }[mode], md = sc >= TH[2] ? 3 : sc >= TH[1] ? 2 : sc >= TH[0] ? 1 : 0;
+    const TH = { drift: [4000, 10000, 18000], stunt: [6000, 12000, 20000], derby: [2, 4, 6], hunt: [2, 4, 5], heli: [5, 10, 16], jet: [3, 8, 15] }[mode], md = sc >= TH[2] ? 3 : sc >= TH[1] ? 2 : sc >= TH[0] ? 1 : 0;
     $('finTitle').textContent = ['😕 БЕЗ МЕДАЛИ', '🥉 БРОНЗА', '🥈 СЕРЕБРО', '🥇 ЗОЛОТО'][md] + ' · ' + (mode === 'heli' ? sc + ' подбито' : mode === 'derby' || mode === 'hunt' ? sc + ' таранов' : sc.toLocaleString('ru-RU') + ' очков');
     placeR = [300, 900, 1600, 2600][md];
   }
@@ -3697,7 +3794,7 @@ setTimeout(resize, 300);
 
 function frame(now) {
   requestAnimationFrame(frame);
-  const rdt = Math.min(.05, (now - last) / 1000); last = now;
+  const rdt = Math.min(.05, (now - last) / 1000); last = now; frame.dtL = rdt;
   if (TSC.t > 0) { TSC.t -= rdt; if (TSC.t <= 0) TSC.k = 1; }
   const dt = rdt * (state === 'race' && !paused ? (TSC.t > 0 ? TSC.k + (1 - TSC.k) * clamp(1 - TSC.t / .25, 0, 1) * 0 : 1) : 1);
   if (KD.t > 0) KD.t -= rdt;
@@ -3743,7 +3840,7 @@ function frame(now) {
     if (npcs.length) streetTick(dt, racing, live);
     if (HELI.on) heliTick(dt, racing);
     if (JET.on) jetTick(dt, racing);
-    if (TRK.flats) flatsTick();
+    if (TRK.flats) { flatsTick(); flatCarsTick(dt); }
     if (settings.mode === 'derby' && racing) for (const c of live) if (!c.isPlayer && !c.remote && !c.wreck) { const g = (player.dist - c.dist) * DS; if (g > -10 && g < 70) { c.laneT = clamp(player.q.lat, -HALF + 2, HALF - 2); if (g > 5 && c.nitro > .1) c.inp.nitro = 1; } }
     if (NET.race) netTick(dt);
     for (const c of cars) { c.hold = (!racing && !c.remote) || ((HELI.on || JET.on) && c.isPlayer); if (c.hold) { c.inp.thr = 0; c.inp.brk = 0; c.inp.nitro = 0; } }
@@ -3775,7 +3872,7 @@ function frame(now) {
     if (camMode === 2 && (mirrorTick++ & (curQ === 'low' ? 3 : 1)) === 0) { drawCluster(myPos); renderMirror(); }
     updateAudio();
     const spd = Math.abs(player.vF);
-    fxPass.uniforms.uBlur.value = JET.on ? Math.min(.018, JET.v / 834 * .016) : (camMode === 2 ? .35 : 1) * (clamp((spd - 50) / 40, 0, 1) * .004 + (player.nitroOn ? .008 : 0));
+    fxPass.uniforms.uBlur.value = JET.on ? (AIR.view ? .5 : 1) * Math.min(.02, JET.v / JET_MAX * .02) : (camMode === 2 ? .35 : 1) * (clamp((spd - 50) / 40, 0, 1) * .004 + (player.nitroOn ? .008 : 0));
     fxPass.uniforms.uVig.value = camMode === 2 ? .35 : .6;
     const inT = player.q.i >= TUN0 + 4 && player.q.i <= TUN1 - 4;
     tunnelK = lerp(tunnelK, inT ? .3 : 1, 1 - Math.exp(-dt * 3));
@@ -3938,7 +4035,7 @@ function startRace() {
   if (!tut && !NET.race) { paused = true; $('tut').classList.remove('hidden'); }
 }
 function toMenu() {
-  heliOff(); jetOff();
+  heliOff(); jetOff(); for (const c of FLATCARS) { scene.remove(c.root); c.dispose(); } FLATCARS.length = 0; $('airHint').classList.add('hidden'); if ($('reticle')) $('reticle').style.display = 'none';
   for (const c of npcs) { scene.remove(c.root); c.dispose(); } npcs = []; if (audio && audio.siren) audio.siren.gain.value = 0; document.body.classList.remove('street');
   const wasCareer = !!careerEv, wasTD = testDrive;
   testDrive = null;
@@ -4267,8 +4364,8 @@ $('gTest').onclick = () => { testDrive = gModel; if (!savedSettings) savedSettin
 const fmtT = t => { t = Math.max(0, t); return Math.floor(t / 60) + ':' + String(Math.floor(t % 60)).padStart(2, '0'); };
 function endScoreGame(win, msg) { if (player.finish != null) return; player.finish = raceTime; GS.win = win; showMsg(win ? '🏆' : '⏱', msg); setTimeout(() => { if (state === 'race') { if (PREFS.replay !== false && settings.mode !== 'heli') startReplay(showFinish); else showFinish(); } }, 2200); }
 function scoreHUD() { const el = $('score'); if (!el) return; const m = settings.mode;
-  el.querySelector('b').textContent = m === 'heli' ? GS.hits + ' 💥' : m === 'derby' || m === 'hunt' ? GS.hits + ' / ' + (m === 'derby' ? 6 : 5) : Math.round(GS.score + GS.combo).toLocaleString('ru-RU');
-  el.querySelector('span').textContent = m === 'drift' ? (GS.combo > 0 ? 'КОМБО ×' + GS.mult + '  +' + Math.round(GS.combo) : 'ОЧКИ ДРИФТА') : m === 'stunt' ? 'ОЧКИ ТРЮКОВ' : m === 'derby' ? 'ТАРАНЫ · ' + fmtT(GS.timer) : m === 'heli' ? 'ПОДБИТО · ' + fmtT(GS.timer) + (HELI.rkCD > 0 ? ' · ракета ' + HELI.rkCD.toFixed(1) + 'с' : ' · 🚀 готова') : 'ТАРАНЫ БЕГЛЕЦА · ' + fmtT(GS.timer); }
+  el.querySelector('b').textContent = m === 'jet' ? Math.round(JET.v * 3.6).toLocaleString('ru-RU') + ' км/ч' : m === 'heli' ? GS.hits + ' 💥' : m === 'derby' || m === 'hunt' ? GS.hits + ' / ' + (m === 'derby' ? 6 : 5) : Math.round(GS.score + GS.combo).toLocaleString('ru-RU');
+  el.querySelector('span').textContent = m === 'drift' ? (GS.combo > 0 ? 'КОМБО ×' + GS.mult + '  +' + Math.round(GS.combo) : 'ОЧКИ ДРИФТА') : m === 'stunt' ? 'ОЧКИ ТРЮКОВ' : m === 'derby' ? 'ТАРАНЫ · ' + fmtT(GS.timer) : m === 'jet' ? 'ВЫСОТА ' + Math.round(JET.y) + ' м · ПОРАЖЕНО ' + GS.hits + (JET.rkCD > 0 ? ' · ракета ' + JET.rkCD.toFixed(1) + 'с' : ' · 🚀 готова') : m === 'heli' ? 'ВЫСОТА ' + Math.round(HELI.y) + ' м · ПОДБИТО · ' + fmtT(GS.timer) + (HELI.rkCD > 0 ? ' · ракета ' + HELI.rkCD.toFixed(1) + 'с' : ' · 🚀 готова') : 'ТАРАНЫ БЕГЛЕЦА · ' + fmtT(GS.timer); }
 function modeTick(dt) {
   const m = settings.mode, p = player;
   if (m === 'drift' && p.finish == null) {
@@ -4981,9 +5078,10 @@ if (renderer.compileAsync) renderer.compileAsync(scene, camera).catch(() => { })
 $('loading').classList.add('hidden');
 $('menu').classList.remove('hidden');
 setRoom(ROOM);
+for (const id of ['airHint', 'keyHint']) { const e = document.getElementById(id); if (e) document.body.appendChild(e); }
 window.__gameReady = true;
 setTimeout(thumbsIdle, 2500);
-window.__sr = { start: () => startRace(), get st() { return { state, countdown, raceTime, i: player.q.i, lat: player.q.lat, v: player.vF, y: player.pos.y, vy: player.vy, cars: cars.map(c => [c.q.i, +c.vF.toFixed(1), +c.pos.y.toFixed(2)]) }; }, cam: m => { camMode = m; }, bot: v => { settings.auto = v; }, tp: (i, lat = 0) => { player.place(i, lat); snapCamera(); }, set: (k, v) => { settings[k] = v; }, N, view: (i, back, up, side = 0) => { const j = (i - Math.round(back / DS) + N) % N; window.__fc = [PX[j] + NX[j] * side, up, PZ[j] + NZ[j] * side, PX[i], 0, PZ[i]]; }, free: () => { window.__fc = null; }, gar: (m, tab) => { if (state !== 'garage') openGarage(); gModel = m; if (tab) gTab = tab; buildGarageCar(); renderGarage(); }, pv: () => { const i = RAVINES.length ? RAVINES[0].i0 + 12 : CUTS.length ? CUTS[0].i : BOOSTS.length ? BOOSTS[0].i + 20 : 150; const j = (i - Math.round(75 / DS) + N) % N; window.__fc = [PX[j] + NX[j] * 34, 30, PZ[j] + NZ[j] * 34, PX[i], 0, PZ[i]]; document.body.classList.add('replay'); }, heat: v => { ST.heat = v; }, key: (k, v) => { keys[k] = v; }, go: () => { countdown = 0; }, heli: () => ({ on: HELI.on, x: +HELI.x.toFixed(1), v: +HELI.v.toFixed(1), hits: GS.hits, rockets: HELI.rockets.length, tgt: !!HELI.target, pv: player.root.visible }), rp: () => startReplay(() => { }), perf: () => { const i = renderer.info; let lights = 0, meshes = 0, vis = 0; scene.traverse(o => { if (o.isLight) lights++; if (o.isMesh || o.isInstancedMesh || o.isPoints || o.isSprite) { meshes++; if (o.visible) vis++; } }); return { calls: i.render.calls, tris: i.render.triangles, progs: i.programs.length, geos: i.memory.geometries, tex: i.memory.textures, lights, meshes, vis, q: curQ, pr: renderer.getPixelRatio(), fps: lastFps }; }, rpT: () => [RP.active, RP.t.toFixed(1), RP.t0.toFixed(1), RP.t1.toFixed(1), RP.buf.length], off: (k, lat) => { const e = EXITS[k]; const i = (e.i0 + 8) % N; player.place(i, e.side * lat); player.qOn = i; snapCamera(); }, info: () => ({ RAVINES, CUTS, BOOSTS: BOOSTS.length, RAMPS: RAMPS.length, TUN: [TUN0, TUN1], DS }) };
+window.__sr = { start: () => startRace(), get st() { return { state, countdown, raceTime, i: player.q.i, lat: player.q.lat, v: player.vF, y: player.pos.y, vy: player.vy, cars: cars.map(c => [c.q.i, +c.vF.toFixed(1), +c.pos.y.toFixed(2)]) }; }, cam: m => { camMode = m; }, bot: v => { settings.auto = v; }, tp: (i, lat = 0) => { player.place(i, lat); snapCamera(); }, set: (k, v) => { settings[k] = v; }, N, view: (i, back, up, side = 0) => { const j = (i - Math.round(back / DS) + N) % N; window.__fc = [PX[j] + NX[j] * side, up, PZ[j] + NZ[j] * side, PX[i], 0, PZ[i]]; }, free: () => { window.__fc = null; }, gar: (m, tab) => { if (state !== 'garage') openGarage(); gModel = m; if (tab) gTab = tab; buildGarageCar(); renderGarage(); }, pv: () => { const i = RAVINES.length ? RAVINES[0].i0 + 12 : CUTS.length ? CUTS[0].i : BOOSTS.length ? BOOSTS[0].i + 20 : 150; const j = (i - Math.round(75 / DS) + N) % N; window.__fc = [PX[j] + NX[j] * 34, 30, PZ[j] + NZ[j] * 34, PX[i], 0, PZ[i]]; document.body.classList.add('replay'); }, heat: v => { ST.heat = v; }, key: (k, v) => { keys[k] = v; }, go: () => { countdown = 0; }, jet: () => ({ jp: [JET.g.position.x, JET.g.position.y, JET.g.position.z].map(v => +v.toFixed(1)), cam: camera.position.toArray().map(v => +v.toFixed(1)), vis: JET.g.visible, inScene: !!JET.g.parent, v: Math.round(JET.v * 3.6), view: AIR.view, scr: JET.g.position.clone().project(camera).toArray().map(v => +v.toFixed(2)) }), heli: () => ({ on: HELI.on, x: +HELI.x.toFixed(1), v: +HELI.v.toFixed(1), hits: GS.hits, rockets: HELI.rockets.length, tgt: !!HELI.target, pv: player.root.visible }), rp: () => startReplay(() => { }), perf: () => { const i = renderer.info; let lights = 0, meshes = 0, vis = 0; scene.traverse(o => { if (o.isLight) lights++; if (o.isMesh || o.isInstancedMesh || o.isPoints || o.isSprite) { meshes++; if (o.visible) vis++; } }); return { calls: i.render.calls, tris: i.render.triangles, progs: i.programs.length, geos: i.memory.geometries, tex: i.memory.textures, lights, meshes, vis, q: curQ, pr: renderer.getPixelRatio(), fps: lastFps }; }, rpT: () => [RP.active, RP.t.toFixed(1), RP.t0.toFixed(1), RP.t1.toFixed(1), RP.buf.length], off: (k, lat) => { const e = EXITS[k]; const i = (e.i0 + 8) % N; player.place(i, e.side * lat); player.qOn = i; snapCamera(); }, info: () => ({ RAVINES, CUTS, BOOSTS: BOOSTS.length, RAMPS: RAMPS.length, TUN: [TUN0, TUN1], DS }) };
 requestAnimationFrame(frame);
 
 </script>
