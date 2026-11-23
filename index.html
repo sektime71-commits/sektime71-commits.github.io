@@ -3,11 +3,11 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
-<title>Street Racer 3D</title>
+<title>Speed Racer 5D</title>
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Street Racer">
+<meta name="apple-mobile-web-app-title" content="Speed Racer 5D">
 <meta name="theme-color" content="#06080f">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icon-180.png">
@@ -366,11 +366,11 @@ body.heli #tN{background:radial-gradient(circle,#ff6a3d,#b91c1c)!important}body.
 </head>
 <body>
 <div id="app">
-<div id="loading"><div class="ldLogo">STREET<span>RACER</span></div><div>ЗАГРУЗКА ТРАССЫ…</div><div class="bar"><i></i></div><div class="ldTip" id="ldTip">Совет: нажми НИТРО ровно на «СТАРТ!» — получишь идеальный старт</div></div>
+<div id="loading"><div class="ldLogo">SPEED<span>RACER 5D</span></div><div>ЗАГРУЗКА ТРАССЫ…</div><div class="bar"><i></i></div><div class="ldTip" id="ldTip">Совет: нажми НИТРО ровно на «СТАРТ!» — получишь идеальный старт</div></div>
 
 <div id="menu" class="hidden">
   <div class="mTop">
-    <div class="mLogo">STREET<span>RACER</span></div>
+    <div class="mLogo">SPEED<span>RACER 5D</span></div>
     <div class="mRes">
       <div class="res"><i>★</i><b id="mStars">0</b></div><div class="res" title="Рейтинг"><b id="mRank">🥉 1000</b></div>
       <div class="res"><i>🪙</i><b id="mCoins">0</b><span class="plus" id="mPlus">+</span></div>
@@ -4005,7 +4005,7 @@ const gCam = new THREE.PerspectiveCamera(40, 1, .05, 200);
   const glassM = new THREE.MeshBasicMaterial({ map: cityTex }), mullM = new THREE.MeshStandardMaterial({ color: 0x15171c, metalness: .7, roughness: .4 });
   for (let k = 0; k < 3; k++) { const z = D0 + 4 + k * 7; wall(6, 3.6, glassM, -W + .05, 4.4, z, Math.PI / 2); for (const dz of [-3, 0, 3]) { const m = new THREE.Mesh(new THREE.BoxGeometry(.2, 3.8, .14), mullM); m.position.set(-W + .1, 4.4, z + dz); roomG.add(m); } for (const dy of [-1.85, 1.85]) { const m = new THREE.Mesh(new THREE.BoxGeometry(.2, .14, 6.1), mullM); m.position.set(-W + .1, 4.4 + dy, z); roomG.add(m); } }
   // neon sign on back wall
-  const signTex = canvasTex(1024, 256, (g, w, h) => { g.clearRect(0, 0, w, h); g.font = 'italic 900 120px Arial'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.shadowColor = '#ff3d6e'; g.shadowBlur = 30; g.fillStyle = '#ff6a8a'; g.fillText('STREET', w * .3, h / 2); g.shadowColor = '#3dd5ff'; g.fillStyle = '#9feaff'; g.fillText('RACER', w * .72, h / 2); });
+  const signTex = canvasTex(1024, 256, (g, w, h) => { g.clearRect(0, 0, w, h); g.font = 'italic 900 120px Arial'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.shadowColor = '#ff3d6e'; g.shadowBlur = 30; g.fillStyle = '#ff6a8a'; g.fillText('SPEED', w * .3, h / 2); g.shadowColor = '#3dd5ff'; g.fillStyle = '#9feaff'; g.fillText('RACER', w * .72, h / 2); });
   signTex.wrapS = signTex.wrapT = THREE.ClampToEdgeWrapping;
   const sign = new THREE.Mesh(new THREE.PlaneGeometry(10, 2.5), new THREE.MeshBasicMaterial({ map: signTex, transparent: true })); sign.position.set(-3, 6, D0 + .05); roomG.add(sign);
   // roller door on back wall
@@ -4945,7 +4945,7 @@ function renderOnline() {
     <button class="btn sec" id="onLeave">${host ? 'Закрыть комнату' : 'Выйти из комнаты'}</button>`;
   drawQR(link);
   $('onCopy').onclick = () => { try { navigator.clipboard.writeText(link).then(() => netStatus('Ссылка скопирована — отправь другу!'), () => netStatus(link)); } catch (_) { netStatus(link); } };
-  if ($('onShare')) $('onShare').onclick = () => navigator.share({ title: 'Street Racer 3D', text: 'Гоняем вместе! Код комнаты ' + NET.code, url: link }).catch(() => { });
+  if ($('onShare')) $('onShare').onclick = () => navigator.share({ title: 'Speed Racer 5D', text: 'Гоняем вместе! Код комнаты ' + NET.code, url: link }).catch(() => { });
   $('onLeave').onclick = () => closeOnline();
   if (host) {
     $('onStart').onclick = hostStartRace;
