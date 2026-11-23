@@ -550,7 +550,7 @@ const TRACKS = {
   drag: { name: 'Дрэг-стрип', desc: 'Прямая 1 км: старт, передачи, нитро', theme: 'city', v: 'drag', sprint: true, clean: true, tun: [1500, 1640], ovp: [], river: -1, endK: 2,
     ctrl: [[0, 0], [700, 0], [1450, 0], [1650, 170], [1450, 340], [700, 340], [0, 340], [-200, 170]] },
   flats: { name: 'Бесконечная прямая', desc: 'Соляное плато: прямая без конца для разгона', theme: 'mountain', v: 'flats', flats: true, clean: true, tun: [2390, 2395], ovp: [], river: -1,
-    ctrl: [[0, 0], [8000, 0], [16000, 0], [24000, 0], [24400, 450], [24000, 900], [12000, 900], [0, 900], [-400, 450]] },
+    ctrl: [[0, 0], [2000, 0], [4000, 0], [6000, 0], [8000, 0], [10000, 0], [12000, 0], [14000, 0], [16000, 0], [18000, 0], [20000, 0], [22000, 0], [24000, 0], [24600, 450], [24000, 900], [12000, 900], [0, 900], [-600, 450]] },
   canyon: { name: 'Каньон', desc: 'Красная пустыня, прыжки через овраги, длинная прямая', theme: 'mountain', v: 'desert', tun: 'auto', ovp: [], river: -1,
     ctrl: [[0, 0], [600, -20], [900, 80], [960, 300], [780, 420], [560, 380], [420, 500], [520, 680], [380, 820], [80, 800], [-120, 640], [-80, 440], [-260, 320], [-300, 120]] },
   forest: { name: 'Лесная тропа', desc: 'Густой лес, срезки через чащу, быстрые связки', theme: 'mountain', v: 'forest', tun: 'auto', ovp: [], river: -1,
@@ -827,10 +827,11 @@ function tickPickups(dt) { for (const p of PICKUPS) if (p.t > 0) p.t -= dt; }
 const effGrip = c => c.isPlayer ? 1 - (1 - SIMENV.grip) * .55 : SIMENV.grip;
 // driver aids for the player: corner-speed throttle lift (auto-gas is on)
 function assistInputs(c) {
+  if (c.rocket) return;
   if (c.air || c.inp.brk > 0 || c.inp.hand) return;
   const g = Math.sqrt(effGrip(c) * c.gripMul);
   let lim = 1e9; const look = 4 + Math.floor(Math.max(0, c.vF) * .25);
-  for (let k = 2; k <= look; k += 2) lim = Math.min(lim, LIMIT[(c.q.i + k) % N]);
+  if (!c.rocket) for (let k = 2; k <= look; k += 2) lim = Math.min(lim, LIMIT[(c.q.i + k) % N]);
   lim = lim * g * 1.1 + (c.nitroOn ? 4 : 0);
   if (c.vF > lim + 4) { c.inp.thr = 0; c.inp.brk = clamp((c.vF - lim - 4) / 10, .15, .6); }
   else if (c.vF > lim) c.inp.thr = .3;
@@ -872,7 +873,8 @@ function stepCar(c, dt) {
     c.slipF = Math.abs(CF * af) > mu * Nf ? 1 : 0; c.slipR = Math.abs(CRr * ar) > muR * Nr ? 1 : 0;
     const vmax = c.vmax * (c.nitroOn ? (c.shock ? 1.24 : 1.14) : 1) * (.9 + .1 * SIMENV.grip);
     if (inp.thr > 0) {
-      if (vx >= -.5) { const v0 = Math.max(vx, 0); acc += inp.thr * Math.min(c.power * .5, 300 * c.power / 16 / Math.max(v0, 1)) * Math.max(0, 1 - Math.pow(v0 / vmax, 6)); }
+      if (c.rocket && vx >= -.5) acc += inp.thr * (10 + (c.nitroOn ? 9 : 0)) * Math.max(0, 1 - Math.pow(Math.max(vx, 0) / c.rocket, 4)) + .00016 * vx * vx;
+      else if (vx >= -.5) { const v0 = Math.max(vx, 0); acc += inp.thr * Math.min(c.power * .5, 300 * c.power / 16 / Math.max(v0, 1)) * Math.max(0, 1 - Math.pow(v0 / vmax, 6)); }
       else acc += inp.thr * 26;
     }
     if (c.nitroOn) acc += 4.5 * c.nitroMul * (c.shock ? 1.8 : 1);
@@ -919,6 +921,11 @@ function stepCar(c, dt) {
   const gx = Math.sin(c.h), gz = Math.cos(c.h);
   c.vel.x = gx * vx + gz * vy; c.vel.z = gz * vx - gx * vy;
   c.vF = vx; c.vS = vy;
+  if (c.rocket && !c.air) { // rocket car: kill side-slip and yaw wobble so it tracks straight at 1000 km/h
+    const fx = Math.sin(c.h), fz = Math.cos(c.h), vf = c.vel.x * fx + c.vel.z * fz, vs = c.vel.x * fz - c.vel.z * fx, k = Math.exp(-dt * 8);
+    c.vel.x = fx * vf + fz * vs * k; c.vel.z = fz * vf - fx * vs * k; c.r *= Math.exp(-dt * 5);
+    if (Math.abs(inp.steer) < .05) { const th = Math.atan2(TX[c.q.i], TZ[c.q.i]); c.h += wrapA(th - c.h) * (1 - Math.exp(-dt * 2)); }
+  }
   c.pos.x += c.vel.x * dt; c.pos.z += c.vel.z * dt;
   const q = trackQuery(c.pos.x, c.pos.z, c.q.i);
   // vertical: ramps / flight
@@ -1722,6 +1729,7 @@ const shopEm = canvasTex(1024, 160, (g) => {
   for (let k = 0; k < 4; k++) { const x = k * 256, [word, col] = shopInfo[k]; const gr = g.createLinearGradient(0, 52, 0, 160); gr.addColorStop(0, '#ffe3b0'); gr.addColorStop(1, '#7a5a30'); g.fillStyle = gr; g.globalAlpha = .7; g.fillRect(x + 14, 52, 228, 108); g.globalAlpha = 1; g.fillStyle = col; g.font = 'italic 900 22px Arial'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(word, x + 128, 16); }
 });
 
+const FLAT_I0 = (() => { let b = 0, bd = 1e18; for (let i = 0; i < N / 2; i++) { const d = Math.abs(PX[i] - 3000) + Math.abs(PZ[i]) * 10; if (d < bd) { bd = d; b = i; } } return b; })();
 const TRACK_ICON = { flats: '♾', city: '🌃', streets: '🚔', sunset: '🌇', downtown: '🏙', port: '⚓', docks: '🏭', mountain: '🏔', canyon: '🏜', forest: '🌲', glacier: '🧊' };
 /* ================= TRACK RIBBONS ================= */
 function ribbon(offA, offB, yA, yB, vLen, uA = 0, uB = 1, i0 = 0, i1 = N) {
@@ -2899,7 +2907,7 @@ const GAMES = [
   { id: 'cruise', icon: '🌆', name: 'Свободная езда', track: 'sunset', mode: 'cruise', desc: 'Спокойный город: поток машин и пешеходы' },
   { id: 'heli', icon: '🚁', name: 'Вертолёт', track: 'city', mode: 'heli', desc: 'Летай над городом и подбивай машины: пулемёт и ракеты, 2:30' },
   { id: 'jet', icon: '🛩', name: 'Истребитель 3000', track: 'flats', mode: 'jet', desc: 'Форсаж до 3 000 км/ч над бесконечной прямой, звуковой барьер' },
-  { id: 'snail', icon: '🐢', name: 'Улитка 1 км/ч', track: 'flats', mode: 'snail', desc: 'Машина, которая едет ровно 1 км/ч. Дзен-заезд по бесконечной прямой' },
+  { id: 'snail', icon: '🚀', name: 'Суперкар 1000', track: 'flats', mode: 'snail', desc: 'Машина с ракетным двигателем: разгон до 1 000 км/ч на бесконечной прямой' },
   { id: 'online', icon: '🌐', name: 'Онлайн с друзьями', track: null, mode: null, desc: 'Комната по ссылке или QR, ставки' },
 ];
 let GAME = null; try { GAME = GAMES.find(g => g.id === localStorage.getItem('sr3d_game')); } catch (_) { }
@@ -2963,13 +2971,13 @@ function setupRace() {
   if (settings.mode === 'touge' && keepAI) { const a = keepAI[0]; a.skill = 1; a.vmax *= 1.04; a.power *= 1.05; }
   if (settings.mode === 'drag' && keepAI) { const a = keepAI[0]; a.vmax = player.vmax * (.97 + (settings.diff ?? 1) * .02); a.power = player.power * (.95 + (settings.diff ?? 1) * .03); }
   Object.assign(GS, { score: 0, combo: 0, mult: 1, dT: 0, offT: 0, hits: 0, timer: settings.mode === 'derby' ? 180 : settings.mode === 'hunt' || settings.mode === 'heli' ? 150 : 0, target: null });
-  order.forEach((c, k) => { const row = Math.floor(k / 2), side = k % 2 ? 1 : -1, i = TRK.flats ? 60 - row * 2 : TRK.sprint ? SPR_START - 4 - row * 7 : (N - 10 - row * 6) % N; c.place(i, side * 3.6); c.dist = TRK.flats ? 0 : TRK.sprint ? i - SPR_START : -(N - i); c.lapStart = 0; c.lapTimes = []; c.finish = null; c.nitro = c.isPlayer ? .35 : .3; c.prevLap = undefined; c.flip = null; cars.push(c); });
+  order.forEach((c, k) => { const row = Math.floor(k / 2), side = k % 2 ? 1 : -1, i = TRK.flats ? FLAT_I0 - row * 2 : TRK.sprint ? SPR_START - 4 - row * 7 : (N - 10 - row * 6) % N; c.place(i, side * 3.6); c.dist = TRK.flats ? 0 : TRK.sprint ? i - SPR_START : -(N - i); c.lapStart = 0; c.lapTimes = []; c.finish = null; c.nitro = c.isPlayer ? .35 : .3; c.prevLap = undefined; c.flip = null; cars.push(c); });
   for (const p of PICKUPS) p.t = 0;
   raceTime = 0; countdown = 3; finishShown = false; LAPS = TRK.sprint ? 1 : TRK.flats || ['elim', 'derby', 'hunt', 'cruise', 'heli'].includes(settings.mode) ? 99 : ['drift', 'stunt', 'touge'].includes(settings.mode) ? 2 : settings.laps;
   if (settings.mode === 'hunt' && !NET.race) setupHunt();
   setupHeli(); setupJet();
   ODO.m = 0; ODO.lx = player.pos.x;
-  if (settings.mode === 'snail' && !NET.race) { player.fixedV = 1 / 3.6; player.nitro = 0; flash('🐢 Режим «1 км/ч». Расслабься.', 2.5); }
+  if (settings.mode === 'snail' && !NET.race) { player.rocket = 1030 / 3.6; player.vmax = 1030 / 3.6; player.gripMul = 3; player.nitro = 1; player.nitroMul = 0; flash('🚀 Суперкар: жми ГАЗ и НИТРО — до 1 000 км/ч', 2.5); }
   if (player.policeBar) { player.policeBar.visible = settings.mode === 'hunt'; } else if (settings.mode === 'hunt') addPoliceBar(player);
   document.body.classList.toggle('scoremode', SCORE_MODES.includes(settings.mode)); document.body.classList.toggle('cruise', ['cruise', 'jet', 'snail'].includes(settings.mode)); document.body.classList.toggle('solo', SOLO.includes(settings.mode) || settings.mode === 'hunt' || settings.mode === 'heli');
   if (TRK.sprint && settings.mode === 'elim') settings.mode = 'race';
@@ -3193,13 +3201,13 @@ function drawHUD(dt) {
   if (heavy) {
   dial.clearRect(0, 0, W, W);
   dial.beginPath(); dial.arc(cx, cy, R + 14, 0, Math.PI * 2); dial.fillStyle = 'rgba(0,0,0,.5)'; dial.fill();
-  const a0 = Math.PI * .75, a1 = Math.PI * 2.25, MAXK = 360;
+  const a0 = Math.PI * .75, a1 = Math.PI * 2.25, MAXK = settings.mode === 'snail' ? 1080 : JET.on ? 3240 : 360;
   dial.lineWidth = 14; dial.lineCap = 'round';
   dial.beginPath(); dial.arc(cx, cy, R - 10, a0, a1); dial.strokeStyle = 'rgba(255,255,255,.12)'; dial.stroke();
   const frac = Math.min(1, kmh / MAXK), gr = dial.createLinearGradient(0, W, W, 0); gr.addColorStop(0, '#ffb03d'); gr.addColorStop(1, '#ff3d6e');
   dial.beginPath(); dial.arc(cx, cy, R - 10, a0, a0 + (a1 - a0) * frac); dial.strokeStyle = c.nitroOn ? '#3dd5ff' : gr; dial.stroke();
   dial.lineWidth = 3; dial.fillStyle = '#fff'; dial.font = 'bold 22px Arial'; dial.textAlign = 'center'; dial.textBaseline = 'middle';
-  for (let k = 0; k <= MAXK; k += 20) { const a = a0 + (a1 - a0) * k / MAXK, big = k % 60 === 0; dial.strokeStyle = k >= 300 ? '#ff3d3d' : 'rgba(255,255,255,.7)'; dial.beginPath(); dial.moveTo(cx + Math.cos(a) * (R - 30), cy + Math.sin(a) * (R - 30)); dial.lineTo(cx + Math.cos(a) * (R - (big ? 48 : 38)), cy + Math.sin(a) * (R - (big ? 48 : 38))); dial.stroke(); if (big) dial.fillText(k, cx + Math.cos(a) * (R - 72), cy + Math.sin(a) * (R - 72)); }
+  const STP = MAXK / 18, BIG = STP * 3; for (let k = 0; k <= MAXK; k += STP) { const a = a0 + (a1 - a0) * k / MAXK, big = k % BIG === 0; dial.strokeStyle = k >= MAXK * .83 ? '#ff3d3d' : 'rgba(255,255,255,.7)'; dial.beginPath(); dial.moveTo(cx + Math.cos(a) * (R - 30), cy + Math.sin(a) * (R - 30)); dial.lineTo(cx + Math.cos(a) * (R - (big ? 48 : 38)), cy + Math.sin(a) * (R - (big ? 48 : 38))); dial.stroke(); if (big) dial.fillText(k, cx + Math.cos(a) * (R - 72), cy + Math.sin(a) * (R - 72)); }
   const na = a0 + (a1 - a0) * frac; dial.lineWidth = 6; dial.strokeStyle = '#ff3d6e'; dial.beginPath(); dial.moveTo(cx + Math.cos(na) * 60, cy + Math.sin(na) * 60); dial.lineTo(cx + Math.cos(na) * (R - 26), cy + Math.sin(na) * (R - 26)); dial.stroke();
   }
   $('spd').textContent = Math.round(kmh); $('gear').textContent = calcGear(c);
@@ -3208,7 +3216,7 @@ function drawHUD(dt) {
   $('nitro').classList.toggle('on', c.nitroOn); $('tN').classList.toggle('burn', c.nitroOn);
   const ranked = rankList(), myPos = ranked.indexOf(c) + 1;
   if (heavy) $('pos').innerHTML = myPos + '<small>/' + cars.length + '</small>';
-  if (heavy) $('lap').innerHTML = settings.mode === 'snail' ? (ODO.m).toFixed(1) + '<small>м</small>' : TRK.flats ? (ODO.m / 1000).toFixed(1) + '<small>км</small>' : settings.mode === 'cruise' ? (Math.max(0, c.dist) * DS / 1000).toFixed(1) + '<small>км</small>' : ['derby', 'hunt', 'heli'].includes(settings.mode) ? fmtT(GS.timer) : TRK.sprint ? Math.max(0, (SPR_FIN - SPR_START - c.dist) * DS / 1000).toFixed(1) + '<small>км</small>' : settings.mode === 'elim' ? (countdown > 0 ? '—' : Math.max(0, Math.ceil(elimT)) + '<small>с</small>') : clamp(Math.floor(c.dist / N) + 1, 1, LAPS) + '<small>/' + LAPS + '</small>';
+  if (heavy) $('lap').innerHTML = TRK.flats ? (ODO.m / 1000).toFixed(1) + '<small>км</small>' : settings.mode === 'cruise' ? (Math.max(0, c.dist) * DS / 1000).toFixed(1) + '<small>км</small>' : ['derby', 'hunt', 'heli'].includes(settings.mode) ? fmtT(GS.timer) : TRK.sprint ? Math.max(0, (SPR_FIN - SPR_START - c.dist) * DS / 1000).toFixed(1) + '<small>км</small>' : settings.mode === 'elim' ? (countdown > 0 ? '—' : Math.max(0, Math.ceil(elimT)) + '<small>с</small>') : clamp(Math.floor(c.dist / N) + 1, 1, LAPS) + '<small>/' + LAPS + '</small>';
   $('time').textContent = fmt(raceTime);
   hudT += dt;
   if (hudT > .25) { hudT = 0; $('board').innerHTML = ranked.map((r, k) => `<div class="${r === c ? 'me' : ''}">${k + 1}. ${r.name}</div>`).join(''); $('lastlap').textContent = 'Круг: ' + fmt(c.lapTimes.length ? c.lapTimes[c.lapTimes.length - 1] : null); $('best').textContent = 'Рекорд: ' + fmt(best); }
