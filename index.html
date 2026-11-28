@@ -472,6 +472,23 @@ body.foot #footStamW{display:block}body.foot #speedo,body.foot #nitroWrap,body.f
 #fCrouch.on{background:rgba(250,204,21,.5)}
 body.foot #joy{display:block}body.foot .fb{display:flex}
 body.foot #wheel,body.foot #tG,body.foot #tB,body.foot #tD,body.foot #tN,body.foot #tL,body.foot #tR,body.foot #wDeg{display:none!important}
+
+/* open city HUD: GTA-style radar top-left, everything else moves out of its way */
+body.citymode #map{left:calc(env(safe-area-inset-left) + 12px)!important;top:calc(env(safe-area-inset-top) + 10px)!important;right:auto!important;bottom:auto!important;width:176px!important;height:176px!important;border-radius:50%;border:3px solid rgba(10,14,22,.85);box-shadow:0 2px 12px rgba(0,0,0,.5);background:#1c2430}
+body.touch.citymode #map{width:min(32vh,124px)!important;height:min(32vh,124px)!important}
+body.citymode #tl{display:none}
+body.citymode #clock{left:calc(env(safe-area-inset-left) + 200px);top:calc(env(safe-area-inset-top) + 12px)}
+body.citymode #fuelW{left:calc(env(safe-area-inset-left) + 200px);top:calc(env(safe-area-inset-top) + 40px)}
+body.citymode #phoneBtn{left:calc(env(safe-area-inset-left) + 200px);top:calc(env(safe-area-inset-top) + 62px)}
+body.citymode #radioBtn{left:calc(env(safe-area-inset-left) + 246px);top:calc(env(safe-area-inset-top) + 62px)}
+body.touch.citymode #clock,body.touch.citymode #fuelW,body.touch.citymode #phoneBtn{left:calc(env(safe-area-inset-left) + min(32vh,124px) + 22px)}
+body.touch.citymode #radioBtn{left:calc(env(safe-area-inset-left) + min(32vh,124px) + 66px)}
+/* quieter pop-up texts */
+#sub{font-size:16px!important;font-style:normal;letter-spacing:.5px;font-weight:800;opacity:.78;color:#fff7d6;text-shadow:0 2px 6px rgba(0,0,0,.9)}
+body.touch #sub{font-size:13px!important;top:20%}
+#sub:empty{display:none}
+#feed{opacity:.72}#feed>*{font-size:12px!important;padding:3px 9px!important}
+#district{font-size:18px!important;opacity:0}
 </style>
 <link rel="preconnect" href="https://cdn.jsdelivr.net"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Russo+One&display=swap" rel="stylesheet">
@@ -3796,7 +3813,8 @@ function drawHUD(dt) {
   $('time').textContent = fmt(raceTime);
   hudT += dt;
   if (hudT > .25) { hudT = 0; $('board').innerHTML = ranked.map((r, k) => `<div class="${r === c ? 'me' : ''}">${k + 1}. ${r.name}</div>`).join(''); $('lastlap').textContent = 'Круг: ' + fmt(c.lapTimes.length ? c.lapTimes[c.lapTimes.length - 1] : null); $('best').textContent = 'Рекорд: ' + fmt(best); }
-  if (heavy) { mapC.clearRect(0, 0, 380, 380); mapC.save(); mapC.beginPath(); mapC.arc(190, 190, 186, 0, Math.PI * 2); mapC.clip();
+  if (heavy && OPEN && CITY && CITY.on && settings.mode === 'free') { cityRadar(mapC, c); }
+  else if (heavy) { mapC.clearRect(0, 0, 380, 380); mapC.save(); mapC.beginPath(); mapC.arc(190, 190, 186, 0, Math.PI * 2); mapC.clip();
   if (camMode === 2) { mapC.fillStyle = '#0b1220'; mapC.fillRect(0, 0, 380, 380); }
   mapC.lineWidth = 16; mapC.strokeStyle = 'rgba(255,255,255,.25)'; mapC.lineJoin = 'round'; mapC.stroke(mapPath);
   mapC.lineWidth = 6; mapC.strokeStyle = 'rgba(255,255,255,.85)'; mapC.stroke(mapPath);
@@ -4465,7 +4483,7 @@ function frame(now) {
     const live = cars.filter(c => !c.elim);
     for (const c of live) if (!c.isPlayer && !c.remote) aiControl(c, dt, live, player, racing);
     if (npcs.length) streetTick(dt, racing, live);
-    cityTick(dt, racing); misTick(dt); dayTick(dt); lifeTick(dt); econTick(dt); radioTick(dt); rndEvTick(dt);
+    cityTick(dt, racing); misTick(dt); routeRibbon(dt); dayTick(dt); lifeTick(dt); econTick(dt); radioTick(dt); rndEvTick(dt);
     if (HELI.on) heliTick(dt, racing);
     if (JET.on) jetTick(dt, racing);
     if (TRK.flats) { flatsTick(); flatCarsTick(dt); }
@@ -7004,6 +7022,67 @@ function netBusted(by, st) {
 }
 window.__sr.remoteInfo = () => [...NET.remote.values()].map(r => [r.car.cfg.model, r.car.stars || 0, !!(r.car.starTag && r.car.starTag.visible)]);
 window.__sr.bounty = () => { const r = [...NET.remote.values()][0]; if (r) netBounty(r.car); return SAVE.coins; };
+
+/* ---- GTA-style radar and street route ---- */
+function cityRoute(px, pz, tx, tz) {
+  const G = CITY.G, sx = snapLine(px, G.x0), sz = snapLine(pz, G.z0), txL = snapLine(tx, G.x0), tzL = snapLine(tz, G.z0);
+  if (Math.hypot(tx - px, tz - pz) < 40) return [[px, pz], [tx, tz]];
+  return Math.abs(px - sx) < Math.abs(pz - sz) ? [[px, pz], [sx, tzL], [txL, tzL], [txL, tz], [tx, tz]] : [[px, pz], [txL, sz], [txL, tzL], [tx, tzL], [tx, tz]];
+}
+var RADAR = { R: 230, route: null, routeT: 0, rib: null };
+function routeTarget() { if (!CITY || !CITY.on) return null; const t = MIS.target || PHONE.way; if (t) return t; if (FOOT.on && CITY.ownCar) return { x: CITY.ownCar.pos.x, z: CITY.ownCar.pos.z }; return null; }
+function cityRadar(g, c) {
+  const me = FOOT.on ? { x: FOOT.x, z: FOOT.z } : c.pos, h = FOOT.on ? (FOOT.camYaw + orbitYaw) : Math.atan2(camera.getWorldDirection(tmpV).x, tmpV.z), R = RADAR.R, k = 186 / R, ch = Math.cos(h), sh = Math.sin(h), G = CITY.G;
+  const P = (x, z) => { const dx = x - me.x, dz = z - me.z; return [190 + (dx * ch - dz * sh) * k, 190 - (dx * sh + dz * ch) * k]; };
+  g.clearRect(0, 0, 380, 380); g.save(); g.beginPath(); g.arc(190, 190, 188, 0, Math.PI * 2); g.clip();
+  g.fillStyle = '#2b3442'; g.fillRect(0, 0, 380, 380);
+  // water beyond the city edge
+  const [cx, cy] = P(G.CX, G.CZ); g.fillStyle = '#1d4e89'; g.fillRect(0, 0, 380, 380); g.beginPath(); g.arc(cx, cy, G.R * k + 30 * k, 0, Math.PI * 2); g.fillStyle = '#3a4352'; g.fill();
+  // streets
+  g.strokeStyle = '#8b95a5'; g.lineWidth = ST_W * k * .9; g.lineCap = 'butt';
+  const n0 = Math.floor((me.x - R * 1.5 - G.x0) / G.B), n1 = Math.ceil((me.x + R * 1.5 - G.x0) / G.B), m0 = Math.floor((me.z - R * 1.5 - G.z0) / G.B), m1 = Math.ceil((me.z + R * 1.5 - G.z0) / G.B);
+  g.beginPath();
+  for (let n = n0; n <= n1; n++) { const x = G.x0 + n * G.B, a = P(x, me.z - R * 1.5), b = P(x, me.z + R * 1.5); g.moveTo(a[0], a[1]); g.lineTo(b[0], b[1]); }
+  for (let m = m0; m <= m1; m++) { const z = G.z0 + m * G.B, a = P(me.x - R * 1.5, z), b = P(me.x + R * 1.5, z); g.moveTo(a[0], a[1]); g.lineTo(b[0], b[1]); }
+  g.stroke();
+  // the ring road (race track) through the city
+  g.strokeStyle = '#c7cdd6'; g.lineWidth = 12 * k * 1.4; g.beginPath(); let pen = false;
+  for (let i = 0; i <= N; i += 6) { const j = i % N; if (Math.abs(PX[j] - me.x) > R * 1.5 || Math.abs(PZ[j] - me.z) > R * 1.5) { pen = false; continue; } const [x, y] = P(PX[j], PZ[j]); if (pen) g.lineTo(x, y); else g.moveTo(x, y); pen = true; }
+  g.stroke();
+  // route
+  const T = routeTarget(); if (T) { if (!RADAR.route || (RADAR.routeT -= .1) <= 0) { RADAR.routeT = 1; RADAR.route = cityRoute(me.x, me.z, T.x, T.z); }
+    g.strokeStyle = '#d946ef'; g.lineWidth = 7; g.lineJoin = 'round'; g.beginPath(); RADAR.route.forEach(([x, z], i) => { const [a, b] = P(i ? x : me.x, i ? z : me.z); if (i) g.lineTo(a, b); else g.moveTo(a, b); }); g.stroke(); }
+  else RADAR.route = null;
+  // blips: clamp to the rim like in GTA
+  const blip = (x, z, col, r = 7, ring) => { let [a, b] = P(x, z); const dx = a - 190, dy = b - 190, d = Math.hypot(dx, dy); if (d > 172) { a = 190 + dx / d * 172; b = 190 + dy / d * 172; } g.beginPath(); g.arc(a, b, r, 0, Math.PI * 2); g.fillStyle = col; g.fill(); g.lineWidth = 2.5; g.strokeStyle = ring || '#0b0f16'; g.stroke(); };
+  if (!MIS.on) for (const m of MIS.marks) if (m.cool <= 0 && Math.hypot(m.x - me.x, m.z - me.z) < R * 1.1) blip(m.x, m.z, '#' + new THREE.Color(MTYPES[m.type].col).getHexString(), 6);
+  for (const m of PLACES.list) if (Math.hypot(m.x - me.x, m.z - me.z) < R * 1.1) blip(m.x, m.z, m.T.id === 'police' ? '#3b82f6' : '#f97316', 6, '#fff');
+  for (const m of PROP.marks) if (Math.hypot(m.x - me.x, m.z - me.z) < R * 1.1) blip(m.x, m.z, CS.props.includes(m.P.id) ? '#22c55e' : '#94a3b8', 6, '#fff');
+  for (const cc of CITY.cops || []) blip(cc.pos.x, cc.pos.z, Math.floor(timeAcc * 6) % 2 ? '#ef4444' : '#3b82f6', 5);
+  for (const [, r] of (NET.remote || new Map())) if (r.car) blip(r.car.pos.x, r.car.pos.z, r.car.stars ? '#f87171' : '#22d3ee', 6, '#fff');
+  if (FOOT.on && CITY && player) blip(player.pos.x, player.pos.z, '#facc15', 5);
+  if (T) blip(T.x, T.z, '#facc15', 9, '#d946ef');
+  // you: an arrow pointing where you face
+  const fh = (FOOT.on ? FOOT.h : c.h) - h; g.save(); g.translate(190, 190); g.rotate(fh); g.beginPath(); g.moveTo(0, -15); g.lineTo(10, 11); g.lineTo(0, 5); g.lineTo(-10, 11); g.closePath(); g.fillStyle = '#fff'; g.fill(); g.lineWidth = 3; g.strokeStyle = '#0b0f16'; g.stroke(); g.restore();
+  // north
+  const [nx, ny] = P(me.x, me.z + R * 5); const dn = Math.hypot(nx - 190, ny - 190) || 1; const ax = 190 + (nx - 190) / dn * 168, ay = 190 + (ny - 190) / dn * 168;
+  g.beginPath(); g.arc(ax, ay, 13, 0, Math.PI * 2); g.fillStyle = '#0b0f16'; g.fill(); g.fillStyle = '#fff'; g.font = '900 17px Arial'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('N', ax, ay + 1);
+  g.restore();
+}
+// the same route painted on the road ahead
+function routeRibbon(dt) {
+  if (!CITY || !CITY.on || settings.mode !== 'free' || state !== 'race') { if (RADAR.rib) RADAR.rib.visible = false; return; }
+  const R = RADAR.route; if (!RADAR.rib) { RADAR.rib = new THREE.Mesh(new THREE.BufferGeometry(), new THREE.MeshBasicMaterial({ color: 0xd946ef, transparent: true, opacity: .7, depthWrite: false, toneMapped: false, polygonOffset: true, polygonOffsetFactor: -4 })); RADAR.rib.frustumCulled = false; RADAR.rib.renderOrder = 3; scene.add(RADAR.rib); }
+  RADAR.rib.visible = !!R && !FOOT.inside; if (!R) return;
+  if ((RADAR.ribT = (RADAR.ribT || 0) - dt) > 0) return; RADAR.ribT = .3;
+  const me = FOOT.on ? { x: FOOT.x, z: FOOT.z } : player.pos, pts = R.map((p, i) => i ? p : [me.x, me.z]), pos = [], w = .8;
+  let left = 260; // only the first ~260 m
+  for (let i = 0; i < pts.length - 1 && left > 0; i++) { let [ax, az] = pts[i], [bx, bz] = pts[i + 1]; let L = Math.hypot(bx - ax, bz - az); if (L < .1) continue; if (L > left) { bx = ax + (bx - ax) / L * left; bz = az + (bz - az) / L * left; L = left; } left -= L;
+    const ux = (bx - ax) / L, uz = (bz - az) / L, nx = -uz * w, nz = ux * w, y = .36;
+    pos.push(ax + nx, y, az + nz, bx + nx, y, bz + nz, bx - nx, y, bz - nz, ax + nx, y, az + nz, bx - nx, y, bz - nz, ax - nx, y, az - nz); }
+  RADAR.rib.geometry.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); RADAR.rib.geometry.attributes.position.needsUpdate = true;
+}
+window.__sr.radar = () => ({ vis: RADAR.rib && RADAR.rib.visible, n: RADAR.rib && RADAR.rib.geometry.attributes.position ? RADAR.rib.geometry.attributes.position.count : 0, first: RADAR.rib && RADAR.rib.geometry.attributes.position ? Array.from(RADAR.rib.geometry.attributes.position.array.slice(0, 6)).map(v => +v.toFixed(1)) : null, route: RADAR.route, me: [player.pos.x, player.pos.z].map(v => +v.toFixed(1)), inScene: !!(RADAR.rib && RADAR.rib.parent) });
 
 /* ================= LIVING CITY: pedestrians with goals, districts, storms & fog, opening hours ================= */
 var LIFE = { peds: [], meshes: null, max: 110, district: '', distT: 0, talkT: 6, fog: 0, storm: 0, boltT: 8, flashK: 0 };
