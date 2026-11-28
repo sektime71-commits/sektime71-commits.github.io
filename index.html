@@ -2007,12 +2007,15 @@ function garageDrive(id) {
 /* ===================== GAME (three.js) ===================== */
 const $ = id => document.getElementById(id);
 const NET = { race: null, remote: new Map(), players: new Map(), conns: new Map(), showCars: [] };
-const isTouch = matchMedia('(pointer:coarse)').matches || ('ontouchstart' in window && navigator.maxTouchPoints > 0);
+let isTouch = matchMedia('(pointer:coarse)').matches || matchMedia('(any-pointer:coarse)').matches || navigator.maxTouchPoints > 1 || 'ontouchstart' in window;
 const isAndroid = /Android/i.test(navigator.userAgent);
 const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent) || (/Macintosh/.test(navigator.userAgent) && navigator.maxTouchPoints > 1);
 const lowEnd = !isIOS && !!((navigator.deviceMemory && navigator.deviceMemory <= 4) || (navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4));
 const APP = $('app');
 $('helpTxt').innerHTML = 'Клавиатура: W/↑ газ · S/↓ тормоз · A D / ← → руль · ПРОБЕЛ дрифт · SHIFT / Q нитро · C камера · R на трассу · H сигнал · ESC пауза · +/− зум.<br>В меню: ENTER — играть, G — гараж, T — выбор игры.<br>🎮 Геймпад: стик — руль, RT газ, LT тормоз, A нитро, B дрифт, Y камера, X на трассу, Start пауза.';
+// a finger on the screen always switches on the touch controls (iPad in desktop mode, laptops with touch screens)
+function touchOn() { if (isTouch) return; isTouch = true; document.body.classList.add('touch'); try { if (state === 'race') $('touch').classList.remove('hidden'); } catch (_) { } try { FOOT.label = null; } catch (_) { } }
+addEventListener('touchstart', touchOn, { passive: true, capture: true }); addEventListener('pointerdown', e => { if (e.pointerType === 'touch') touchOn(); }, { passive: true, capture: true });
 if (isTouch) { document.body.classList.add('touch'); $('helpTxt').innerHTML = 'Газ — сам. Собирай синие баллоны и жми НИТРО. Трамплины: жёлтый — прыжок, синий — бочка.<br>Крути РУЛЬ · ТОРМОЗ · ДРИФТ · двумя пальцами — зум, одним — обзор<br>🎥 камера (погоня / дальняя / салон / капот) · ↺ на трассу'; }
 let ROT = false;
 function updateOrient() {
