@@ -461,6 +461,7 @@ body.foot #footStamW{display:block}body.foot #speedo,body.foot #nitroWrap,body.f
 .smIt{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 12px;border-radius:12px;background:rgba(255,255,255,.06);cursor:pointer}.smIt:active{transform:scale(.98);background:rgba(255,255,255,.12)}
 .smIt b{display:block;font-size:15px}.smIt small{opacity:.65;font-size:11px}.smIt span{font:800 14px system-ui;color:#fde68a;white-space:nowrap}
 .smFoot{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px 12px 12px}.smFoot small{opacity:.7;font-size:11px}.smFoot .btn{margin:0;width:auto;padding:8px 14px}
+#keysBox{display:grid;grid-template-columns:1fr auto auto;gap:6px 8px;align-items:center;margin-top:6px;font-size:14px}#keysBox .kb{min-width:74px;padding:6px 8px;border-radius:9px;background:#1e293b;border:1px solid #334155;color:#e2e8f0;font:600 13px system-ui;cursor:pointer;text-align:center}#keysBox .kb.wait{background:#f59e0b;color:#111;border-color:#f59e0b}#keysBox .kr{grid-column:1/-1}
 </style>
 <link rel="preconnect" href="https://cdn.jsdelivr.net"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Russo+One&display=swap" rel="stylesheet">
@@ -545,6 +546,7 @@ body.foot #footStamW{display:block}body.foot #speedo,body.foot #nitroWrap,body.f
   <div class="row"><label>Автопилот (машина рулит сама, ты — нитро и тормоз)</label><div class="opts" id="autoP"><div class="opt on" data-v="0">Выкл</div><div class="opt" data-v="1">🤖 Вкл</div></div></div>
   <div class="row"><label>Управление</label><div class="opts" id="ctl"><div class="opt on" data-v="wheel">🎡 Руль</div><div class="opt" data-v="arrows">◀ ▶ Кнопки</div><div class="opt" data-v="tilt">📱 Наклон</div></div></div>
   <div class="row"><label>Чувствительность руля: <b id="sensV">5</b> <small style="opacity:.6">(1 — плавно, 10 — резко)</small></label><input type="range" id="sensR" min="1" max="10" step="1" value="5" style="width:100%;accent-color:#f59e0b"></div>
+  <div class="row" id="keysRow"><label>Клавиши (клавиатура) <button class="btn sec" id="keysTog" style="padding:4px 10px;font-size:13px;margin-left:6px">⌨️ Настроить</button></label><div id="keysBox" class="hidden"></div></div>
   <div class="row"><label>Графика</label><div class="opts" id="qual"><div class="opt on" data-v="auto">🎯 Авто</div><div class="opt" data-v="low">⚡ Оптимизированное</div><div class="opt" data-v="mid">Баланс</div><div class="opt" data-v="high">Ультра</div></div></div>
   <div style="display:flex;gap:8px"><button class="btn sec fullBtn" id="full" style="flex:1">⛶ Во весь экран</button><button class="btn sec" id="bbHelp" style="flex:1">❓ Как играть</button></div>
   <div class="help" id="helpTxt"></div>
@@ -2959,6 +2961,41 @@ function addSkid(a, b) {
 /* ================= INPUT ================= */
 const keys = {};
 const KM = { ArrowDown: 'down', KeyS: 'down', ArrowLeft: 'left', KeyA: 'left', ArrowRight: 'right', KeyD: 'right', Space: 'hand', ShiftLeft: 'nitro', ShiftRight: 'nitro', KeyQ: 'nitro', KeyN: 'nitro', KeyE: 'climb', KeyX: 'dive', ArrowUp: 'up', KeyW: 'up' };
+/* key remapping: physical key -> default (canonical) code, applied before all game handlers */
+const KEY_ACTS = [['up', 'Газ', ['KeyW', 'ArrowUp']], ['down', 'Тормоз / назад', ['KeyS', 'ArrowDown']], ['left', 'Влево', ['KeyA', 'ArrowLeft']], ['right', 'Вправо', ['KeyD', 'ArrowRight']], ['hand', 'Ручник / прыжок', ['Space', '']], ['nitro', 'Нитро / бег', ['ShiftLeft', 'KeyQ']], ['act', 'Действие (выйти, сесть, войти)', ['KeyF', '']], ['horn', 'Сигнал', ['KeyH', '']], ['cam', 'Камера / присесть', ['KeyC', '']], ['reset', 'Сброс на дорогу', ['KeyR', '']], ['phone', 'Телефон', ['KeyT', '']], ['radio', 'Радио', ['KeyY', '']], ['pause', 'Пауза', ['KeyP', '']], ['mute', 'Звук вкл/выкл', ['KeyM', '']]];
+const KEY_DEF = { up: ['KeyW', 'ArrowUp'], down: ['KeyS', 'ArrowDown'], left: ['KeyA', 'ArrowLeft'], right: ['KeyD', 'ArrowRight'], hand: ['Space'], nitro: ['ShiftLeft', 'ShiftRight', 'KeyQ', 'KeyN'], act: ['KeyF'], horn: ['KeyH'], cam: ['KeyC'], reset: ['KeyR'], phone: ['KeyT'], radio: ['KeyY'], pause: ['KeyP'], mute: ['KeyM'] };
+let KEYB = {}; try { KEYB = JSON.parse(localStorage.getItem('sr3d_keys') || '{}') || {}; } catch (_) { KEYB = {}; }
+let KEY_MAP = null, KEY_WAIT = null;
+function keyBuild() { // returns null when nothing is customised
+  const custom = Object.keys(KEYB).filter(a => KEY_DEF[a]); if (!custom.length) { KEY_MAP = null; return; }
+  const m = {}; for (const a in KEY_DEF) { const codes = KEYB[a] ? KEYB[a].filter(Boolean) : KEY_DEF[a]; for (const c of codes) if (!(c in m)) m[c] = KEY_DEF[a][0]; }
+  for (const a in KEY_DEF) for (const c of KEY_DEF[a]) if (!(c in m)) m[c] = ''; // a default key that was moved elsewhere does nothing now
+  KEY_MAP = m;
+}
+const keyName = c => !c ? '—' : ({ ShiftLeft: 'Shift', ShiftRight: 'R-Shift', ControlLeft: 'Ctrl', ControlRight: 'R-Ctrl', AltLeft: 'Alt', AltRight: 'R-Alt', MetaLeft: '⌘', MetaRight: 'R-⌘', Space: 'Пробел', Enter: 'Enter', Tab: 'Tab' })[c] || c.replace(/^Key/, '').replace(/^Digit/, '').replace('Arrow', '').replace('Up', '↑').replace('Down', '↓').replace('Left', '←').replace('Right', '→').replace('ShiftLeft', 'Shift').replace('ShiftRight', 'R-Shift').replace('Space', 'Пробел').replace('ControlLeft', 'Ctrl').replace('AltLeft', 'Alt').replace('Numpad', 'Num');
+function keyGet(a) { const d = KEY_ACTS.find(x => x[0] === a)[2]; return KEYB[a] ? [KEYB[a][0] || '', KEYB[a][1] || ''] : d.slice(); }
+function keySave() { try { localStorage.setItem('sr3d_keys', JSON.stringify(KEYB)); } catch (_) { } keyBuild(); }
+function keysRender() {
+  const box = $('keysBox'); if (!box) return;
+  box.innerHTML = KEY_ACTS.map(([a, label]) => { const k = keyGet(a); return `<span>${label}</span>` + [0, 1].map(j => `<button class="kb${KEY_WAIT && KEY_WAIT[0] === a && KEY_WAIT[1] === j ? ' wait' : ''}" data-a="${a}" data-j="${j}">${KEY_WAIT && KEY_WAIT[0] === a && KEY_WAIT[1] === j ? 'нажми…' : keyName(k[j])}</button>`).join(''); }).join('') + '<div class="kr" style="display:flex;gap:8px;margin-top:4px"><button class="btn sec" id="keysReset" style="flex:1;padding:6px">↺ По умолчанию</button></div><small class="kr" style="opacity:.6">Нажми на клавишу в таблице, потом новую. Esc — отмена, Backspace — убрать.</small>';
+  box.querySelectorAll('.kb').forEach(b => b.onclick = () => { KEY_WAIT = [b.dataset.a, +b.dataset.j]; keysRender(); });
+  $('keysReset').onclick = () => { KEYB = {}; KEY_WAIT = null; keySave(); keysRender(); flash('Клавиши по умолчанию', 1); };
+}
+function keyAssign(code) {
+  const [a, j] = KEY_WAIT; KEY_WAIT = null;
+  if (code !== 'Escape') {
+    const nv = code === 'Backspace' ? '' : code;
+    if (nv) for (const x of KEY_ACTS) { const k = keyGet(x[0]); let ch = false; for (let q = 0; q < 2; q++) if (k[q] === nv && !(x[0] === a && q === j)) { k[q] = ''; ch = true; } if (ch) KEYB[x[0]] = k; } // one key = one action
+    const k = keyGet(a); k[j] = nv; if (!k[0] && !k[1]) k[j] = KEY_DEF[a][0]; KEYB[a] = k; keySave();
+  }
+  keysRender();
+}
+addEventListener('keydown', e => {
+  if (KEY_WAIT) { e.preventDefault(); e.stopImmediatePropagation(); keyAssign(e.code); return; }
+  if (KEY_MAP && state === 'race' && !(e.target && /INPUT|TEXTAREA/.test(e.target.tagName)) && e.code in KEY_MAP) Object.defineProperty(e, 'code', { value: KEY_MAP[e.code] });
+}, true);
+addEventListener('keyup', e => { if (KEY_MAP && e.code in KEY_MAP) Object.defineProperty(e, 'code', { value: KEY_MAP[e.code] }); }, true);
+keyBuild();
 const CAM_NAMES = ['ПОГОНЯ', 'ДАЛЬНЯЯ', 'САЛОН', 'КАПОТ'];
 let camMode = 0;
 function nextCam() { if (HELI.on || JET.on) { AIR.view = (AIR.view + 1) % 2; flash('КАМЕРА: ' + (AIR.view ? 'КАБИНА' : 'СНАРУЖИ'), 1.2); orbitYaw = 0; orbitPitch = 0; return; } camMode = (camMode + 1) % 4; flash('КАМЕРА: ' + CAM_NAMES[camMode], 1.2); }
@@ -4257,6 +4294,7 @@ function bindPref(id, key, store) {
 }
 settings.autoGas = 0; settings.diff = 1;
 settings.sens = 1; settings.sensV = 5; try { settings.sensV = +(localStorage.getItem('sr3d_sens') || 5); settings.ctl = localStorage.getItem('sr3d_ctl') || 'wheel'; } catch (_) { }
+$('keysTog').onclick = () => { const b = $('keysBox'); b.classList.toggle('hidden'); KEY_WAIT = null; keysRender(); };
 { const r = $('sensR'); r.value = settings.sensV; $('sensV').textContent = settings.sensV; r.oninput = () => { settings.sensV = +r.value; $('sensV').textContent = r.value; try { localStorage.setItem('sr3d_sens', r.value); } catch (_) { } }; applyCtl(); }
 bindPref('gasP', 'autoGas', 'sr3d_autogas'); bindPref('diffP', 'diff', 'sr3d_diff');
 document.querySelectorAll('#autoP .opt').forEach(o => { o.classList.toggle('on', (o.dataset.v === '1') === !!settings.auto); o.onclick = () => { settings.auto = o.dataset.v === '1'; document.querySelectorAll('#autoP .opt').forEach(x => x.classList.toggle('on', x === o)); try { localStorage.setItem('sr3d_auto', settings.auto ? '1' : '0'); } catch (_) { } if (state === 'race') flash(settings.auto ? '🤖 АВТОПИЛОТ ВКЛ' : 'АВТОПИЛОТ ВЫКЛ', 1.2); }; });
@@ -5600,6 +5638,7 @@ function chunkCull() { if (!CHUNKS.length || !scene.fog) return; const cx = came
 window.__gameReady = true;
 setTimeout(thumbsIdle, 2500);
 window.__sr = { start: () => startRace(), get st() { return { state, countdown, raceTime, i: player.q.i, lat: player.q.lat, v: player.vF, y: player.pos.y, vy: player.vy, cars: cars.map(c => [c.q.i, +c.vF.toFixed(1), +c.pos.y.toFixed(2)]) }; }, cam: m => { camMode = m; }, bot: v => { settings.auto = v; }, tp: (i, lat = 0) => { player.place(i, lat); snapCamera(); }, set: (k, v) => { settings[k] = v; }, N, view: (i, back, up, side = 0) => { const j = (i - Math.round(back / DS) + N) % N; window.__fc = [PX[j] + NX[j] * side, up, PZ[j] + NZ[j] * side, PX[i], 0, PZ[i]]; }, free: () => { window.__fc = null; }, gar: (m, tab) => { if (state !== 'garage') openGarage(); gModel = m; if (tab) gTab = tab; buildGarageCar(); renderGarage(); }, pv: () => { const i = RAVINES.length ? RAVINES[0].i0 + 12 : CUTS.length ? CUTS[0].i : BOOSTS.length ? BOOSTS[0].i + 20 : 150; const j = (i - Math.round(75 / DS) + N) % N; window.__fc = [PX[j] + NX[j] * 34, 30, PZ[j] + NZ[j] * 34, PX[i], 0, PZ[i]]; document.body.classList.add('replay'); }, heat: v => { ST.heat = v; }, key: (k, v) => { keys[k] = v; }, go: () => { countdown = 0; }, space: () => ({ ramp: SPACE.ramp && SPACE.ramp.visible, on: SPACE.on, t: +SPACE.t.toFixed(1), y: Math.round(player.y), v: Math.round(player.vF * 3.6), x: Math.round(player.pos.x), rx: SPACE.ramp ? Math.round(SPACE.ramp.position.x) : 0 }), jump: t => { if (!SPACE.ramp) buildSpaceFx(); SPACE.on = true; SPACE.t = t; SPACE.x0 = player.pos.x; SPACE.z = player.pos.z; player.cine = true; spaceTick(0); }, boost: v => { player.vel.x = v; player.vel.z = 0; player.vF = v; player.h = Math.PI / 2; }, jet: () => ({ jp: [JET.g.position.x, JET.g.position.y, JET.g.position.z].map(v => +v.toFixed(1)), cam: camera.position.toArray().map(v => +v.toFixed(1)), vis: JET.g.visible, inScene: !!JET.g.parent, v: Math.round(JET.v * 3.6), view: AIR.view, scr: JET.g.position.clone().project(camera).toArray().map(v => +v.toFixed(2)) }), heli: () => ({ on: HELI.on, x: +HELI.x.toFixed(1), v: +HELI.v.toFixed(1), hits: GS.hits, rockets: HELI.rockets.length, tgt: !!HELI.target, pv: player.root.visible }), rp: () => startReplay(() => { }), coins: () => SAVE.coins, netFin: t => { player.finish = t ?? raceTime; netFinish(); }, net: () => ({ track: TRACK_ID, ready: [...NET.players.values()].map(p => !!p.ready), role: NET.role, code: NET.code, link: NET.code && roomLink(NET.code), t: raceTime, v: player && Math.round(player.vF*3.6), players: [...NET.players.values()].map(p => p.name), race: !!NET.race, remote: [...NET.remote.values()].map(r => [r.car.name, Math.round(r.car.pos.x), Math.round(r.car.pos.z), r.buf.length]), me: player && [Math.round(player.pos.x), Math.round(player.pos.z)], status: ($('onStatus') || {}).textContent, results: NET.results && { winner: NET.results.winner && NET.results.winner.name, me: NET.results.winner === player, n: NET.results.fin.length }, fin: !$('finish').classList.contains('hidden') }), heavy: () => { const L = []; scene.traverse(o => { if ((o.isMesh || o.isInstancedMesh) && o.visible && o.geometry) { const g = o.geometry, t = (g.index ? g.index.count : g.attributes.position.count) / 3 * (o.isInstancedMesh ? o.count : 1); L.push([Math.round(t), o.isInstancedMesh ? 'inst' + o.count : 'mesh', g.type, (o.material && o.material.type) || '', o.parent && o.parent.type]); } }); L.sort((a, b) => b[0] - a[0]); return L.slice(0, 14); }, perf: () => { const i = renderer.info; let lights = 0, meshes = 0, vis = 0; scene.traverse(o => { if (o.isLight) lights++; if (o.isMesh || o.isInstancedMesh || o.isPoints || o.isSprite) { meshes++; if (o.visible) vis++; } }); return { calls: i.render.calls, tris: i.render.triangles, progs: i.programs.length, geos: i.memory.geometries, tex: i.memory.textures, lights, meshes, vis, q: curQ, pr: renderer.getPixelRatio(), fps: lastFps }; }, rpT: () => [RP.active, RP.t.toFixed(1), RP.t0.toFixed(1), RP.t1.toFixed(1), RP.buf.length], off: (k, lat) => { const e = EXITS[k]; const i = (e.i0 + 8) % N; player.place(i, e.side * lat); player.qOn = i; snapCamera(); }, info: () => ({ RAVINES, CUTS, BOOSTS: BOOSTS.length, RAMPS: RAMPS.length, TUN: [TUN0, TUN1], DS }) };
+window.__sr.keys = () => ({ ...keys }); window.__sr.keyMap = () => KEY_MAP;
 requestAnimationFrame(frame);
 
 /* ================= ON FOOT: get out of the car, walk around, go into shops & restaurants ================= */
