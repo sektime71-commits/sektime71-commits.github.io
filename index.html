@@ -2962,6 +2962,7 @@ addEventListener('keydown', e => {
   if (e.code === 'KeyH' && audio && !e.repeat) horn(true);
   if (e.code === 'KeyF' && !e.repeat) footAction();
   if (e.code === 'KeyC' && !FOOT.on) nextCam();
+  if (e.code === 'KeyC' && FOOT.on && !e.repeat) { FOOT.crouch = !FOOT.crouch; flash(FOOT.crouch ? '🧎 Присел' : '🧍 Встал', .8); }
   if (e.code === 'KeyR') resetPlayer();
   if (e.code === 'KeyP' || e.code === 'Escape') togglePause();
   if (e.code === 'KeyM' && audio) audio.master.gain.value = audio.master.gain.value > 0 ? 0 : .5;
@@ -4062,7 +4063,7 @@ function frame(now) {
     const live = cars.filter(c => !c.elim);
     for (const c of live) if (!c.isPlayer && !c.remote) aiControl(c, dt, live, player, racing);
     if (npcs.length) streetTick(dt, racing, live);
-    cityTick(dt, racing); misTick(dt); dayTick(dt); lifeTick(dt); econTick(dt); radioTick(dt);
+    cityTick(dt, racing); misTick(dt); dayTick(dt); lifeTick(dt); econTick(dt); radioTick(dt); rndEvTick(dt);
     if (HELI.on) heliTick(dt, racing);
     if (JET.on) jetTick(dt, racing);
     if (TRK.flats) { flatsTick(); flatCarsTick(dt); }
@@ -5740,6 +5741,7 @@ function buildInterior(T) {
     c.font = '700 46px Arial'; T.items.forEach((it, k) => { c.textAlign = 'left'; c.fillStyle = '#f5f5f5'; c.fillText(it[0], 70, 180 + k * 72); c.textAlign = 'right'; c.fillStyle = T.acc; c.fillText(it[1] + ' 💰', w - 70, 180 + k * 72); });
   });
   const mb = new THREE.Mesh(new THREE.PlaneGeometry(5.2, 2.1), new THREE.MeshBasicMaterial({ map: board, toneMapped: false })); mb.position.set(0, 2.75, -D / 2 + .02); S.add(mb);
+  if (T.kind === 'home') return homeInterior(S, T, std, box);
   const cash = makeHuman({ skin: 0xd9a37e, shirt: new THREE.Color(T.col).getHex(), pants: 0x1f2937, hair: 0x2b1b12, apron: 0xf5f5f4, cap: new THREE.Color(T.col).getHex() });
   cash.g.position.set(0, 0, -3.75); S.add(cash.g); INT.cashier = cash;
   // furniture by kind
@@ -5867,7 +5869,8 @@ function footTick(dt) {
     else {
       FOOT.h -= steerIn * (2.6 - Math.min(1, Math.abs(FOOT.v) / 6) * .9) * dt;
       const run = keys.nitro && FOOT.stam > .03 && fwd > 0;
-      const tv = fwd > 0 ? (run ? 6.4 : 2.1) : fwd < 0 ? -1.4 : 0;
+      if (run) FOOT.crouch = false;
+      const tv = (fwd > 0 ? (run ? 6.4 : 2.1) : fwd < 0 ? -1.4 : 0) * (FOOT.crouch ? .45 : 1);
       FOOT.v += (tv - FOOT.v) * (1 - Math.exp(-dt * (grounded ? 9 : 1.5)));
       FOOT.stam = clamp(FOOT.stam + (run ? -dt / 9 : dt / 6), 0, 1);
       if (keys.hand && grounded && !FOOT.jumpLock) { FOOT.vy = 4.8; FOOT.jumpLock = true; if (audio) beep(260, .04, .06); }
@@ -5887,11 +5890,12 @@ function footTick(dt) {
     FOOT.ph += dt * (Math.abs(FOOT.v) * 3.3 + .001);
     const amp = clamp(Math.abs(FOOT.v) / 6.4 * 1.15, 0, 1) * (FOOT.v < 0 ? .6 : 1);
     animHuman(H, FOOT.ph, Math.max(amp, Math.abs(FOOT.v) > .2 ? .45 : 0), FOOT.t, FOOT.y > FOOT.gy + .25);
+    if (FOOT.crouch) { H.hips.position.y -= .3; for (const l of H.legs) { l.hip.rotation.x -= .9; l.knee.rotation.x += 1.5; } H.torso.rotation.x += .35; }
     H.g.position.set(FOOT.x, FOOT.y, FOOT.z); H.g.rotation.set(FOOT.down > 0 ? -Math.min(1.45, (2.2 - FOOT.down) * 5) * (FOOT.down > .5 ? 1 : FOOT.down / .5) : 0, FOOT.h, 0);
     if (FOOT.inside) {
       if (INT.cashier) { animHuman(INT.cashier, 0, 0, FOOT.t + 1.3, false); INT.cashier.g.rotation.y = Math.atan2(FOOT.x, FOOT.z + 3.75) * .5; INT.cashier.arms[1].sh.rotation.x = Math.hypot(FOOT.x, FOOT.z + 2) < 2.6 ? -.9 + Math.sin(FOOT.t * 6) * .25 : 0; }
       if (Math.hypot(FOOT.x, FOOT.z - (INT.D / 2 - .6)) < 1.4) { label = '🚪 ВЫЙТИ НА УЛИЦУ'; act = shopLeave; }
-      else if (Math.abs(FOOT.x) < 3.4 && FOOT.z < -1.4) { label = FOOT.menu ? '✕ ЗАКРЫТЬ МЕНЮ' : '🧾 МЕНЮ'; act = () => shopMenu(!FOOT.menu); }
+      else if (Math.abs(FOOT.x) < 3.4 && FOOT.z < -1.4) { const home = FOOT.shop && FOOT.shop.type.kind === 'home'; label = FOOT.menu ? '✕ ЗАКРЫТЬ' : home ? '🛏 ОТДЫХ · ГАРДЕРОБ' : '🧾 МЕНЮ'; act = home ? () => FOOT.menu ? shopMenu(false) : homeMenu(FOOT.shop.P) : () => shopMenu(!FOOT.menu); }
     } else {
       if (Math.hypot(FOOT.x - player.pos.x, FOOT.z - player.pos.z) < 3.6) { label = '🚗 СЕСТЬ В МАШИНУ'; act = footEnter; }
       let best = null, bd = 2.6; for (const s of SHOPS) { const d = Math.hypot(FOOT.x - s.dx, FOOT.z - s.dz); if (d < bd) { bd = d; best = s; } }
@@ -6178,7 +6182,7 @@ function citySetup() {
   if (!CITY.on || settings.mode !== 'free') return;
   const nT = curQ === 'low' ? 14 : curQ === 'mid' ? 20 : 26;
   for (let k = 0; k < nT; k++) { const c = gridCar(k < 2 ? 'cop' : 'traffic'); if (k < 2) { c.cop = true; c.patrol = true; c.lightR.visible = c.lightB.visible = false; c.police = false; } if (!gridSpawn(c, player.pos, 60, 330)) gridSpawn(c, player.pos, 60, 500); CITY.traffic.push(c); }
-  lifeSetup(); placeMarks(); fuelStations(); econSetup(); storySetup(); radioSetup(); DAY.t = settings.tod === 'day' ? 12 : settings.tod === 'sunset' ? 19.6 : 21.5; DAY.wxT = 180;
+  lifeSetup(); placeMarks(); fuelStations(); econSetup(); storySetup(); radioSetup(); rndEvSetup(); DAY.t = settings.tod === 'day' ? 12 : settings.tod === 'sunset' ? 19.6 : 21.5; DAY.wxT = 180;
 }
 const _m4 = new THREE.Matrix4();
 function cityTick(dt, racing) {
@@ -6359,6 +6363,7 @@ function cityAction() {
   if (!CITY || !CITY.on || settings.mode !== 'free' || state !== 'race') return null;
   const p = player;
   const sa = storyAction(); if (sa) return sa;
+  const ra = rndEvAction(); if (ra) return ra;
   const ea = econAction(); if (ea) return ea;
   if (FOOT.on && !FOOT.inside) {
     if (CITY.ownCar && Math.hypot(FOOT.x - CITY.ownCar.pos.x, FOOT.z - CITY.ownCar.pos.z) < 3.6) return ['🚗 СЕСТЬ В СВОЮ МАШИНУ', takeOwnCar];
@@ -6390,7 +6395,7 @@ function misTick(dt) {
   const fw = $('fuelBar'); if (fw) fw.style.width = (dmgState(p).fuel * 100).toFixed(0) + '%';
   if (tgt) { gps.classList.remove('hidden'); const camYaw = Math.atan2(camera.getWorldDirection(tmpV).x, tmpV.z), a = Math.atan2(tgt.x - me.x, tgt.z - me.z) - camYaw; gps.firstElementChild.style.transform = `rotate(${(-a * 180 / Math.PI - 90).toFixed(0)}deg)`; const d = Math.hypot(tgt.x - me.x, tgt.z - me.z); gps.lastElementChild.textContent = d > 1000 ? (d / 1000).toFixed(1) + ' км' : Math.round(d) + ' м'; }
   else gps.classList.add('hidden');
-  if (!MIS.on) { misHUD(null); return; }
+  if (!MIS.on) { if (!RNDEV.cur) misHUD(null); return; }
   const T = MTYPES[MIS.type], atDest = MIS.target && Math.hypot(p.pos.x - MIS.target.x, p.pos.z - MIS.target.z) < 9 && Math.abs(p.vF) < 6 && !FOOT.on;
   if (!FOOT.on && p.impact > 5 && MIS.stage === 'go') { MIS.hp -= Math.min(30, p.impact * 2.2); if (MIS.type === 'taxi') flash(['😨 «Аккуратнее!»', '😡 «Ты где права купил?!»', '😱 «Мы же разобьёмся!»'][Math.floor(Math.random() * 3)], 1.5); if (MIS.type === 'food') flash('🥡 Заказ трясётся!', 1); if (MIS.hp <= 0) return missionFail(MIS.type === 'taxi' ? 'Пассажир вышел — слишком опасно' : 'Еда испорчена'); }
   if (MIS.type === 'taxi') {
@@ -6461,6 +6466,7 @@ function todApplyBlend(hour) {
 function dayTick(dt) {
   if (!CITY || !CITY.on || settings.mode !== 'free' || state !== 'race') return;
   DAY.t = (DAY.t + dt * 24 / (24 * 60)) % 24; // one in-game hour per real minute
+  if (DAY.t0 != null) { DAY.t = DAY.t0; DAY.t0 = null; }
   if ((DAY.acc = (DAY.acc || 0) + dt) > .5) { DAY.acc = 0; todApplyBlend(DAY.t); }
   const hh = Math.floor(DAY.t), mm = Math.floor(DAY.t % 1 * 60);
   const ck = $('clock'); if (ck && DAY.last !== mm) { DAY.last = mm; ck.textContent = (DAY.t >= 6 && DAY.t < 21 ? '☀️ ' : '🌙 ') + String(hh).padStart(2, '0') + ':' + String(mm).padStart(2, '0') + ({ rain: ' 🌧', snow: ' ❄️', storm: ' ⛈', fog: ' 🌫' }[WX.cur] || ''); }
@@ -6829,7 +6835,7 @@ function propAction() {
   for (const m of PROP.marks) if (Math.hypot(me.x - m.x, me.z - m.z) < 7 && (FOOT.on || Math.abs(player.vF) < 3)) {
     const P = m.P, own = CS.props.includes(P.id);
     if (!own) return ['🔑 КУПИТЬ: ' + P.name + ' · ' + fmtM(P.price) + ' 💰', () => { if (!pay(P.price, 'Покупка: ' + P.name)) return; CS.props.push(P.id); csSave(); m.g.userData.cyl.material.color.set(0x60a5fa); flash('🔑 ' + P.name + ' — теперь твоя!', 2.6); EV.emit('property', { P }); REP.add(5, 'Своё жильё'); }];
-    if (P.kind === 'flat') return ['🏠 ДОМОЙ: ' + P.name, () => homeMenu(P)];
+    if (P.kind === 'flat') return FOOT.on ? ['🏠 ЗАЙТИ ДОМОЙ', () => { const T = { id: 'home', name: P.name, icon: '🏠', col: '#1d4ed8', acc: '#bfdbfe', wall: P.id === 'pent_cbd' ? 0xe7e5e4 : 0x8b7355, floor: P.id === 'pent_cbd' ? ['#d6d3d1', '#e7e5e4'] : ['#8b5a2b', '#7a4e25'], kind: 'home', items: [] }; shopEnter({ type: T, P, dx: m.x, dz: m.z, nx: 1, nz: 0, h: Math.PI / 2 }); }] : ['🏠 ДОМОЙ: ' + P.name, () => homeMenu(P)];
     if (P.kind === 'garage' && !FOOT.on) return ['🅿 ГАРАЖ: оставить машину', () => garageStore()];
   }
   return null;
@@ -6965,7 +6971,7 @@ function drawCityMap(cv) {
 function econSetup() {
   if (!CITY || !CITY.on) return; atmSetup(); propSetup(); PHONE.way = null; phoneToggle(false);
   document.body.classList.toggle('hasPhone', settings.mode === 'free');
-  if (settings.mode === 'free' && CS.home && !NET.race) { const [x, z] = CS.home; placeCarAt(player, x + 6, z, 0); }
+  if (settings.mode === 'free' && !NET.race) { if (CS.home) { const [x, z] = CS.home; placeCarAt(player, x + 6, z, 0); } else if (CS.last) { placeCarAt(player, CS.last[0], CS.last[1], 0); if (CS.last[2] != null) DAY.t0 = CS.last[2]; } }
   if (settings.mode === 'free' && !CS.welcomed) { CS.welcomed = 1; csSave(); setTimeout(() => msg('Марк', 'Слышал, ты вернулся в город. Загляни на кольцо — есть работа. Открой «🎬 История» в телефоне.'), 6000); }
 }
 function econTick(dt) {
@@ -6983,6 +6989,19 @@ function econAction() {
 $('phoneBtn').addEventListener('pointerdown', e => { e.preventDefault(); e.stopPropagation(); phoneToggle(); });
 $('phClose').addEventListener('pointerdown', e => { e.preventDefault(); phoneToggle(false); });
 addEventListener('keydown', e => { if (e.code === 'KeyT' && state === 'race' && settings.mode === 'free' && !e.repeat && !(e.target && e.target.tagName === 'INPUT')) phoneToggle(); });
+
+function homeInterior(S, T, std, box) { // your apartment: bed, sofa, TV, wardrobe, kitchen
+  INT.cashier = null; const W = INT.W, D = INT.D;
+  const bed = box(2.2, .5, 3, std(0xf5f5f4, .8), -4.8, .25, -2.8, true); box(2.2, .9, .2, std(0x5b4636, .6), -4.8, .45, -4.3); box(1.9, .12, 1, std(0x1d4ed8, .7), -4.8, .56, -2);
+  box(3.2, .45, 1, std(0x374151, .9), 3.2, .22, 1.2, true); box(3.2, .6, .25, std(0x374151, .9), 3.2, .6, 1.65);
+  const tv = new THREE.Mesh(new THREE.PlaneGeometry(2.4, 1.35), new THREE.MeshBasicMaterial({ map: canvasTex(256, 144, (c, w, h) => { const g = c.createLinearGradient(0, 0, w, h); g.addColorStop(0, '#0ea5e9'); g.addColorStop(1, '#7c3aed'); c.fillStyle = g; c.fillRect(0, 0, w, h); c.fillStyle = '#fff'; c.font = '900 26px Arial'; c.textAlign = 'center'; c.fillText('НОВОСТИ ГОРОДА', w / 2, 64); c.font = '16px Arial'; c.fillText((CS.news[0] || [0, 'В городе спокойно'])[1].slice(0, 32), w / 2, 98); }), toneMapped: false }));
+  tv.position.set(3.2, 1.6, -D / 2 + .05); S.add(tv); box(2.6, .5, .5, std(0x111827, .5), 3.2, .25, -D / 2 + .4, true);
+  box(1.6, 2.2, .6, std(0x7c5a3a, .6), W / 2 - .5, 1.1, -1.5, true);
+  box(3, .9, .6, std(0xe5e7eb, .4), -1, .45, -D / 2 + .4, true); box(3, .05, .65, std(0x111827, .3), -1, .92, -D / 2 + .4);
+  const rug = new THREE.Mesh(new THREE.PlaneGeometry(3.2, 2.2), std(0x9d174d, 1)); rug.rotation.x = -Math.PI / 2; rug.position.set(2.8, .01, -.6); S.add(rug);
+  const lamp = new THREE.PointLight(0xffd9a8, 10, 8, 1.6); lamp.position.set(-4.8, 2, -3.5); S.add(lamp);
+  S.add(FOOT.H.g);
+}
 
 /* ================= STORY: «Неоновый город» — characters, dialogues with choices, relations, branches, three endings ================= */
 const CAST = {
@@ -7174,6 +7193,64 @@ function radioTick(dt) {
 function radioSetup() { const on = CITY && CITY.on && settings.mode === 'free'; document.body.classList.toggle('hasRadio', !!on); if (on) radioSet(RADIO.st, false); else { SPB = 60 / BPM / 4; RADIO.swing = false; } if (RADIO.amb && !on) RADIO.amb.g.gain.value = 0; }
 $('radioBtn').addEventListener('pointerdown', e => { e.preventDefault(); e.stopPropagation(); radioSet(RADIO.st + 1); });
 addEventListener('keydown', e => { if (e.code === 'KeyY' && state === 'race' && settings.mode === 'free' && !e.repeat) radioSet(RADIO.st + 1); });
+
+/* ================= RANDOM CITY EVENTS: thief, crash scene, hitchhiker — generated from time, district and your reputation ================= */
+var RNDEV = { t: 45, cur: null };
+function rndEvTick(dt) {
+  if (!CITY || !CITY.on || settings.mode !== 'free' || state !== 'race' || STORY.talk) return;
+  const E = RNDEV.cur, me = FOOT.on ? { x: FOOT.x, z: FOOT.z } : player.pos;
+  if (!E) { if (MIS.on || CITY.stars) return; if ((RNDEV.t -= dt) > 0) return; RNDEV.t = 70 + Math.random() * 80; rndEvStart(me); return; }
+  E.t += dt;
+  const fail = why => { feed('⌛ ' + why, ''); rndEvEnd(); };
+  if (E.kind === 'thief') {
+    const T = E.ped; // the thief runs along the streets and zig-zags at corners
+    const dx = T.x - me.x, dz = T.z - me.z, d = Math.hypot(dx, dz);
+    const sp = (FOOT.on ? 5.4 : 7.5) * (d < 25 ? 1 : .8); let hx = Math.sin(T.h), hz = Math.cos(T.h);
+    if (d < 30) { const ax = dx / (d || 1), az = dz / (d || 1); hx = lerp(hx, ax, .1); hz = lerp(hz, az, .1); const l = Math.hypot(hx, hz); hx /= l; hz /= l; }
+    if ((E.turn -= dt) <= 0) { E.turn = 2 + Math.random() * 3; const G = CITY.G, ax = Math.random() < .5; T.h = ax ? (Math.random() < .5 ? Math.PI / 2 : -Math.PI / 2) : (Math.random() < .5 ? 0 : Math.PI); const lx = snapLine(T.x, G.x0), lz = snapLine(T.z, G.z0); if (ax) T.z = lz + ST_W / 2 + 1.5; else T.x = lx + ST_W / 2 + 1.5; hx = Math.sin(T.h); hz = Math.cos(T.h); }
+    T.x += hx * sp * dt; T.z += hz * sp * dt; T.h = Math.atan2(hx, hz); T.ph += dt * 18;
+    T.g.position.set(T.x, 0, T.z); T.g.rotation.y = T.h; animHuman(T.H, T.ph, 1, timeAcc, false);
+    MIS.target = null; PHONE.way = { x: T.x, z: T.z };
+    misHUD('🏃 ДЕРЖИ ВОРА!', FOOT.on ? 'Догони и схвати его' : 'Перегороди дорогу машиной (медленно!) или догони пешком', Math.max(0, 50 - E.t));
+    const caught = d < (FOOT.on ? 1.6 : 3.2) && (FOOT.on || Math.abs(player.vF) < 9);
+    if (d < 3.2 && !FOOT.on && Math.abs(player.vF) >= 9) { T.down = 1; fail('Ты сбил вора — сумку забрала полиция'); REP.add(-2, 'Перестарался'); crime(1, 'Наезд'); return; }
+    if (caught) { payout(400 + Math.round(Math.random() * 400), 'Вернул украденную сумку'); REP.add(4, 'Поймал вора'); news('peds', { dist: districtAt(me.x, me.z).name }); CS.news[0][1] = '🦸 Прохожий задержал карманника в районе «' + districtAt(me.x, me.z).name + '»'; rndEvEnd(); return; }
+    if (E.t > 50 || d > 220) fail('Вор скрылся');
+  }
+  if (E.kind === 'crash') {
+    if (E.cars) for (const c of E.cars) { c.hold = true; if (Math.random() < dt * 4) puff(c.pos.x, 1, c.pos.z, 0, 0, 1.2, 0x333333, .3); }
+    const d = Math.hypot(E.x - me.x, E.z - me.z); MIS.target = null; PHONE.way = { x: E.x, z: E.z };
+    misHUD('🚑 ДТП НА ДОРОГЕ', d < 12 ? 'Остановись и помоги пострадавшим' : 'Рядом авария — пострадавшим нужна помощь', Math.max(0, 90 - E.t));
+    if (E.helping) { E.help += dt; misHUD('🚑 ПОМОЩЬ ПОСТРАДАВШИМ', 'Не отходи далеко…', null, E.help / 6 * 100); if (d > 14) { E.helping = false; flash('Ты ушёл — помощь прервана', 1.4); } if (E.help >= 6) { payout(250, 'Помог пострадавшим в ДТП'); REP.add(5, 'Помог людям'); msg('Скорая помощь', 'Спасибо, что остались до нашего приезда. Пострадавшие в порядке.'); rndEvEnd(); } }
+    if (E.t > 90 && !E.helping) fail('Пострадавших забрала скорая');
+  }
+  if (E.kind === 'hitch') {
+    const H = E.ped, d = Math.hypot(H.x - player.pos.x, H.z - player.pos.z);
+    animHuman(H.H, 0, 0, timeAcc, false); H.H.arms[1].sh.rotation.x = -2.4 + Math.sin(timeAcc * 5) * .3; H.g.rotation.y = Math.atan2(player.pos.x - H.x, player.pos.z - H.z);
+    if (!E.picked) { MIS.target = null; PHONE.way = { x: H.x, z: H.z }; misHUD('👍 ПОПУТЧИК', 'Человек голосует у дороги — подвези?', Math.max(0, 60 - E.t)); if (!FOOT.on && d < 8 && Math.abs(player.vF) < 2) { E.picked = 1; H.g.visible = false; const q = streetPoint(player.pos.x, player.pos.z, 500, 1000); E.dx = q.x; E.dz = q.z; PHONE.way = { x: q.x, z: q.z }; msg('Попутчик', ['Спасибо! Мне в ' + districtAt(q.x, q.z).name + ', если по пути.', 'Выручил! Только без гонок, ладно?'][Math.floor(Math.random() * 2)]); } if (E.t > 60) fail('Попутчик уехал на автобусе'); }
+    else { const dd = Math.hypot(E.dx - player.pos.x, E.dz - player.pos.z); misHUD('👍 ПОПУТЧИК', 'Довези до метки', null); if (dd < 10 && Math.abs(player.vF) < 3) { const tip = REP.v > 20 ? 600 : 350; payout(tip, 'Подвёз попутчика'); REP.add(2, 'Добрый водитель'); rndEvEnd(); } if (player.impact > 8) { E.scared = (E.scared || 0) + 1; if (E.scared > 2) { flash('😱 Попутчик выскочил на светофоре', 1.6); rndEvEnd(); } } }
+  }
+}
+function rndEvStart(me) {
+  const night = DAY.t < 6 || DAY.t > 21, D = districtAt(me.x, me.z), r = Math.random();
+  // thieves in rich & busy districts, crashes at night and in rain, hitchhikers on the outskirts
+  const kind = r < (D.id === 'cbd' || D.id === 'bay' ? .45 : .25) ? 'thief' : r < .7 + (night ? .1 : 0) + WX.rain * .1 ? 'crash' : 'hitch';
+  if (kind === 'thief' && FOOT.inside) return;
+  const q = streetPoint(me.x, me.z, kind === 'thief' ? 30 : 120, kind === 'thief' ? 70 : 260); if (!q) return;
+  const E = { kind, t: 0, x: q.x, z: q.z, turn: 2 };
+  if (kind === 'thief' || kind === 'hitch') { const H = makeHuman(kind === 'thief' ? { skin: 0xe0ac69, shirt: 0x111111, pants: 0x111111, hair: 0x111111, cap: 0x111111, jacket: 0x1f2937 } : { skin: 0xf1c27d, shirt: 0xf59e0b, pants: 0x1e3a8a, hair: 0x6b4423, shoe: 0xf4f4f5 }); const side = ST_W / 2 + 1.6; const x = q.ax === 'z' ? q.x + side : q.x, z = q.ax === 'x' ? q.z + side : q.z; H.g.position.set(x, 0, z); scene.add(H.g); E.ped = { H, g: H.g, x, z, h: q.ax === 'z' ? 0 : Math.PI / 2, ph: 0 }; }
+  if (kind === 'thief') { flash('🏃 «Держи вора! Он украл сумку!»', 2.4); if (audio) beep(900, .15, .1); }
+  if (kind === 'crash') { E.cars = []; for (const s of [-1, 1]) { const c = gridCar('traffic'); placeCarAt(c, q.x + (q.ax === 'z' ? s * 1.6 : s * 2.2), q.z + (q.ax === 'x' ? s * 1.6 : s * 2.2), (q.ax === 'z' ? 0 : Math.PI / 2) + s * .9); c.dmg = 70; c.hold = true; c.hitP = [c.pos.x + s, c.pos.z, 16]; E.cars.push(c); } feed('🚨 Неподалёку авария', 'red'); }
+  if (kind === 'hitch') feed('👍 Кто-то голосует у дороги', '');
+  RNDEV.cur = E;
+}
+function rndEvAction() {
+  const E = RNDEV.cur; if (!E || E.kind !== 'crash' || E.helping) return null;
+  const me = FOOT.on ? { x: FOOT.x, z: FOOT.z } : player.pos; if (Math.hypot(E.x - me.x, E.z - me.z) > 10 || (!FOOT.on && Math.abs(player.vF) > 3)) return null;
+  return ['🚑 ПОМОЧЬ ПОСТРАДАВШИМ', () => { E.helping = true; E.help = 0; flash('🚑 Ты вызвал скорую и помогаешь…', 1.6); }];
+}
+function rndEvEnd() { const E = RNDEV.cur; if (!E) return; if (E.ped) scene.remove(E.ped.g); if (E.cars) for (const c of E.cars) { const k = npcs.indexOf(c); if (k >= 0) npcs.splice(k, 1); scene.remove(c.root); c.dispose(); } RNDEV.cur = null; PHONE.way = null; if (!MIS.on) misHUD(null); }
+function rndEvSetup() { rndEvEnd(); RNDEV.t = 50; }
 
 </script>
 </body>
