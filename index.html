@@ -335,7 +335,9 @@ body.street #heat{display:block}#heat span{display:block;font-size:9px;letter-sp
 #heat.h3 b{background:linear-gradient(90deg,#ffb020 60%,rgba(255,255,255,.25) 60%);-webkit-background-clip:text;color:transparent}#heat.h4 b{background:linear-gradient(90deg,#ff6a20 80%,rgba(255,255,255,.25) 80%);-webkit-background-clip:text;color:transparent}#heat.h5 b{color:#ff3030}
 #heat.chase{animation:cop .5s steps(2) infinite}@keyframes cop{0%{box-shadow:0 0 18px #ff2020}50%{box-shadow:0 0 18px #2050ff}}
 #score{display:none;position:absolute;left:50%;transform:translateX(-50%);top:calc(var(--st,0px) + 64px);text-align:center;pointer-events:none}
-body.scoremode #score{display:block}#score b{display:block;font:italic 900 34px/1 system-ui;color:#fff;text-shadow:0 0 18px rgba(255,61,110,.9),0 2px 4px #000}#score span{font:800 11px system-ui;letter-spacing:2px;color:#ffd23d;text-shadow:0 1px 3px #000}
+body.scoremode #score{display:block}#score b{display:block;font:italic 900 34px/1 system-ui;color:#fff;text-shadow:0 0 18px rgba(255,61,110,.9),0 2px 4px #000}.gLock{display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;padding:24px 10px}.gLock i{font-style:normal;font-size:40px}.gLock small{opacity:.7;font-size:12px}
+#score.hot b{color:#fecaca;text-shadow:0 0 20px #ef4444,0 2px 4px #000;animation:hotP .5s ease-in-out infinite alternate}@keyframes hotP{to{transform:scale(1.12)}}
+#score span{font:800 11px system-ui;letter-spacing:2px;color:#ffd23d;text-shadow:0 1px 3px #000}
 body.solo .box.stat:first-child,body.cruise #pos,body.cruise #board,body.scoremode #board{display:none}
 .gcard.on{outline:2px solid #ffd23d}.tshot.onl{display:flex!important;align-items:center;justify-content:center;font-size:54px;background:linear-gradient(135deg,#1d4ed8,#7c3aed)}
 .trkCards{grid-template-columns:repeat(4,1fr)!important}@media (max-width:700px){.trkCards{grid-template-columns:repeat(3,1fr)!important}}
@@ -347,6 +349,7 @@ body.solo .box.stat:first-child,body.cruise #pos,body.cruise #board,body.scoremo
 .onCard.host{background:linear-gradient(145deg,rgba(255,61,110,.35),rgba(255,176,61,.18))}.onCard.join{background:linear-gradient(145deg,rgba(61,213,255,.3),rgba(124,58,237,.2))}
 .onCard i{font-style:normal;font-size:30px}.onCard b{font-size:17px}.onCard small{font-size:11px;opacity:.75;line-height:1.3}
 .onGo{margin-top:auto;align-self:flex-start;padding:8px 16px;border-radius:10px;background:#fff;color:#111;font:900 13px system-ui;letter-spacing:1px;cursor:pointer}
+.onCodeRow{position:relative;width:100%}.onCodeRow .onCodeIn{width:100%;box-sizing:border-box;padding-right:40px!important}.onPaste{position:absolute;right:6px;top:50%;transform:translateY(-50%);font-size:20px;cursor:pointer;padding:4px}.onGo.dis{opacity:.45;pointer-events:none}
 .onCodeIn{text-align:center;font:900 22px/1 'Russo One',Arial!important;letter-spacing:10px;text-transform:uppercase;padding:8px!important}
 .onSlots{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
 .onSlot{border-radius:14px;padding:10px 6px;background:rgba(255,255,255,.06);display:flex;flex-direction:column;align-items:center;gap:4px;text-align:center;font-size:12px;min-height:150px}
@@ -368,6 +371,40 @@ body.jet #tN{background:radial-gradient(circle,#ff6a3d,#b91c1c)!important}body.j
 button,.btn,.tile,.opt,.card,.rt,.ib,.mBar>*{-webkit-tap-highlight-color:transparent;-webkit-user-select:none;user-select:none;transition:transform .12s ease,filter .12s ease}
 .btn:active,.tile:active,.opt:active,.card:active,.rt:active,.ib:active,#go:active,#bbTrack:active{transform:scale(.95);filter:brightness(1.15)}
 .tb:active,.tb.on{filter:brightness(1.25)}
+
+/* online lobby v2 */
+.onLobby{display:grid;grid-template-columns:200px 1fr;gap:12px;align-items:start}
+.onInv{background:linear-gradient(160deg,rgba(61,213,255,.14),rgba(255,61,110,.10));border:1px solid rgba(255,255,255,.12);border-radius:16px;padding:12px;display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center}
+.onLobby .onCode{display:flex;gap:4px;cursor:pointer;font-size:0;letter-spacing:0}
+.onLobby .onCode span{display:inline-flex;width:30px;height:40px;align-items:center;justify-content:center;background:rgba(0,0,0,.35);border:1px solid rgba(253,230,138,.35);border-radius:8px;font:400 26px 'Russo One',Arial;color:#fde68a}
+.onLobby .onQR{width:128px;height:128px;padding:5px;box-sizing:border-box}
+.onLobby .onBtns{justify-content:center;gap:5px}.onLobby .onBtns .btn{margin:0;padding:7px 10px;font-size:12px}
+.onHow{font-size:11px;opacity:.75;line-height:1.35}
+.onMain{display:flex;flex-direction:column;gap:8px;min-width:0}
+.onHdr{display:flex;justify-content:space-between;align-items:baseline;gap:8px;font-size:12px}.onHdr b{font-size:14px;letter-spacing:1px}.onHdr span{opacity:.75;text-align:right}
+.onList{display:flex;flex-direction:column;gap:5px}
+.onPl{position:relative;display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:6px 10px;min-height:44px;animation:onIn .25s ease-out}
+.onPl.me{border-color:rgba(253,230,138,.55);background:rgba(253,230,138,.08)}
+.onPl.empty{opacity:.45;border-style:dashed;animation:none}.onPl.empty .onAv{background:rgba(255,255,255,.1)!important}
+.onPl .onAv{width:34px;height:34px;font-size:16px}
+.onPn{flex:1;min-width:0;display:flex;flex-direction:column}.onPn b{font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.onPn em{font-style:normal;opacity:.6;font-weight:400}.onPn small{font-size:11px;opacity:.65;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.onPc{height:30px;width:auto;flex:none}
+.onChip{flex:none;font:800 10px system-ui;letter-spacing:1px;padding:4px 7px;border-radius:999px}.onChip.host{background:#fde68a;color:#111}.onChip.ok{background:#22c55e;color:#04210f}.onChip.wait{background:rgba(255,255,255,.12);color:#cbd5e1}
+.onBub{position:absolute;right:8px;top:-12px;font-size:26px;opacity:0;pointer-events:none}.onBub.pop{animation:onPop 2.2s ease-out}
+@keyframes onPop{0%{opacity:0;transform:translateY(8px) scale(.4)}12%{opacity:1;transform:translateY(-4px) scale(1.25)}25%{transform:translateY(0) scale(1)}80%{opacity:1}100%{opacity:0;transform:translateY(-10px)}}
+@keyframes onIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.onEmo{display:flex;gap:6px;justify-content:center}.onEmo span{font-size:22px;padding:4px 8px;border-radius:10px;background:rgba(255,255,255,.06);cursor:pointer;transition:transform .1s}.onEmo span:active{transform:scale(1.3)}
+.onSet{background:rgba(255,255,255,.04);border-radius:12px;padding:6px 10px}.onSet summary{cursor:pointer;font-size:12px;font-weight:700;opacity:.85;padding:3px 0}.onSet label{display:block;font-size:10px;opacity:.6;letter-spacing:1px;margin:8px 0 4px}
+.onSet .opts{gap:5px}.onSet .opt{padding:6px 9px;font-size:12px}
+.onTrk{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}.onTrk::-webkit-scrollbar{display:none}
+.onT{flex:none;width:72px;border-radius:10px;padding:6px 4px;text-align:center;background:rgba(255,255,255,.06);border:1px solid transparent;cursor:pointer}.onT i{font-style:normal;font-size:20px;display:block}.onT small{font-size:10px;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.onT.on{border-color:#fde68a;background:rgba(253,230,138,.14)}.onT.dis{pointer-events:none}.onT.dis:not(.on){opacity:.4}
+.onAct{display:flex;gap:8px}.onAct .btn{margin:0}.onAct .btn:first-child{flex:1}.onAct .btn.sec{width:auto;flex:none;padding-left:16px;padding-right:16px}
+.btn.ok{background:linear-gradient(135deg,#22c55e,#16a34a)!important;color:#fff}
+.onAct .btn{font-size:14px;letter-spacing:1px;padding:11px 12px;white-space:nowrap;line-height:1.1}
+@media (max-height:460px){.onLobby{grid-template-columns:180px 1fr;gap:10px}.onLobby .onQR{width:108px;height:108px}.onLobby .onCode span{width:26px;height:34px;font-size:22px}.onInv{padding:10px 8px;gap:6px}
+ .onPl{min-height:38px;padding:4px 8px}.onPl .onAv{width:30px;height:30px}.onPc{height:24px}.onEmo span{font-size:18px;padding:2px 7px}.onHow{font-size:10px}}
+@media (max-width:640px) and (orientation:portrait){.onLobby{grid-template-columns:1fr}.onInv{flex-direction:row;flex-wrap:wrap;justify-content:center}}
 </style>
 <link rel="preconnect" href="https://cdn.jsdelivr.net"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Russo+One&display=swap" rel="stylesheet">
@@ -568,6 +605,12 @@ const TRACKS = {
     ctrl: [[0, 0], [600, -20], [900, 80], [960, 300], [780, 420], [560, 380], [420, 500], [520, 680], [380, 820], [80, 800], [-120, 640], [-80, 440], [-260, 320], [-300, 120]] },
   forest: { name: 'Лесная тропа', desc: 'Густой лес, срезки через чащу, быстрые связки', theme: 'mountain', v: 'forest', tun: 'auto', ovp: [], river: -1,
     ctrl: [[0, 0], [420, -30], [620, 60], [600, 240], [420, 300], [400, 460], [580, 560], [560, 760], [320, 820], [140, 700], [-60, 760], [-280, 680], [-300, 480], [-140, 380], [-260, 220], [-200, 60]] },
+  bay: { traffic: true, name: 'Ночной залив', desc: 'Набережная с длинными прямыми и фоторадарами', theme: 'city', v: 'bay', tun: 'auto', ovp: 'auto', river: -1,
+    ctrl: [[0, 0], [800, 0], [1100, 80], [1200, 300], [1050, 480], [700, 520], [500, 640], [520, 860], [300, 980], [-100, 960], [-400, 880], [-560, 640], [-480, 360], [-260, 180]] },
+  dunes: { name: 'Дюны', desc: 'Песчаные гряды, прыжки и ворота чекпоинтов', theme: 'mountain', v: 'desert', tun: 'auto', ovp: [], river: -1,
+    ctrl: [[0, 0], [500, -60], [820, 40], [900, 260], [760, 400], [820, 580], [700, 760], [420, 780], [300, 620], [120, 700], [-120, 640], [-200, 420], [-80, 260], [-240, 120]] },
+  ring: { name: 'Неон-Ринг', desc: 'Компактное кольцо: плотная борьба и тараны', theme: 'city', v: 'ring', tun: 'auto', ovp: 'auto', river: -1,
+    ctrl: [[0, 0], [420, 0], [600, 120], [600, 340], [440, 440], [460, 620], [300, 740], [60, 700], [-80, 560], [-260, 600], [-420, 480], [-380, 260], [-200, 200], [-160, 60]] },
   glacier: { name: 'Ледник', desc: 'Высокогорье, лёд и снег, трамплины над пропастью', theme: 'mountain', v: 'glacier', tun: 'auto', ovp: [], river: -1,
     ctrl: [[0, 0], [380, 20], [560, 160], [500, 340], [300, 380], [260, 540], [440, 640], [700, 600], [860, 740], [760, 920], [460, 940], [180, 860], [-80, 900], [-300, 760], [-280, 540], [-120, 420], [-240, 240], [-180, 60]] },
 };
@@ -1744,7 +1787,7 @@ const shopEm = canvasTex(1024, 160, (g) => {
 });
 
 const FLAT_I0 = (() => { let b = 0, bd = 1e18; for (let i = 0; i < N / 2; i++) { const d = Math.abs(PX[i] - 3000) + Math.abs(PZ[i]) * 10; if (d < bd) { bd = d; b = i; } } return b; })();
-const TRACK_ICON = { flats: '♾', city: '🌃', streets: '🚔', sunset: '🌇', downtown: '🏙', port: '⚓', docks: '🏭', mountain: '🏔', canyon: '🏜', forest: '🌲', glacier: '🧊' };
+const TRACK_ICON = { bay: '🌉', dunes: '🐪', ring: '⭕', flats: '♾', city: '🌃', streets: '🚔', sunset: '🌇', downtown: '🏙', port: '⚓', docks: '🏭', mountain: '🏔', canyon: '🏜', forest: '🌲', glacier: '🧊' };
 /* ================= TRACK RIBBONS ================= */
 function ribbon(offA, offB, yA, yB, vLen, uA = 0, uB = 1, i0 = 0, i1 = N) {
   if (offA > offB) { [offA, offB] = [offB, offA]; [yA, yB] = [yB, yA]; [uA, uB] = [uB, uA]; }
@@ -2918,6 +2961,9 @@ const GAMES = [
   { id: 'stunt', icon: '🤸', name: 'Трюки', track: 'canyon', mode: 'stunt', desc: 'Очки за прыжки, бочки и мега-прыжок' },
   { id: 'hunt', icon: '🚨', name: 'Перехват', track: 'forest', mode: 'hunt', desc: 'Ты — полиция: 5 таранов беглеца за 2:30' },
   { id: 'rally', icon: '❄', name: 'Ралли на время', track: 'glacier', mode: 'time', desc: 'Лёд и снег, гонка с призраком' },
+  { id: 'traps', icon: '📸', name: 'Фоторадары', track: 'bay', mode: 'traps', desc: 'Пролетай камеры на максималке: очки — сумма скоростей' },
+  { id: 'cp', icon: '⏱', name: 'Чекпоинты', track: 'dunes', mode: 'cp', desc: 'Время тает: ворота дают секунды, успей 3 круга' },
+  { id: 'infect', icon: '☣', name: 'Заражение', track: 'ring', mode: 'infect', desc: 'Бесконечное нитро, но вирус убьёт тебя — догоняй и заражай касанием' },
   { id: 'cruise', icon: '🌆', name: 'Свободная езда', track: 'sunset', mode: 'cruise', desc: 'Спокойный город: поток машин и пешеходы' },
   { id: 'heli', icon: '🚁', name: 'Вертолёт', track: 'city', mode: 'heli', desc: 'Летай над городом и подбивай машины: пулемёт и ракеты, 2:30' },
   { id: 'jet', icon: '🛩', name: 'Истребитель 320 000', track: 'flats', mode: 'jet', desc: 'До 320 000 км/ч, пушка и ракеты, вид из кабины' },
@@ -2927,7 +2973,7 @@ const GAMES = [
 let GAME = null; try { GAME = GAMES.find(g => g.id === localStorage.getItem('sr3d_game')); } catch (_) { }
 if (!GAME || GAME.track !== TRACK_ID) GAME = GAMES.find(g => g.track === TRACK_ID) || GAMES[0];
 settings.mode = GAME.mode;
-const SOLO = ['time', 'drift', 'stunt', 'cruise', 'jet', 'snail'], SCORE_MODES = ['drift', 'stunt', 'derby', 'hunt', 'heli', 'jet'];
+const SOLO = ['time', 'drift', 'stunt', 'cruise', 'jet', 'snail', 'traps', 'cp'], SCORE_MODES = ['drift', 'stunt', 'derby', 'hunt', 'heli', 'jet', 'traps', 'cp', 'infect'];
 const GS = { score: 0, combo: 0, mult: 1, dT: 0, offT: 0, hits: 0, timer: 0, target: null };
 settings.ctl = 'wheel';
 function applyCtl() { document.body.classList.remove('ctl-wheel', 'ctl-arrows', 'ctl-tilt'); document.body.classList.add('ctl-' + settings.ctl); document.querySelectorAll('#ctl .opt').forEach(o => o.classList.toggle('on', o.dataset.v === settings.ctl)); }
@@ -2984,11 +3030,16 @@ function setupRace() {
   if (keepAI && !NET.race) { for (const a of ai) if (!keepAI.includes(a)) { scene.remove(a.root); a.dispose(); } order = [...keepAI, player]; }
   if (settings.mode === 'touge' && keepAI) { const a = keepAI[0]; a.skill = 1; a.vmax *= 1.04; a.power *= 1.05; }
   if (settings.mode === 'drag' && keepAI) { const a = keepAI[0]; a.vmax = player.vmax * (.97 + (settings.diff ?? 1) * .02); a.power = player.power * (.95 + (settings.diff ?? 1) * .03); }
-  Object.assign(GS, { score: 0, combo: 0, mult: 1, dT: 0, offT: 0, hits: 0, timer: settings.mode === 'derby' ? 180 : settings.mode === 'hunt' || settings.mode === 'heli' ? 150 : 0, target: null });
+  Object.assign(GS, { score: 0, combo: 0, mult: 1, dT: 0, offT: 0, hits: 0, timer: settings.mode === 'derby' ? 180 : settings.mode === 'hunt' || settings.mode === 'heli' ? 150 : settings.mode === 'infect' ? INF_T0 : settings.mode === 'cp' ? CP_T0 : 0, target: null, life: 0, kd0: 0 });
   order.forEach((c, k) => { const row = Math.floor(k / 2), side = k % 2 ? 1 : -1, i = TRK.flats ? FLAT_I0 - row * 2 : TRK.sprint ? SPR_START - 4 - row * 7 : (N - 10 - row * 6) % N; c.place(i, side * 3.6); c.dist = TRK.flats ? 0 : TRK.sprint ? i - SPR_START : -(N - i); c.lapStart = 0; c.lapTimes = []; c.finish = null; c.nitro = c.isPlayer ? .35 : .3; c.prevLap = undefined; c.flip = null; cars.push(c); });
   for (const p of PICKUPS) p.t = 0;
-  raceTime = 0; countdown = 3; finishShown = false; LAPS = TRK.sprint ? 1 : TRK.flats || ['elim', 'derby', 'hunt', 'cruise', 'heli'].includes(settings.mode) ? 99 : ['drift', 'stunt', 'touge'].includes(settings.mode) ? 2 : settings.laps;
+  raceTime = 0; countdown = 3; finishShown = false; LAPS = TRK.sprint ? 1 : TRK.flats || ['elim', 'derby', 'hunt', 'cruise', 'heli', 'infect'].includes(settings.mode) ? 99 : ['drift', 'stunt', 'touge', 'traps'].includes(settings.mode) ? 2 : settings.mode === 'cp' ? 3 : settings.laps;
+  setupGates();
   if (settings.mode === 'hunt' && !NET.race) setupHunt();
+  if (settings.mode === 'infect' && !NET.race) { // survivors scattered around the ring, driving at a cruising pace
+    const sv = cars.filter(c => !c.isPlayer); sv.forEach((c, k) => { const i = (player.q.i + Math.round(140 / DS) + k * Math.round(N / 8)) % N; c.place(i, (k % 2 ? 1 : -1) * 3.6); c.dist = player.dist + ((i - player.q.i + N) % N); c.skill = .68; c.vmax *= .8; });
+    flash('☣ ТЫ ЗАРАЖЁН: нитро бесконечное — догоняй выживших и касайся их', 3);
+  }
   setupHeli(); setupJet(); setupFlatCars(); AIR.view = 0; AIR.off = null; orbitYaw = 0; orbitPitch = 0;
   if (HELI.on || JET.on) { const ah = $('airHint'); ah.innerHTML = isTouch ? '<b>ОГОНЬ</b> — пулемёт · <b>РАКЕТА</b> — ракета · <b>▲ ▼</b> — высота · руль — поворот · <b>ГАЗ/ТОРМОЗ</b> — скорость · 🎥 — вид из кабины · проведи по экрану — осмотреться' : '<b>Shift / Q</b> — пулемёт · <b>Пробел</b> — ракета · <b>W / S</b> — газ / тормоз · <b>A D</b> — поворот · <b>E / X</b> — вверх / вниз · <b>C</b> — кабина · <b>мышь</b> — осмотреться, колесо — зум'; ah.classList.remove('hidden', 'fade'); clearTimeout(setupRace.ah); setupRace.ah = setTimeout(() => ah.classList.add('fade'), 9000); }
   else $('airHint').classList.add('hidden');
@@ -3772,9 +3823,9 @@ function showFinish() {
   if (mode === 'elim') $('finTitle').textContent = myPlace === 1 ? '🏆 ПОСЛЕДНИЙ ВЫЖИВШИЙ!' : 'ВЫБЫЛ · МЕСТО ' + myPlace;
   let placeR = mode === 'time' ? 600 + (newGhost ? 900 : 0) : ([2500, 1600, 1100, 700, 500, 300][myPlace - 1] || 300) * (mode === 'elim' ? 1.3 : TRK.sprint ? 1.2 : Math.min(LAPS, 5) / 3);
   if (SCORE_MODES.includes(mode)) {
-    const sc = mode === 'derby' || mode === 'hunt' || mode === 'heli' ? GS.hits : Math.round(GS.score + GS.combo);
-    const TH = { drift: [4000, 10000, 18000], stunt: [6000, 12000, 20000], derby: [2, 4, 6], hunt: [2, 4, 5], heli: [5, 10, 16], jet: [3, 8, 15] }[mode], md = sc >= TH[2] ? 3 : sc >= TH[1] ? 2 : sc >= TH[0] ? 1 : 0;
-    $('finTitle').textContent = ['😕 БЕЗ МЕДАЛИ', '🥉 БРОНЗА', '🥈 СЕРЕБРО', '🥇 ЗОЛОТО'][md] + ' · ' + (mode === 'heli' ? sc + ' подбито' : mode === 'derby' || mode === 'hunt' ? sc + ' таранов' : sc.toLocaleString('ru-RU') + ' очков');
+    const sc = mode === 'derby' || mode === 'hunt' || mode === 'heli' || mode === 'cp' || mode === 'infect' ? GS.hits : Math.round(GS.score + GS.combo);
+    const TH = { drift: [4000, 10000, 18000], stunt: [6000, 12000, 20000], derby: [2, 4, 6], hunt: [2, 4, 5], heli: [5, 10, 16], jet: [3, 8, 15], traps: [170, 215, 255].map(v => v * GATES.total), cp: [Math.ceil(GATES.total / 3), Math.ceil(GATES.total * 2 / 3), GATES.total], infect: [3, 6, 10] }[mode], md = sc >= TH[2] ? 3 : sc >= TH[1] ? 2 : sc >= TH[0] ? 1 : 0;
+    $('finTitle').textContent = ['😕 БЕЗ МЕДАЛИ', '🥉 БРОНЗА', '🥈 СЕРЕБРО', '🥇 ЗОЛОТО'][md] + ' · ' + (mode === 'heli' ? sc + ' подбито' : mode === 'cp' ? sc + '/' + GATES.total + ' чекпоинтов' : mode === 'infect' ? sc + ' заражено · ' + fmtT(GS.life) : mode === 'traps' ? sc.toLocaleString('ru-RU') + ' км/ч на радарах' : mode === 'derby' || mode === 'hunt' ? sc + ' таранов' : sc.toLocaleString('ru-RU') + ' очков');
     placeR = [300, 900, 1600, 2600][md];
   }
   if (mode === 'drag') $('finTitle').textContent = myPlace === 1 ? '🚦 ПОБЕДА В ДРЭГЕ · ' + fmt(player.finish) : '🚦 ПОРАЖЕНИЕ · ' + fmt(player.finish);
@@ -4338,7 +4389,7 @@ $('gView').addEventListener('pointermove', e => {
 const gOff = e => { gPads.delete(e.pointerId); gResumeT = performance.now() + 1500; };
 $('gView').addEventListener('pointerup', gOff); $('gView').addEventListener('pointercancel', gOff);
 $('gView').addEventListener('wheel', e => { gDist = clamp(gDist * (e.deltaY > 0 ? 1.08 : .92), 4.2, 11); }, { passive: true });
-function updateCoins() { const t = '💰 ' + SAVE.coins.toLocaleString('ru-RU'); $('gCoins').textContent = t; $('cCoins').textContent = t; $('mCoins').textContent = SAVE.unlimited ? '∞' : SAVE.coins >= 1e9 ? +(SAVE.coins / 1e9).toFixed(2) + ' млрд' : SAVE.coins >= 1e6 ? +(SAVE.coins / 1e6).toFixed(1) + ' млн' : SAVE.coins >= 100000 ? (SAVE.coins / 1000).toFixed(1) + 'K' : SAVE.coins.toLocaleString('ru-RU'); try { $('mStars').textContent = CUPS.reduce((a, _, ci) => a + cupStars(ci), 0); } catch (_) { } try { const L = league(SAVE.rating || 1000); $('mRank').textContent = L.i + ' ' + (SAVE.rating || 1000); } catch (_) { } }
+function updateCoins() { const t = '💰 ' + (SAVE.unlimited ? '∞' : SAVE.coins.toLocaleString('ru-RU')); $('gCoins').textContent = t; $('cCoins').textContent = t; $('mCoins').textContent = SAVE.unlimited ? '∞' : SAVE.coins >= 1e9 ? +(SAVE.coins / 1e9).toFixed(2) + ' млрд' : SAVE.coins >= 1e6 ? +(SAVE.coins / 1e6).toFixed(1) + ' млн' : SAVE.coins >= 100000 ? (SAVE.coins / 1000).toFixed(1) + 'K' : SAVE.coins.toLocaleString('ru-RU'); try { $('mStars').textContent = CUPS.reduce((a, _, ci) => a + cupStars(ci), 0); } catch (_) { } try { const L = league(SAVE.rating || 1000); $('mRank').textContent = L.i + ' ' + (SAVE.rating || 1000); } catch (_) { } }
 function swatches(list, cur, key, extra = '') {
   if (!extra) extra = `<label class="opt sw pick ${list.includes(cur) ? '' : 'on'}" style="background:conic-gradient(red,yellow,lime,cyan,blue,magenta,red)"><input type="color" data-k="${key}" value="${hex6(cur)}"></label>`;
   return `<div class="opts sws">${list.map(c => `<div class="opt sw ${c === cur ? 'on' : ''}" style="background:${hex6(c)}" data-k="${key}" data-v="${c}"></div>`).join('')}${extra}</div>`;
@@ -4359,6 +4410,7 @@ function statBars(id) {
   return bars.map(([n, f, v]) => `<div class="bar"><span>${n}</span><i><b style="width:${clamp(f, .05, 1) * 100}%"></b></i><em>${v}</em></div>`).join('');
 }
 function renderGarage() {
+  if (SAVE.unlimited && !SAVE.owned.includes(gModel)) { SAVE.owned.push(gModel); saveSave(); }
   const m = MODEL[gModel], t = SAVE.cars[gModel], owned = SAVE.owned.includes(gModel);
   document.querySelectorAll('#gTabs .gt').forEach(x => x.classList.toggle('on', x.dataset.t === gTab));
   let h = '';
@@ -4370,7 +4422,9 @@ function renderGarage() {
   else if (gTab === 'wheels') h = `<div class="row"><label>Диски</label>${choices(RIMS, t.rim, 'rim')}</div><div class="row"><label>Цвет дисков</label>${swatches([0xd7d9dd, 0x1a1a1c, 0xc9a24a, 0x9aa0a8, 0xd10f2f, 0x1f5fff, 0xffb000, 0xf4f4f4], t.rimColor, 'rimColor')}</div>` + slider('camber', 'Развал', 0, 8, .5, t.camber, SLFMT.camber) + `<div class="row"><label>Суппорты</label>${swatches([0xd11b1b, 0xffcc00, 0x1d4ed8, 0x18b866, 0x111111, 0xff5a1f], t.caliper, 'caliper')}</div>`;
   else if (gTab === 'interior') h = `<div class="row"><label>Кожа салона</label>${swatches([0x1c1c20, 0x5a1a1a, 0x6b4a32, 0xd8cbb0, 0x1b2b4b, 0x3a3d42], t.interior, 'interior')}</div><div class="row"><label>Строчка и акценты</label>${swatches([0xff2d55, 0xffb000, 0x22d3ee, 0x39ff88, 0xffffff, 0xa855f7], t.stitch, 'stitch')}</div><div class="row"><label>Каркас безопасности</label>${choices([[0, 'Нет'], [1, 'Сталь'], [2, 'В цвет кузова']], t.cage, 'cage')}</div>` + slider('tint', 'Тонировка', 0, 1, .05, t.tint, SLFMT.tint);
   else if (gTab === 'perf') h = UPG.map(u => { const lv = t.up[u.id], cost = u.cost[lv]; return `<div class="upg"><div><b>${u.icon} ${u.name}</b><div class="lv">${'▰'.repeat(lv)}${'▱'.repeat(5 - lv)}</div></div>${lv >= 5 ? '<div class="opt on">МАКС</div>' : `<div class="opt buy ${owned && (SAVE.unlimited || SAVE.coins >= cost) ? '' : 'dis'}" data-up="${u.id}">${SAVE.unlimited ? '♾ БЕСПЛАТНО' : '💰 ' + cost.toLocaleString('ru-RU')}</div>`}</div>`; }).join('') + (owned ? '' : '<div class="help">Сначала купи машину</div>');
+  if (!owned && gTab !== 'cars') h = `<div class="gLock"><i>🔒</i><b>${m.name}</b><small>Тюнинг и прокачка откроются после покупки</small><div class="opt buy" id="gLockBuy">КУПИТЬ 💰 ${m.price.toLocaleString('ru-RU')}</div></div>`;
   $('gPanel').innerHTML = h;
+  if ($('gLockBuy')) $('gLockBuy').onclick = () => $('gAct').onclick();
   $('gName').innerHTML = `${m.name} <span class="cls c${m.cls}">${m.cls}</span>`;
   $('gStats').innerHTML = statBars(gModel);
   const act = $('gAct');
@@ -4393,7 +4447,8 @@ $('gPanel').addEventListener('click', e => {
   if (o.dataset.model) { gModel = o.dataset.model; buildGarageCar(); renderGarage(); return; }
   if (o.dataset.up) {
     const t = SAVE.cars[gModel], u = UPG.find(x => x.id === o.dataset.up), cost = u.cost[t.up[u.id]];
-    if (!SAVE.owned.includes(gModel) || (!SAVE.unlimited && SAVE.coins < cost)) { gToast('Не хватает монет — выигрывай гонки!'); return; }
+    if (!SAVE.owned.includes(gModel)) { gToast('Сначала купи эту машину'); return; }
+    if (!SAVE.unlimited && SAVE.coins < cost) { gToast('Не хватает ' + (cost - SAVE.coins).toLocaleString('ru-RU') + ' 💰 — выигрывай гонки!'); return; }
     if (!SAVE.unlimited) SAVE.coins -= cost; t.up[u.id]++; saveSave(); renderGarage(); gToast(u.name + ': уровень ' + t.up[u.id]); if (audio) beep(1200, .1, .1); return;
   }
   setTune(o.dataset.k, o.dataset.v); renderGarage();
@@ -4433,8 +4488,69 @@ $('gTest').onclick = () => { testDrive = gModel; if (!savedSettings) savedSettin
 const fmtT = t => { t = Math.max(0, t); return Math.floor(t / 60) + ':' + String(Math.floor(t % 60)).padStart(2, '0'); };
 function endScoreGame(win, msg) { if (player.finish != null) return; player.finish = raceTime; GS.win = win; showMsg(win ? '🏆' : '⏱', msg); setTimeout(() => { if (state === 'race') { if (PREFS.replay !== false && settings.mode !== 'heli') startReplay(showFinish); else showFinish(); } }, 2200); }
 function scoreHUD() { const el = $('score'); if (!el) return; const m = settings.mode;
-  el.querySelector('b').textContent = m === 'jet' ? Math.round(JET.v * 3.6).toLocaleString('ru-RU') + ' км/ч · М' + (JET.v / 343).toFixed(1) : m === 'heli' ? GS.hits + ' 💥' : m === 'derby' || m === 'hunt' ? GS.hits + ' / ' + (m === 'derby' ? 6 : 5) : Math.round(GS.score + GS.combo).toLocaleString('ru-RU');
+  el.querySelector('b').textContent = m === 'jet' ? Math.round(JET.v * 3.6).toLocaleString('ru-RU') + ' км/ч · М' + (JET.v / 343).toFixed(1) : m === 'heli' ? GS.hits + ' 💥' : m === 'derby' || m === 'hunt' ? GS.hits + ' / ' + (m === 'derby' ? 6 : 5) : m === 'cp' ? fmtT(GS.timer) + '.' + Math.floor(GS.timer * 10 % 10) : m === 'infect' ? GS.timer.toFixed(1) + ' c' : Math.round(GS.score + GS.combo).toLocaleString('ru-RU');
+  if (m === 'traps' || m === 'cp' || m === 'infect') { el.querySelector('span').textContent = m === 'traps' ? 'ФОТОРАДАРЫ · ' + GATES.done + '/' + GATES.total + (GATES.last ? ' · последний ' + GATES.last + ' км/ч' : '') : m === 'cp' ? 'ЧЕКПОИНТЫ ' + GS.hits + '/' + GATES.total + ' · КРУГ ' + Math.min(LAPS, player.lapTimes.length + 1) + '/' + LAPS : 'ЗАРАЖЕНО ' + GS.hits + ' · ' + fmtT(GS.life); el.classList.toggle('hot', (m === 'cp' && GS.timer < 6) || (m === 'infect' && GS.timer < 5)); return; }
   el.querySelector('span').textContent = m === 'drift' ? (GS.combo > 0 ? 'КОМБО ×' + GS.mult + '  +' + Math.round(GS.combo) : 'ОЧКИ ДРИФТА') : m === 'stunt' ? 'ОЧКИ ТРЮКОВ' : m === 'derby' ? 'ТАРАНЫ · ' + fmtT(GS.timer) : m === 'jet' ? 'ВЫСОТА ' + Math.round(JET.y) + ' м · ПОРАЖЕНО ' + GS.hits + (JET.rkCD > 0 ? ' · ракета ' + JET.rkCD.toFixed(1) + 'с' : ' · 🚀 готова') : m === 'heli' ? 'ВЫСОТА ' + Math.round(HELI.y) + ' м · ПОДБИТО · ' + fmtT(GS.timer) + (HELI.rkCD > 0 ? ' · ракета ' + HELI.rkCD.toFixed(1) + 'с' : ' · 🚀 готова') : 'ТАРАНЫ БЕГЛЕЦА · ' + fmtT(GS.timer); }
+/* ---- SPEED TRAPS / CHECKPOINTS / INFECTED ---- */
+const INF_T = 22, INF_T0 = 20, CP_T0 = 25;
+const GATES = { list: [], total: 0, done: 0, last: 0, g: null };
+function gateSpots(n, minGap) { // straight, flat sections away from ramps, ravines and shortcuts
+  const bad = new Uint8Array(N); const mark = (a, b) => { for (let k = a; k <= b; k++) bad[((k % N) + N) % N] = 1; };
+  for (const r of RAMPS) mark(r.i0 - 40, r.i0 + r.n + 60); for (const r of RAVINES) mark(r.i0 - 40, r.i0 + 80); for (const c of CUTS) mark(c.i - 30, c.i + 60); mark(-30, 30);
+  const sc = []; const L = Math.round(60 / DS);
+  for (let i = 0; i < N; i += 4) { if (bad[i]) continue; const a = (i - L + N) % N, b = (i + L) % N; const d = Math.abs(Math.atan2(TX[a] * TZ[b] - TZ[a] * TX[b], TX[a] * TX[b] + TZ[a] * TZ[b])); sc.push([d, i]); }
+  sc.sort((x, y) => x[0] - y[0]); const out = [];
+  for (const [, i] of sc) { if (out.every(j => Math.min(Math.abs(i - j), N - Math.abs(i - j)) > minGap)) out.push(i); if (out.length >= n) break; }
+  return out.sort((x, y) => x - y);
+}
+function gateMesh(kind) {
+  const g = new THREE.Group(), post = new THREE.BoxGeometry(.5, 7, .5), dark = new THREE.MeshStandardMaterial({ color: 0x1f2937, metalness: .6, roughness: .4 });
+  for (const sx of [-1, 1]) { const m = new THREE.Mesh(post, dark); m.position.set(sx * (HALF + 1), 3.5, 0); g.add(m); }
+  const col = kind === 'traps' ? 0xff3d6e : 0x22d3ee;
+  const bar = new THREE.Mesh(new THREE.BoxGeometry(ROAD_W + 2.5, .7, .6), new THREE.MeshStandardMaterial({ color: 0x111827, emissive: col, emissiveIntensity: .9 })); bar.position.y = 7; g.add(bar);
+  const tex = canvasTex(512, 96, (c, w, h) => { c.fillStyle = kind === 'traps' ? '#7f1d1d' : '#0e3a4a'; c.fillRect(0, 0, w, h); c.fillStyle = '#fff'; c.font = '900 52px Arial'; c.textAlign = 'center'; c.fillText(kind === 'traps' ? '📸 ФОТОРАДАР' : '⏱ ЧЕКПОИНТ', w / 2, 66); });
+  const sign = new THREE.Mesh(new THREE.PlaneGeometry(10, 1.9), new THREE.MeshBasicMaterial({ map: tex, side: THREE.DoubleSide, toneMapped: false })); sign.position.set(0, 8.4, 0); g.add(sign);
+  if (kind === 'traps') { const cam = new THREE.Mesh(new THREE.BoxGeometry(1, .7, 1.2), dark); cam.position.set(HALF - 2, 6.2, 0); g.add(cam); }
+  const fl = new THREE.Mesh(new THREE.PlaneGeometry(ROAD_W, 6), new THREE.MeshBasicMaterial({ color: kind === 'traps' ? 0xffffff : 0x22d3ee, transparent: true, opacity: 0, side: THREE.DoubleSide, depthWrite: false, toneMapped: false, blending: THREE.AdditiveBlending }));
+  fl.position.y = 3.5; g.add(fl); g.userData.fl = fl;
+  return g;
+}
+function setupGates() {
+  const m = settings.mode, kind = m === 'traps' || m === 'cp' ? m : null;
+  if (GATES.g) { scene.remove(GATES.g); GATES.g.traverse(o => { if (o.geometry) o.geometry.dispose(); }); GATES.g = null; }
+  GATES.list = []; GATES.done = 0; GATES.last = 0;
+  if (!kind) { GATES.total = 0; return; }
+  const idx = gateSpots(kind === 'traps' ? 5 : 7, N / (kind === 'traps' ? 7 : 9));
+  GATES.g = new THREE.Group(); scene.add(GATES.g);
+  idx.forEach((i, k) => { const g = gateMesh(kind); g.position.set(PX[i], 0, PZ[i]); g.rotation.y = Math.atan2(TX[i], TZ[i]) + Math.PI / 2; GATES.g.add(g); GATES.list.push({ i, g, armed: true, k }); });
+  // seconds each checkpoint gives = segment length / reference pace
+  if (kind === 'cp') GATES.list.forEach((G, k) => { const nx = GATES.list[(k + 1) % GATES.list.length]; const seg = ((nx.i - G.i + N) % N || N) * DS; G.bonus = Math.round(seg / 48 * 10) / 10; });
+  GATES.total = GATES.list.length * LAPS;
+}
+function gatesTick(dt) {
+  const p = player, m = settings.mode;
+  for (const G of GATES.list) {
+    const fl = G.g.userData.fl; if (fl.material.opacity > 0) fl.material.opacity = Math.max(0, fl.material.opacity - dt * 2.2);
+    const d = (p.q.i - G.i + N) % N;
+    if (d > N / 3 && d < N * 2 / 3) G.armed = true;
+    if (G.armed && d < Math.round(25 / DS) && Math.abs(p.q.lat) < HALF + 3 && raceTime > 1) {
+      G.armed = false; fl.material.opacity = .85;
+      if (m === 'traps') { const kmh = Math.round(Math.abs(p.vF) * 3.6); GS.score += kmh; GATES.done++; GATES.last = kmh; flash('📸 ' + kmh + ' км/ч', 1.1); if (kmh >= 250) feed('📸 СУПЕР-СКОРОСТЬ ' + kmh, 'gold'); if (audio) beep(1800, .05, .12); }
+      if (m === 'cp' && p.lapTimes.length < LAPS) { GS.hits++; GS.timer += G.bonus; flash('⏱ +' + G.bonus.toFixed(1) + ' c', 1); if (audio) beep(1400, .08, .12); }
+    }
+  }
+  if (m === 'cp') { GS.timer -= dt; if (GS.timer <= 0) { GS.timer = 0; endScoreGame(GS.hits >= Math.ceil(GATES.total / 3), 'ВРЕМЯ ВЫШЛО'); } }
+  if (m === 'infect') {
+    p.nitro = 1; GS.life += dt;
+    for (const c of cars) { if (c === p || c.remote) continue; c.infT = Math.max(0, (c.infT || 0) - dt);
+      if (c.infT <= 0 && Math.hypot(c.pos.x - p.pos.x, c.pos.z - p.pos.z) < 5.4) { c.infT = 10; GS.hits++; GS.timer = Math.max(GS.timer, INF_T); flash('☣ ЗАРАЗИЛ: ' + c.name.toUpperCase() + ' · таймер ' + INF_T + ' c', 1.2); if (audio) beep(500, .12, .14); } }
+    if (raceStats.takedowns > (GS.kd0 || 0)) { GS.hits += raceStats.takedowns - (GS.kd0 || 0); GS.kd0 = raceStats.takedowns; GS.timer = Math.max(GS.timer, INF_T) + 4; flash('💥 ТАРАН: +1 и +4 c', 1.2); }
+    GS.timer -= dt;
+    if (GS.timer < 5 && Math.floor(GS.timer * 2) !== Math.floor((GS.timer + dt) * 2) && audio) beep(900, .05, .1);
+    if (GS.timer <= 0) { GS.timer = 0; endScoreGame(GS.hits >= 3, 'ВИРУС ПОБЕДИЛ'); }
+    else if (GS.life >= 180) endScoreGame(true, 'ТЫ ВЫЖИЛ 3 МИНУТЫ!');
+  }
+}
 function modeTick(dt) {
   const m = settings.mode, p = player;
   if (m === 'drift' && p.finish == null) {
@@ -4446,6 +4562,7 @@ function modeTick(dt) {
   if (m === 'derby' && p.finish == null) { GS.hits = raceStats.takedowns; GS.timer -= dt; if (GS.hits >= 6) endScoreGame(true, 'РАЗГРОМ!'); else if (GS.timer <= 0) endScoreGame(GS.hits >= 3, 'ВРЕМЯ ВЫШЛО'); }
   if (m === 'heli' && p.finish == null) { GS.timer -= dt; if (GS.timer <= 0) endScoreGame(GS.hits >= 5, 'ВРЕМЯ ВЫШЛО'); }
   if (m === 'hunt' && p.finish == null) { GS.timer -= dt; huntTick(dt); if (GS.hits >= 5) endScoreGame(true, 'БЕГЛЕЦ ЗАДЕРЖАН!'); else if (GS.timer <= 0) endScoreGame(false, 'БЕГЛЕЦ УШЁЛ'); }
+  if ((m === 'traps' || m === 'cp' || m === 'infect') && p.finish == null) gatesTick(dt);
   if (SCORE_MODES.includes(m)) scoreHUD();
   if (m !== 'elim' || player.finish != null) return;
   elimT -= dt;
@@ -4781,7 +4898,7 @@ function netSend(msg, except) {
   if (NET.role === 'host') { for (const [id, c] of NET.conns) if (id !== except && c.open) try { c.send(data); } catch (_) { } }
   else if (NET.host && NET.host.open) try { NET.host.send(data); } catch (_) { }
 }
-function lobbyMsg() { return { t: 'lobby', code: NET.code, stake: NET.stake, cfg: NET.cfg, track: TRACK_ID, players: [...NET.players].map(([id, p]) => ({ id, name: p.name, car: p.car, coins: p.coins })) }; }
+function lobbyMsg() { return { t: 'lobby', code: NET.code, stake: NET.stake, cfg: NET.cfg, track: TRACK_ID, players: [...NET.players].map(([id, p]) => ({ id, name: p.name, car: p.car, coins: p.coins, ready: id === 'host' || !!p.ready, via: id === 'host' ? 'host' : p.via, rtt: Math.round(p.rtt || 0) })) }; }
 /* --- relay transport (MQTT over secure WebSocket): works on any network, used together with WebRTC --- */
 const BROKERS = ['wss://broker.hivemq.com:8884/mqtt', 'wss://broker.emqx.io:8084/mqtt', 'wss://test.mosquitto.org:8081'];
 const MY_UID = Math.random().toString(36).slice(2, 10);
@@ -4807,18 +4924,29 @@ class MqConn {
   send(d) { if (this.open) try { this.cl.publish(this.topic, d); } catch (_) { } }
   close() { if (!this.open) return; this.send(JSON.stringify({ t: '__bye' })); this.open = false; this.emit('close'); }
 }
+// local transport: BroadcastChannel (two tabs / windows on the same device; also used by automated tests)
+class BcConn {
+  constructor(ch, me, peer) { this.ch = ch; this.me = me; this.peer = peer; this.open = true; this.h = {}; this.local = true; }
+  on(e, f) { (this.h[e] = this.h[e] || []).push(f); if (e === 'open' && this.open) setTimeout(f, 0); }
+  emit(e, a) { for (const f of this.h[e] || []) try { f(a); } catch (_) { } }
+  send(d) { if (this.open) try { this.ch.postMessage({ to: this.peer, from: this.me, d }); } catch (_) { } }
+  close() { if (!this.open) return; this.send('{"t":"__bye"}'); this.open = false; this.emit('close'); }
+}
+const NET_LOCAL = /[?&]net=local/.test(location.search);
+addEventListener('pagehide', () => { try { if (NET.reloading) return; if (NET.role === 'guest' && NET.host) NET.host.close(); if (NET.role === 'host') netSend({ t: 'closed' }); } catch (_) { } });
 function acceptConn(conn) {
-  if (NET.players.size >= 4 || NET.race) { conn.on('open', () => { conn.send(JSON.stringify({ t: 'full' })); setTimeout(() => conn.close(), 300); }); return; }
+  if (NET.players.size >= 4 || NET.race) { conn.on('open', () => { conn.send(JSON.stringify({ t: 'full', race: !!NET.race })); setTimeout(() => conn.close(), 300); }); return; }
   const id = 'p' + Math.random().toString(36).slice(2, 7);
   conn.on('data', d => onNet(d, id, conn));
   conn.on('close', () => dropPlayer(id));
   conn.on('error', () => dropPlayer(id));
 }
-async function hostRoom() {
+async function hostRoom(fixed) {
   if (NET.role || NET.connecting) return;
   NET.connecting = true;
   netStatus('Создаю комнату…');
   const A = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789'; let code = ''; for (let k = 0; k < 5; k++) code += A[Math.floor(Math.random() * A.length)];
+  if (typeof fixed === 'string' && /^[A-Z0-9]{5}$/.test(fixed)) code = fixed;
   let up = false;
   const ready = () => {
     if (up) return; up = true; NET.connecting = false;
@@ -4827,11 +4955,21 @@ async function hostRoom() {
     netStatus('Комната создана. Позови друга по ссылке или QR-коду!'); renderOnline(); refreshShowroomFriends(); renderMenu();
     clearInterval(NET.pingI); NET.pingI = setInterval(() => { if (NET.role === 'host') netSend({ t: 'ping', at: performance.now() }); }, 2500);
   };
+  try {
+    const ch = new BroadcastChannel('sr3d-' + code); NET.bc = ch; const lconns = new Map();
+    ch.onmessage = e => { const m = e.data || {}; if (m.to !== 'host' || !m.from) return; let c = lconns.get(m.from);
+      if (!c) { if (String(m.d).indexOf('"hello"') < 0) return; c = new BcConn(ch, 'host', m.from); lconns.set(m.from, c); acceptConn(c); }
+      if (m.d === '{"t":"__bye"}') { lconns.delete(m.from); if (c.open) { c.open = false; c.emit('close'); } return; }
+      c.emit('data', m.d); };
+    if (NET_LOCAL) setTimeout(ready, 50);
+  } catch (_) { }
+  if (NET_LOCAL) return;
   let fails = 0; const fail = () => { if (++fails >= 2 && !up) { NET.connecting = false; netStatus('Онлайн сейчас недоступен: нет связи с серверами. Проверь интернет (Wi-Fi или мобильный) и попробуй ещё раз.', true); closeOnline(true); } };
   // 1) relay (always works through firewalls / mobile networks)
   mqConnect().then(cl => {
-    NET.mq = cl; const pre = 'sr3d/' + code + '/';
+    NET.mq = cl; const pre = 'sr3d/' + code + '/'; NET.mqPre = pre;
     cl.subscribe(pre + 'up/+', { qos: 0 });
+    try { cl.publish(pre + 'info', JSON.stringify({ t: 'room', at: Date.now() }), { retain: true, qos: 1 }); } catch (_) { }
     const vconns = new Map();
     cl.on('message', (topic, payload) => {
       if (!topic.startsWith(pre + 'up/')) return;
@@ -4854,10 +4992,18 @@ async function hostRoom() {
     peer.on('disconnected', () => { try { peer.reconnect(); } catch (_) { } });
   } catch (e) { fail(); }
 }
+// "b4x f6", "В4ХF6" (cyrillic look-alikes), a pasted invite link — all become B4XF6
+function normCode(v) {
+  v = String(v || ''); const m = /join-([A-Za-zА-Яа-я0-9]{5})/.exec(v); if (m) v = m[1];
+  const CY = { 'А': 'A', 'В': 'B', 'С': 'C', 'Е': 'E', 'Н': 'H', 'К': 'K', 'М': 'M', 'О': 'O', 'Р': 'P', 'Т': 'T', 'Х': 'X', 'У': 'Y', 'З': '3', 'Б': '6' };
+  return v.toUpperCase().replace(/[А-ЯЁ]/g, ch => CY[ch] || '').replace(/[^A-Z0-9]/g, '').slice(0, 5);
+}
 async function joinRoom(code) {
-  code = String(code || '').toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 5);
-  if (code.length !== 5) { netStatus('Код комнаты — 5 символов', true); return; }
-  if (NET.role) closeOnline(true);
+  code = normCode(code);
+  if (code.length !== 5) { netStatus(code.length ? 'В коде 5 символов — введено ' + code.length : 'Введи код комнаты из 5 символов', true); return; }
+  if (NET.connecting && NET.joinCode === code) return;
+  if (NET.role || NET.connecting) closeOnline(true);
+  NET.joinCode = code;
   netStatus('Подключаюсь к комнате ' + code + '…');
   NET.connecting = true; NET.host = null;
   const cands = [];
@@ -4868,24 +5014,33 @@ async function joinRoom(code) {
       if (!NET.host) {
         let m; try { m = JSON.parse(d); } catch (_) { return; }
         if (!m || (m.t !== 'welcome' && m.t !== 'full')) return;
-        if (m.t === 'full') { netStatus('Комната заполнена (максимум 4 игрока)', true); closeOnline(true); return; }
+        if (m.t === 'full') { netStatus(m.race ? 'Сейчас идёт заезд — дождись, пока он закончится, и войди снова' : 'Комната заполнена (максимум 4 игрока)', true); closeOnline(true); return; }
         NET.host = conn; NET.connecting = false; clearTimeout(tmo);
         for (const o of cands) if (o !== conn) try { o.close(); } catch (_) { }
         Object.assign(NET, { role: 'guest', code });
-        netStatus('Подключено' + (conn.relay ? ' (через сервер)' : ' (напрямую)') + '! Ждём старта от хоста'); renderMenu();
+        netStatus('Подключено' + (conn.local ? ' (на этом устройстве)' : conn.relay ? ' (через сервер)' : ' (напрямую)') + '! Ждём старта от хоста'); renderMenu();
       }
       if (conn === NET.host) onNet(d, 'host', conn);
     });
     conn.on('close', () => { if (conn === NET.host && NET.role === 'guest') { netStatus('Хост закрыл комнату', true); hostGone(); } });
     conn.on('error', () => { });
   };
-  const tmo = setTimeout(() => { if (!NET.host) { netStatus('Комната ' + code + ' не найдена. Проверь код — хост должен держать игру открытой на экране.', true); closeOnline(true); } }, 16000);
+  try {
+    const ch = new BroadcastChannel('sr3d-' + code); NET.bc = ch; const conn = new BcConn(ch, MY_UID, 'host');
+    ch.onmessage = e => { const m = e.data || {}; if (m.to !== MY_UID) return; if (m.d === '{"t":"__bye"}') { if (conn.open) { conn.open = false; conn.emit('close'); } return; } conn.emit('data', m.d); };
+    attach(conn); hello(conn);
+  } catch (_) { }
+  // keep knocking: the host may have the game in the background (e.g. while sending the link in a messenger)
+  clearInterval(NET.helloI); NET.helloI = setInterval(() => { if (NET.host || !NET.connecting || NET.joinCode !== code) return clearInterval(NET.helloI); for (const c of cands) if (c.open !== false) hello(c); }, 2000);
+  let seen = false; NET.onRoomInfo = () => { if (!seen && !NET.host) { seen = true; netStatus('Комната ' + code + ' найдена, подключаюсь… Хост должен держать игру открытой'); } };
+  const tmo = setTimeout(() => { if (!NET.host) { netStatus(seen ? 'Хост не отвечает. Попроси друга открыть игру (не сворачивать) и нажми «Войти» ещё раз' : 'Комната ' + code + ' не найдена. Проверь код: 5 символов, хост должен держать игру открытой', true); closeOnline(true); } }, 25000);
+  if (NET_LOCAL) return;
   mqConnect().then(cl => {
     if (NET.host && !NET.host.relay) { cl.end(true); return; }
     NET.mq = cl; const pre = 'sr3d/' + code + '/';
     const conn = new MqConn(cl, pre + 'up/' + MY_UID);
-    cl.subscribe(pre + 'dn/' + MY_UID, { qos: 0 }, () => { hello(conn); setTimeout(() => { if (!NET.host) hello(conn); }, 3000); });
-    cl.on('message', (topic, payload) => { const txt = payload.toString(); if (txt === '{"t":"__bye"}') { if (conn.open) { conn.open = false; conn.emit('close'); } return; } conn.emit('data', txt); });
+    cl.subscribe(pre + 'dn/' + MY_UID, { qos: 0 }, () => hello(conn)); cl.subscribe(pre + 'info', { qos: 0 });
+    cl.on('message', (topic, payload) => { const txt = payload.toString(); if (topic === pre + 'info') { if (txt && NET.onRoomInfo) NET.onRoomInfo(); return; } if (txt === '{"t":"__bye"}') { if (conn.open) { conn.open = false; conn.emit('close'); } return; } conn.emit('data', txt); });
     attach(conn);
   }).catch(() => { });
   try {
@@ -4914,16 +5069,19 @@ function hostGone() {
   NET.role = null; NET.players.clear(); NET.conns.clear(); NET.host = null;
   try { NET.peer && NET.peer.destroy(); } catch (_) { }
   try { NET.mq && NET.mq.end(true); } catch (_) { }
-  NET.peer = null; NET.mq = null; refreshShowroomFriends(); renderOnline(); renderMenu();
+  try { NET.bc && NET.bc.close(); } catch (_) { }
+  NET.peer = null; NET.mq = null; NET.bc = null; refreshShowroomFriends(); renderOnline(); renderMenu();
   if (inRace) netCheckResults(true);
 }
 function closeOnline(silent) {
-  if (NET.role === 'host') netSend({ t: 'closed' });
+  if (NET.role === 'host') { netSend({ t: 'closed' }); try { NET.mq && NET.mqPre && NET.mq.publish(NET.mqPre + 'info', '', { retain: true, qos: 1 }); } catch (_) { } }
+  clearInterval(NET.helloI); NET.joinCode = null;
   for (const c of NET.conns.values()) try { c.close(); } catch (_) { }
   try { NET.host && NET.host.close(); } catch (_) { }
   try { NET.peer && NET.peer.destroy(); } catch (_) { }
   try { NET.mq && NET.mq.end(true); } catch (_) { }
-  Object.assign(NET, { role: null, peer: null, mq: null, host: null, code: null, myId: null, stake: 0, connecting: false }); NET.conns.clear(); NET.players.clear();
+  try { NET.bc && NET.bc.close(); } catch (_) { }
+  Object.assign(NET, { role: null, peer: null, mq: null, bc: null, host: null, code: null, myId: null, stake: 0, connecting: false }); NET.conns.clear(); NET.players.clear();
   if (!silent) netStatus('');
   refreshShowroomFriends(); renderOnline(); renderMenu();
 }
@@ -4932,28 +5090,37 @@ function onNet(raw, from, conn) {
   if (!m || typeof m.t !== 'string') return;
   if (NET.role === 'host') {
     if (m.t === 'hello') {
-      if (m.uid && [...NET.players.values()].some(p => p.uid === m.uid)) { if (NET.conns.get(from) !== conn) { conn.send(JSON.stringify({ t: 'dup' })); } return; }
-      if (NET.players.size >= 4) return;
+      const old = m.uid ? [...NET.players.entries()].find(([id, p]) => p.uid === m.uid && id !== 'host') : null;
+      if (old) { const oc = NET.conns.get(old[0]);
+        if (oc === conn) { conn.send(JSON.stringify({ t: 'welcome', id: old[0] })); netSend(lobbyMsg()); return; } // repeated hello on the same link
+        if (oc && oc.open !== false) { conn.send(JSON.stringify({ t: 'dup' })); return; } // same guest via a second transport — keep the first
+        NET.players.delete(old[0]); NET.conns.delete(old[0]); }
+      if (NET.players.size >= 4 || NET.race) { conn.send(JSON.stringify({ t: 'full', race: !!NET.race })); return; }
       NET.conns.set(from, conn);
-      NET.players.set(from, { name: String(m.name || 'Гость').slice(0, 16), car: sanitizeCar(m.car), coins: num(m.coins), uid: String(m.uid || '').slice(0, 12) });
+      NET.players.set(from, { name: String(m.name || 'Гость').slice(0, 16), car: sanitizeCar(m.car), coins: num(m.coins), uid: String(m.uid || '').slice(0, 12), ready: false, via: conn.local ? 'local' : conn.relay ? 'relay' : 'p2p' });
       conn.send(JSON.stringify({ t: 'welcome', id: from }));
       netSend(lobbyMsg()); toastAny('🎮 ' + NET.players.get(from).name + ' подключился!'); if (audio) beep(1300, .1, .1);
       renderOnline(); refreshShowroomFriends(); renderMenu(); return;
     }
     if (m.t === 'car' && NET.players.has(from)) { const p = NET.players.get(from); p.car = sanitizeCar(m.car); p.coins = num(m.coins); netSend(lobbyMsg()); renderOnline(); refreshShowroomFriends(); return; }
-    if (m.t === 'pong') { NET.rtt = lerp(NET.rtt, performance.now() - num(m.at), .3); return; }
+    if (m.t === 'pong') { const r = performance.now() - num(m.at); NET.rtt = lerp(NET.rtt, r, .3); const p = NET.players.get(from); if (p) { p.rtt = p.rtt ? lerp(p.rtt, r, .3) : r; if (!NET.race && (NET.lobbyT = (NET.lobbyT || 0) + 1) % 4 === 0) { netSend(lobbyMsg()); renderOnline(); } } return; }
+    if (m.t === 'rdy' && NET.players.has(from) && !NET.race) { NET.players.get(from).ready = !!m.v; netSend(lobbyMsg()); renderOnline(); if (audio) beep(m.v ? 1100 : 600, .06, .08); return; }
+    if (m.t === 'emo' && NET.players.has(from)) { m.id = from; netSend(m, from); }
     if (m.t === 'st' || m.t === 'fin' || m.t === 'leave') { m.id = from; netSend(m, from); }
   }
-  if (m.t === 'ping') { if (NET.host) NET.host.send(JSON.stringify({ t: 'pong', at: m.at })); NET.rtt = 80; return; }
+  if (m.t === 'ping') { if (NET.host) NET.host.send(JSON.stringify({ t: 'pong', at: m.at })); return; }
   if (m.t === 'welcome') { NET.myId = String(m.id); return; }
-  if (m.t === 'full') { netStatus('Комната заполнена (максимум 4)', true); closeOnline(true); return; }
+  if (m.t === 'full') { netStatus(m.race ? 'Сейчас идёт заезд — дождись, пока он закончится, и войди снова' : 'Комната заполнена (максимум 4 игрока)', true); closeOnline(true); return; }
   if (m.t === 'closed') { netStatus('Хост закрыл комнату', true); hostGone(); return; }
   if (m.t === 'lobby' && NET.role === 'guest') {
     NET.stake = num(m.stake); NET.cfg = Object.assign(NET.cfg, m.cfg || {});
-    NET.players.clear(); for (const p of (m.players || []).slice(0, 4)) NET.players.set(String(p.id), { name: String(p.name).slice(0, 16), car: sanitizeCar(p.car), coins: num(p.coins) });
-    if (m.track && m.track !== TRACK_ID && TRACKS[m.track]) { try { localStorage.setItem('sr3d_track', m.track); localStorage.setItem('sr3d_join', NET.code); } catch (_) { } netStatus('Загружаю трассу хоста…'); setTimeout(() => location.reload(), 300); return; }
+    NET.players.clear(); for (const p of (m.players || []).slice(0, 4)) NET.players.set(String(p.id), { name: String(p.name).slice(0, 16), car: sanitizeCar(p.car), coins: num(p.coins), ready: !!p.ready, via: ['host', 'local', 'relay', 'p2p'].includes(p.via) ? p.via : 'p2p', rtt: num(p.rtt) });
+    if (NET.host) { const me = NET.players.get(NET.myId); if (me) { me.via = NET.host.local ? 'local' : NET.host.relay ? 'relay' : 'p2p'; NET.rtt = me.rtt || NET.rtt; } }
+    if (m.track && m.track !== TRACK_ID && TRACKS[m.track]) { try { localStorage.setItem('sr3d_track', m.track); sessionStorage.setItem('sr3d_join', NET.code); } catch (_) { } netStatus('Загружаю трассу хоста…'); setTimeout(() => location.reload(), 300); return; }
     renderOnline(); refreshShowroomFriends(); renderMenu(); return;
   }
+  if (m.t === 'emo') { showEmo(String(m.id || from), num(m.e)); return; }
+  if (m.t === 'retrack' && NET.role === 'guest' && TRACKS[m.track]) { try { localStorage.setItem('sr3d_track', m.track); sessionStorage.setItem('sr3d_join', NET.code); } catch (_) { } NET.reloading = true; netStatus('Хост сменил трассу — загружаю…'); setTimeout(() => location.reload(), 250); return; }
   if (m.t === 'left') { const id = String(m.id); NET.players.delete(id); remoteGone(id); renderOnline(); refreshShowroomFriends(); return; }
   if (m.t === 'start' && NET.role === 'guest') { netBeginRace(m, NET.rtt / 2000); return; }
   if (m.t === 'wx' && NET.race && ['clear', 'rain', 'snow'].includes(m.w)) { setWeather(m.w, true); return; }
@@ -4966,7 +5133,7 @@ function netSendCar() { if (!NET.role) return; if (NET.role === 'host') { const 
 // ---- race ----
 function hostStartRace() {
   if (NET.role !== 'host' || NET.players.size < 2) return;
-  if (TRK.flats || ['heli', 'jet', 'snail', 'cruise'].includes(GAME.id)) { netStatus('Для онлайн-заезда выбери гоночную игру (кнопка «Игра» в меню): кольцевую, побег, дрифт, дрэг, тоуге…', true); return; }
+  if (TRK.flats) { netStatus('Эта карта не для онлайна — выбери трассу в лобби', true); return; }
   const poor = [...NET.players.values()].find(p => p.coins < NET.stake);
   if (poor) { netStatus('У игрока ' + poor.name + ' не хватает монет для ставки', true); return; }
   if (SAVE.coins < NET.stake) { netStatus('Тебе не хватает монет для ставки', true); return; }
@@ -4980,6 +5147,8 @@ function netBeginRace(m, lag) {
   NET.race = { order: (m.order || []).map(String), stake: num(m.stake), pot: num(m.stake) * (m.order || []).length, start: performance.now() };
   if (m.players) for (const p of m.players) if (NET.players.has(String(p.id))) NET.players.get(String(p.id)).car = sanitizeCar(p.car);
   NET.results = null; $('restart').classList.add('hidden');
+  for (const p of NET.players.values()) p.ready = false;
+  if (['heli', 'jet', 'snail', 'cruise'].includes(GAME.id)) GAME = GAMES.find(g => g.track === TRACK_ID && g.mode === 'race') || GAME;
   if (NET.race.stake > 0) { SAVE.coins = Math.max(0, SAVE.coins - NET.race.stake); saveSave(); }
   if (!savedSettings) savedSettings = Object.assign({}, settings);
   Object.assign(settings, { mode: 'race', laps: clamp(num(cfg.laps, 3), 1, 5), tod: PRESETS[cfg.tod] ? cfg.tod : 'night', wx: ['clear', 'rain', 'snow', 'auto'].includes(cfg.wx) ? cfg.wx : 'clear' });
@@ -5083,10 +5252,85 @@ function refreshShowroomFriends() {
   });
 }
 // ---- UI ----
-async function drawQR(link) {
-  const box = $('onQR');
-  try { if (!window.qrcode) await loadScript('https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js'); const q = window.qrcode(0, 'M'); q.addData(link); q.make(); box.innerHTML = q.createSvgTag({ cellSize: 4, margin: 2, scalable: true }); }
-  catch (_) { box.innerHTML = '<div class="help">QR недоступен — отправь ссылку</div>'; }
+// Minimal QR encoder (byte mode, EC level M, versions 1–10) — no network needed, works offline.
+function qrMatrix(text) {
+  const bytes = [...new TextEncoder().encode(text)];
+  const ECC = [0, 10, 16, 26, 18, 24, 16, 18, 22, 22, 26], BLK = [0, 1, 1, 1, 2, 2, 4, 4, 4, 5, 5];
+  const rawMods = v => { let r = (16 * v + 128) * v + 64; if (v >= 2) { const n = Math.floor(v / 7) + 2; r -= (25 * n - 10) * n - 55; if (v >= 7) r -= 36; } return r; };
+  const cap = v => Math.floor(rawMods(v) / 8) - ECC[v] * BLK[v];
+  let ver = 1; while (ver <= 10 && 4 + (ver < 10 ? 8 : 16) + bytes.length * 8 > cap(ver) * 8) ver++;
+  if (ver > 10) return null;
+  const size = ver * 4 + 17, M = [], F = [];
+  for (let y = 0; y < size; y++) { M.push(new Array(size).fill(false)); F.push(new Array(size).fill(false)); }
+  const setF = (x, y, d) => { M[y][x] = d; F[y][x] = true; };
+  // bit stream
+  const bits = []; const put = (v, n) => { for (let i = n - 1; i >= 0; i--) bits.push((v >>> i) & 1); };
+  put(4, 4); put(bytes.length, ver < 10 ? 8 : 16); for (const b of bytes) put(b, 8);
+  const capBits = cap(ver) * 8; put(0, Math.min(4, capBits - bits.length)); put(0, (8 - bits.length % 8) % 8);
+  for (let p = 0xEC; bits.length < capBits; p ^= 0xEC ^ 0x11) put(p, 8);
+  const data = []; for (let i = 0; i < bits.length; i += 8) { let b = 0; for (let j = 0; j < 8; j++) b = b << 1 | bits[i + j]; data.push(b); }
+  // Reed–Solomon
+  const mul = (x, y) => { let z = 0; for (let i = 7; i >= 0; i--) { z = (z << 1) ^ ((z >>> 7) * 0x11D); z ^= ((y >>> i) & 1) * x; } return z; };
+  const deg = ECC[ver], div = new Array(deg).fill(0); div[deg - 1] = 1;
+  for (let i = 0, root = 1; i < deg; i++) { for (let j = 0; j < deg; j++) { div[j] = mul(div[j], root); if (j + 1 < deg) div[j] ^= div[j + 1]; } root = mul(root, 2); }
+  const rem = d => { const r = new Array(deg).fill(0); for (const b of d) { const f = b ^ r.shift(); r.push(0); div.forEach((c, i) => r[i] ^= mul(c, f)); } return r; };
+  const nb = BLK[ver], raw = Math.floor(rawMods(ver) / 8), nShort = nb - raw % nb, shortLen = Math.floor(raw / nb), blocks = [];
+  for (let i = 0, k = 0; i < nb; i++) { const d = data.slice(k, k + shortLen - deg + (i < nShort ? 0 : 1)); k += d.length; const e = rem(d); if (i < nShort) d.push(0); blocks.push(d.concat(e)); }
+  const cw = []; for (let i = 0; i < blocks[0].length; i++) blocks.forEach((b, j) => { if (i !== shortLen - deg || j >= nShort) cw.push(b[i]); });
+  // function patterns
+  for (let i = 0; i < size; i++) { setF(6, i, i % 2 === 0); setF(i, 6, i % 2 === 0); }
+  for (const [cx, cy] of [[3, 3], [size - 4, 3], [3, size - 4]]) for (let dy = -4; dy <= 4; dy++) for (let dx = -4; dx <= 4; dx++) { const x = cx + dx, y = cy + dy, d = Math.max(Math.abs(dx), Math.abs(dy)); if (x >= 0 && x < size && y >= 0 && y < size) setF(x, y, d !== 2 && d !== 4); }
+  if (ver > 1) { const n = Math.floor(ver / 7) + 2, step = Math.ceil((ver * 4 + 4) / (n * 2 - 2)) * 2, pos = [6]; for (let p = ver * 4 + 10; pos.length < n; p -= step) pos.splice(1, 0, p);
+    for (let i = 0; i < n; i++) for (let j = 0; j < n; j++) { if ((i === 0 && j === 0) || (i === 0 && j === n - 1) || (i === n - 1 && j === 0)) continue; for (let dy = -2; dy <= 2; dy++) for (let dx = -2; dx <= 2; dx++) setF(pos[i] + dx, pos[j] + dy, Math.max(Math.abs(dx), Math.abs(dy)) !== 1); } }
+  const fmt = mask => { const d = mask; let r = d; for (let i = 0; i < 10; i++) r = (r << 1) ^ ((r >>> 9) * 0x537); const b = (d << 10 | r) ^ 0x5412, g = i => ((b >>> i) & 1) === 1;
+    for (let i = 0; i <= 5; i++) setF(8, i, g(i)); setF(8, 7, g(6)); setF(8, 8, g(7)); setF(7, 8, g(8)); for (let i = 9; i < 15; i++) setF(14 - i, 8, g(i));
+    for (let i = 0; i < 8; i++) setF(size - 1 - i, 8, g(i)); for (let i = 8; i < 15; i++) setF(8, size - 15 + i, g(i)); setF(8, size - 8, true); };
+  fmt(0);
+  if (ver >= 7) { let r = ver; for (let i = 0; i < 12; i++) r = (r << 1) ^ ((r >>> 11) * 0x1F25); const b = ver << 12 | r; for (let i = 0; i < 18; i++) { const d = ((b >>> i) & 1) === 1, a = size - 11 + i % 3, c = Math.floor(i / 3); setF(a, c, d); setF(c, a, d); } }
+  // data, zig-zag
+  for (let right = size - 1, i = 0; right >= 1; right -= 2) { if (right === 6) right = 5;
+    for (let v = 0; v < size; v++) for (let j = 0; j < 2; j++) { const x = right - j, up = ((right + 1) & 2) === 0, y = up ? size - 1 - v : v;
+      if (!F[y][x] && i < cw.length * 8) { M[y][x] = ((cw[i >>> 3] >>> (7 - (i & 7))) & 1) === 1; i++; } } }
+  // mask (pick lowest penalty)
+  const MK = [(x, y) => (x + y) % 2 === 0, (x, y) => y % 2 === 0, x => x % 3 === 0, (x, y) => (x + y) % 3 === 0, (x, y) => (Math.floor(x / 3) + Math.floor(y / 2)) % 2 === 0,
+    (x, y) => x * y % 2 + x * y % 3 === 0, (x, y) => (x * y % 2 + x * y % 3) % 2 === 0, (x, y) => ((x + y) % 2 + x * y % 3) % 2 === 0];
+  const apply = k => { for (let y = 0; y < size; y++) for (let x = 0; x < size; x++) if (!F[y][x] && MK[k](x, y)) M[y][x] = !M[y][x]; };
+  const pen = () => { let p = 0, dark = 0;
+    for (let a = 0; a < size; a++) { let rx = 1, ry = 1; for (let b = 1; b < size; b++) { if (M[a][b] === M[a][b - 1]) { if (++rx === 5) p += 3; else if (rx > 5) p++; } else rx = 1; if (M[b][a] === M[b - 1][a]) { if (++ry === 5) p += 3; else if (ry > 5) p++; } else ry = 1; } }
+    for (let y = 0; y < size; y++) for (let x = 0; x < size; x++) { if (M[y][x]) dark++; if (x && y && M[y][x] === M[y - 1][x] && M[y][x] === M[y][x - 1] && M[y][x] === M[y - 1][x - 1]) p += 3; }
+    return p + Math.floor(Math.abs(dark * 20 - size * size * 10) / (size * size)) * 10; };
+  let best = 0, bp = 1e9; for (let k = 0; k < 8; k++) { apply(k); fmt(k); const p = pen(); if (p < bp) { bp = p; best = k; } apply(k); }
+  apply(best); fmt(best);
+  return M;
+}
+function qrSvg(text, px) {
+  const M = qrMatrix(text); if (!M) return '';
+  const n = M.length, q = 2; let d = '';
+  for (let y = 0; y < n; y++) for (let x = 0; x < n; x++) if (M[y][x]) d += `M${x + q} ${y + q}h1v1h-1z`;
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${n + q * 2} ${n + q * 2}" width="${px}" height="${px}" shape-rendering="crispEdges"><rect width="100%" height="100%" fill="#fff"/><path d="${d}" fill="#000"/></svg>`;
+}
+function drawQR(link) {
+  const box = $('onQR'); if (!box) return;
+  try { box.innerHTML = qrSvg(link, 132) || '<div class="help">Ссылка слишком длинная для QR</div>'; } catch (_) { box.innerHTML = '<div class="help">QR недоступен — отправь ссылку</div>'; }
+}
+const ON_TRACKS = ['city', 'ring', 'sunset', 'bay', 'downtown', 'port', 'docks', 'mountain', 'canyon', 'dunes', 'forest', 'glacier', 'streets'].filter(t => TRACKS[t]);
+const EMO = ['👍', '😂', '🔥', '😈', '🏁', '🤝'];
+const AVC = ['#ff3d6e', '#3dd5ff', '#ffd23d', '#4ade80'];
+function showEmo(id, k) {
+  const e = EMO[k | 0]; if (!e) return; const p = NET.players.get(id); const who = p ? p.name : '';
+  if (state === 'race') { feed(who + ' ' + e, 'blue'); return; }
+  const el = document.querySelector(`.onPl[data-id="${id}"] .onBub`); if (el) { el.textContent = e; el.classList.remove('pop'); void el.offsetWidth; el.classList.add('pop'); }
+  else toastAny(who + ' ' + e);
+}
+function switchTrack(t) {
+  if (!TRACKS[t] || t === TRACK_ID) return;
+  const g = GAMES.find(x => x.track === t && x.mode === 'race') || GAMES.find(x => x.track === t);
+  try { localStorage.setItem('sr3d_track', t); if (g) localStorage.setItem('sr3d_game', g.id); if (NET.role === 'host') sessionStorage.setItem('sr3d_hostcode', NET.code); else sessionStorage.setItem('sr3d_hostnew', '1'); } catch (_) { }
+  if (NET.role === 'host') netSend({ t: 'retrack', track: t });
+  NET.reloading = true; netStatus('Загружаю трассу «' + TRACKS[t].name + '»…'); setTimeout(() => location.reload(), 300);
+}
+function trackPicker(host) {
+  return `<div class="onTrk">${ON_TRACKS.map(t => `<div class="onT ${t === TRACK_ID ? 'on' : ''} ${host ? '' : 'dis'}" data-trk="${t}"><i>${TRACK_ICON[t] || '🏁'}</i><small>${TRACKS[t].name}</small></div>`).join('')}</div>`;
 }
 function renderOnline() {
   const body = $('onBody'); if (!body) return;
@@ -5095,48 +5339,83 @@ function renderOnline() {
     const av = (myName || '?').trim()[0] || '?';
     body.innerHTML = `<div class="onMe"><div class="onAv">${esc(av.toUpperCase())}</div><div style="flex:1"><div class="onCodeL">ТВОЙ НИК</div><input class="txt" id="onName" maxlength="16" value="${esc(myName)}"></div><div class="onCarMini">${THUMBS[SAVE.sel] && THUMBS[SAVE.sel] !== 'x' ? `<img src="${THUMBS[SAVE.sel]}">` : ''}<small>${MODEL[SAVE.sel].name}</small></div></div>
       <div class="onCards">
-        <div class="onCard host" id="onHost"><i>🏠</i><b>Создать лобби</b><small>Ты хост: выбираешь ставку и запускаешь гонку. Друг заходит по ссылке или QR</small><span class="onGo">СОЗДАТЬ</span></div>
-        <div class="onCard join"><i>🔑</i><b>Войти по коду</b><small>Введи 5 символов, которые прислал друг</small><input class="txt onCodeIn" id="onCode" maxlength="5" placeholder="•••••" autocapitalize="characters"><span class="onGo" id="onJoin">ВОЙТИ</span></div>
+        <div class="onCard host"><i>🏠</i><b>Создать лобби</b><small>Ты хост: выбираешь трассу и ставку, друг заходит по коду, ссылке или QR</small><span class="onGo" id="onHost">СОЗДАТЬ</span></div>
+        <div class="onCard join"><i>🔑</i><b>Войти по коду</b><small>Введи 5 символов от друга — вход сразу</small><div class="onCodeRow"><input class="txt onCodeIn" id="onCode" maxlength="40" placeholder="•••••" autocapitalize="characters" autocomplete="off" autocorrect="off" spellcheck="false" enterkeyhint="go">${navigator.clipboard && navigator.clipboard.readText ? '<span class="onPaste" id="onPaste" title="Вставить">📋</span>' : ''}</div><span class="onGo" id="onJoin">ВОЙТИ</span></div>
       </div>
-      <div class="help">Игра в лобби: ${GAME.icon} ${GAME.name} · ${TRACKS[TRACK_ID].name}. До 4 игроков, ставки — только игровые монеты.</div>`;
+      <div class="help">Трассу выберешь в лобби. До 4 игроков, ставки — только игровые монеты. Работает через интернет (Wi-Fi или мобильный), а также в двух вкладках на одном устройстве.</div>`;
     $('onName').oninput = e => { myName = e.target.value.slice(0, 16) || 'Гонщик'; try { localStorage.setItem('sr3d_name', myName); } catch (_) { } };
-    $('onHost').onclick = hostRoom;
-    $('onJoin').onclick = () => joinRoom($('onCode').value);
+    $('onHost').onclick = () => hostRoom();
+    const ci = $('onCode'), jb = $('onJoin');
+    const sync = () => { const v = normCode(ci.value); if (ci.value !== v) ci.value = v; jb.classList.toggle('dis', v.length !== 5); return v; };
+    ci.oninput = () => { const v = sync(); if (v.length === 5 && ci.dataset.auto !== v) { ci.dataset.auto = v; ci.blur(); joinRoom(v); } };
+    ci.onkeydown = e => { if (e.key === 'Enter') { e.preventDefault(); joinRoom(ci.value); } };
+    jb.onclick = () => joinRoom(ci.value); sync();
+    if ($('onPaste')) $('onPaste').onclick = () => navigator.clipboard.readText().then(t => { ci.value = t; ci.oninput(); }, () => netStatus('Не удалось вставить — введи код вручную', true));
     return;
   }
-  const host = NET.role === 'host', link = roomLink(NET.code);
-  const PL = [...NET.players], AVC = ['#ff3d6e', '#3dd5ff', '#ffd23d', '#4ade80'];
-  const plist = '<div class="onSlots">' + [0, 1, 2, 3].map(k => { const e = PL[k]; if (!e) return '<div class="onSlot empty"><i>＋</i><small>Свободно</small></div>'; const [id, p] = e, md = MODEL[p.car.model];
-    return `<div class="onSlot ${id === NET.myId ? 'me' : ''}"><div class="onAv" style="background:${AVC[k]}">${esc((p.name || '?')[0].toUpperCase())}</div><b>${id === 'host' ? '👑 ' : ''}${esc(p.name)}${id === NET.myId ? ' · ты' : ''}</b>${THUMBS[p.car.model] && THUMBS[p.car.model] !== 'x' ? `<img src="${THUMBS[p.car.model]}">` : ''}<small>${md.name} <span class="cls c${md.cls}">${md.cls}</span></small><em>🪙 ${p.coins.toLocaleString('ru-RU')}</em></div>`; }).join('') + '</div>';
+  const host = NET.role === 'host', link = roomLink(NET.code), n = NET.players.size;
+  const VIA = { host: ['👑', 'хост'], local: ['💻', 'это устройство'], relay: ['☁️', 'через сервер'], p2p: ['📶', 'напрямую'] };
+  const PL = [...NET.players];
+  const rows = [0, 1, 2, 3].slice(0, Math.min(4, n + 1)).map(k => { const e = PL[k];
+    if (!e) return `<div class="onPl empty"><div class="onAv">＋</div><div class="onPn"><b>Свободно</b><small>${k === n ? 'Пригласи друга: код, ссылка или QR' : ''}</small></div></div>`;
+    const [id, p] = e, md = MODEL[p.car.model] || MODEL[0], me = id === NET.myId, v = VIA[p.via || (id === 'host' ? 'host' : 'p2p')] || VIA.p2p;
+    const st = id === 'host' ? '<span class="onChip host">ХОСТ</span>' : p.ready ? '<span class="onChip ok">✓ ГОТОВ</span>' : '<span class="onChip wait">НЕ ГОТОВ</span>';
+    return `<div class="onPl ${me ? 'me' : ''}" data-id="${esc(id)}"><div class="onAv" style="background:${AVC[k]}">${esc((p.name || '?')[0].toUpperCase())}</div>
+      <div class="onPn"><b>${esc(p.name)}${me ? ' <em>· ты</em>' : ''}</b><small>${esc(md.name)} · ${v[0]} ${v[1]}${id !== 'host' && p.rtt ? ' · ' + p.rtt + ' мс' : ''}</small></div>
+      ${THUMBS[p.car.model] && THUMBS[p.car.model] !== 'x' ? `<img class="onPc" src="${THUMBS[p.car.model]}">` : ''}${st}<span class="onBub"></span></div>`; }).join('');
+  const guests = PL.filter(([id]) => id !== 'host'), allReady = guests.length > 0 && guests.every(([, p]) => p.ready);
+  const me = NET.players.get(NET.myId) || {};
   const stakes = [0, 500, 1000, 2500, 5000, 10000];
-  body.innerHTML = `<div class="onRoom"><div><div class="onCodeL">КОД КОМНАТЫ</div><div class="onCode">${NET.code}</div>
-      <div class="onBtns"><button class="btn sec" id="onCopy">🔗 Копировать ссылку</button>${navigator.share && /github\.io$/.test(location.hostname) ? '<button class="btn sec" id="onShare">📤 Поделиться</button>' : ''}</div></div>
-      <div id="onQR" class="onQR"></div></div>
-    <div class="row"><label>Игроки ${NET.players.size}/4 · ${GAME.icon} ${GAME.name}</label>${plist}${NET.players.size < 2 ? '<div class="help">Ждём друга… Он может открыть ссылку или навести камеру на QR-код</div>' : ''}</div>
-    <div class="row"><label>Ставка с каждого (игровые монеты) · банк забирает победитель</label><div class="opts">${stakes.map(v => `<div class="opt ${NET.stake === v ? 'on' : ''} ${host ? '' : 'dis'}" data-stake="${v}">${v ? v.toLocaleString('ru-RU') : 'Без ставки'}</div>`).join('')}</div></div>
-    <div class="row"><label>Заезд</label><div class="opts">${[1, 2, 3, 5].map(v => `<div class="opt ${NET.cfg.laps === v ? 'on' : ''} ${host ? '' : 'dis'}" data-laps="${v}">${v} кр.</div>`).join('')}${[['day', '☀️'], ['sunset', '🌇'], ['night', '🌙']].map(([v, n]) => `<div class="opt ${NET.cfg.tod === v ? 'on' : ''} ${host ? '' : 'dis'}" data-tod="${v}">${n}</div>`).join('')}${[['clear', 'Ясно'], ['rain', '🌧'], ['snow', '❄️'], ['auto', '🔄']].map(([v, n]) => `<div class="opt ${NET.cfg.wx === v ? 'on' : ''} ${host ? '' : 'dis'}" data-wx="${v}">${n}</div>`).join('')}</div></div>
-    <div class="help">${TRACK_ICON[TRACK_ID]} ${TRACKS[TRACK_ID].name} · пинг ~${Math.round(NET.rtt)} мс${NET.stake ? ' · банк ' + (NET.stake * NET.players.size).toLocaleString('ru-RU') + ' 🪙' : ''}</div>
-    ${host ? `<button class="btn ${NET.players.size < 2 ? 'dis' : ''}" id="onStart">🏁 НАЧАТЬ ГОНКУ</button>` : '<div class="onWait">⏳ Ждём, когда хост начнёт гонку…</div>'}
-    <button class="btn sec" id="onLeave">${host ? 'Закрыть комнату' : 'Выйти из комнаты'}</button>`;
+  const opt = (k, v, lab, on) => `<div class="opt ${on ? 'on' : ''} ${host ? '' : 'dis'}" data-${k}="${v}">${lab}</div>`;
+  body.innerHTML = `<div class="onLobby">
+    <div class="onInv">
+      <div class="onCodeL">КОД КОМНАТЫ</div>
+      <div class="onCode" id="onCodeBig" title="Нажми, чтобы скопировать">${NET.code.split('').map(c => `<span>${c}</span>`).join('')}</div>
+      <div id="onQR" class="onQR"></div>
+      <div class="onBtns"><button class="btn sec" id="onCopyC">📋 Код</button><button class="btn sec" id="onCopy">🔗 Ссылка</button>${navigator.share ? '<button class="btn sec" id="onShare">📤</button>' : ''}</div>
+      <div class="onHow">Друг: <b>Онлайн → Войти по коду</b><br>или камера телефона на QR</div>
+    </div>
+    <div class="onMain">
+      <div class="onHdr"><b>Игроки ${n}/4</b><span>${TRACK_ICON[TRACK_ID] || '🏁'} ${TRACKS[TRACK_ID].name} · ${NET.cfg.laps} кр.${NET.stake ? ' · банк ' + (NET.stake * n).toLocaleString('ru-RU') + ' 🪙' : ''}</span></div>
+      <div class="onList">${rows}</div>
+      <div class="onEmo">${EMO.map((e, k) => `<span data-emo="${k}">${e}</span>`).join('')}</div>
+      <div class="onAct">${host
+        ? `<button class="btn ${n < 2 ? 'dis' : ''}" id="onStart">${n < 2 ? '⏳ ЖДЁМ ДРУГА…' : allReady ? '🏁 НАЧАТЬ ГОНКУ' : '🏁 НАЧАТЬ (не все готовы)'}</button>`
+        : `<button class="btn ${me.ready ? 'ok' : ''}" id="onReady">${me.ready ? '✓ ГОТОВ — ждём хоста' : '✋ Я ГОТОВ'}</button>`}
+        <button class="btn sec" id="onLeave">${host ? 'Закрыть' : 'Выйти'}</button></div>
+      <details class="onSet" id="onSet" ${(NET.setOpen ?? host) ? 'open' : ''}><summary>${host ? '⚙️ Настройки заезда' : '⚙️ Настройки (выбирает хост)'}</summary>
+        <label>Трасса</label>${trackPicker(host)}
+        <label>Ставка с каждого · банк забирает победитель</label><div class="opts">${stakes.map(v => opt('stake', v, v ? v.toLocaleString('ru-RU') : 'Без ставки', NET.stake === v)).join('')}</div>
+        <label>Круги · время · погода</label><div class="opts">${[1, 2, 3, 5].map(v => opt('laps', v, v + ' кр.', NET.cfg.laps === v)).join('')}${[['day', '☀️'], ['sunset', '🌇'], ['night', '🌙']].map(([v, l]) => opt('tod', v, l, NET.cfg.tod === v)).join('')}${[['clear', '🌤'], ['rain', '🌧'], ['snow', '❄️']].map(([v, l]) => opt('wx', v, l, NET.cfg.wx === v)).join('')}</div>
+      </details>
+    </div></div>`;
   drawQR(link);
-  $('onCopy').onclick = () => { try { navigator.clipboard.writeText(link).then(() => netStatus('Ссылка скопирована — отправь другу!'), () => netStatus(link)); } catch (_) { netStatus(link); } };
-  if ($('onShare')) $('onShare').onclick = () => navigator.share({ title: 'Speed Racer 5D', text: 'Гоняем вместе! Код комнаты ' + NET.code, url: link }).catch(() => { });
+  $('onSet').ontoggle = e => { NET.setOpen = e.target.open; };
+  const copy = (txt, ok) => { const done = () => netStatus(ok); try { navigator.clipboard.writeText(txt).then(done, () => netStatus(txt)); } catch (_) { netStatus(txt); } };
+  $('onCopy').onclick = () => copy(link, 'Ссылка скопирована — отправь другу!');
+  $('onCopyC').onclick = $('onCodeBig').onclick = () => copy(NET.code, 'Код ' + NET.code + ' скопирован');
+  if ($('onShare')) $('onShare').onclick = () => navigator.share({ title: 'Speed Racer 5D', text: 'Гоняем вместе в Speed Racer 5D! Код комнаты: ' + NET.code, url: link }).catch(() => { });
   $('onLeave').onclick = () => closeOnline();
+  body.querySelectorAll('[data-emo]').forEach(o => o.onclick = () => { const k = +o.dataset.emo; showEmo(NET.myId, k); netSend({ t: 'emo', e: k, id: NET.myId }); });
   if (host) {
     $('onStart').onclick = hostStartRace;
-    body.querySelectorAll('[data-stake]').forEach(o => o.onclick = () => { NET.stake = +o.dataset.stake; netSend(lobbyMsg()); renderOnline(); });
-    body.querySelectorAll('[data-laps]').forEach(o => o.onclick = () => { NET.cfg.laps = +o.dataset.laps; netSend(lobbyMsg()); renderOnline(); });
-    body.querySelectorAll('[data-tod]').forEach(o => o.onclick = () => { NET.cfg.tod = o.dataset.tod; netSend(lobbyMsg()); renderOnline(); });
-    body.querySelectorAll('[data-wx]').forEach(o => o.onclick = () => { NET.cfg.wx = o.dataset.wx; netSend(lobbyMsg()); renderOnline(); });
-  }
+    const set = f => o => o.onclick = () => { f(o); netSend(lobbyMsg()); renderOnline(); };
+    body.querySelectorAll('[data-stake]').forEach(set(o => NET.stake = +o.dataset.stake));
+    body.querySelectorAll('[data-laps]').forEach(set(o => NET.cfg.laps = +o.dataset.laps));
+    body.querySelectorAll('[data-tod]').forEach(set(o => NET.cfg.tod = o.dataset.tod));
+    body.querySelectorAll('[data-wx]').forEach(set(o => NET.cfg.wx = o.dataset.wx));
+    body.querySelectorAll('[data-trk]').forEach(o => o.onclick = () => switchTrack(o.dataset.trk));
+  } else $('onReady').onclick = () => { me.ready = !me.ready; netSend({ t: 'rdy', v: me.ready }); renderOnline(); };
 }
 $('btnOnline').onclick = () => { renderOnline(); $('online').classList.remove('hidden'); };
 $('onClose').onclick = () => $('online').classList.add('hidden');
 { // join via link (#join-CODE) or after a track reload
   let code = null;
   const hm = /^#join-([A-Za-z0-9]{5})$/.exec(location.hash); if (hm) code = hm[1];
-  try { const j = localStorage.getItem('sr3d_join'); if (j) { code = j; localStorage.removeItem('sr3d_join'); } } catch (_) { }
+  try { const j = sessionStorage.getItem('sr3d_join'); if (j) { code = j; sessionStorage.removeItem('sr3d_join'); } } catch (_) { }
   if (code) setTimeout(() => { $('online').classList.remove('hidden'); renderOnline(); joinRoom(code); }, 400);
+  let hc = null, hn = null; if (!code) try { hc = sessionStorage.getItem('sr3d_hostcode'); hn = sessionStorage.getItem('sr3d_hostnew'); sessionStorage.removeItem('sr3d_hostcode'); sessionStorage.removeItem('sr3d_hostnew'); } catch (_) { }
+  if (!code && (hc || hn)) setTimeout(() => { $('online').classList.remove('hidden'); renderOnline(); hostRoom(hc || undefined); }, 400);
 }
 
 /* ================= BOOT ================= */
@@ -5168,7 +5447,7 @@ for (const id of ['airHint', 'keyHint']) { const e = document.getElementById(id)
 })();
 window.__gameReady = true;
 setTimeout(thumbsIdle, 2500);
-window.__sr = { start: () => startRace(), get st() { return { state, countdown, raceTime, i: player.q.i, lat: player.q.lat, v: player.vF, y: player.pos.y, vy: player.vy, cars: cars.map(c => [c.q.i, +c.vF.toFixed(1), +c.pos.y.toFixed(2)]) }; }, cam: m => { camMode = m; }, bot: v => { settings.auto = v; }, tp: (i, lat = 0) => { player.place(i, lat); snapCamera(); }, set: (k, v) => { settings[k] = v; }, N, view: (i, back, up, side = 0) => { const j = (i - Math.round(back / DS) + N) % N; window.__fc = [PX[j] + NX[j] * side, up, PZ[j] + NZ[j] * side, PX[i], 0, PZ[i]]; }, free: () => { window.__fc = null; }, gar: (m, tab) => { if (state !== 'garage') openGarage(); gModel = m; if (tab) gTab = tab; buildGarageCar(); renderGarage(); }, pv: () => { const i = RAVINES.length ? RAVINES[0].i0 + 12 : CUTS.length ? CUTS[0].i : BOOSTS.length ? BOOSTS[0].i + 20 : 150; const j = (i - Math.round(75 / DS) + N) % N; window.__fc = [PX[j] + NX[j] * 34, 30, PZ[j] + NZ[j] * 34, PX[i], 0, PZ[i]]; document.body.classList.add('replay'); }, heat: v => { ST.heat = v; }, key: (k, v) => { keys[k] = v; }, go: () => { countdown = 0; }, space: () => ({ ramp: SPACE.ramp && SPACE.ramp.visible, on: SPACE.on, t: +SPACE.t.toFixed(1), y: Math.round(player.y), v: Math.round(player.vF * 3.6), x: Math.round(player.pos.x), rx: SPACE.ramp ? Math.round(SPACE.ramp.position.x) : 0 }), jump: t => { if (!SPACE.ramp) buildSpaceFx(); SPACE.on = true; SPACE.t = t; SPACE.x0 = player.pos.x; SPACE.z = player.pos.z; player.cine = true; spaceTick(0); }, boost: v => { player.vel.x = v; player.vel.z = 0; player.vF = v; player.h = Math.PI / 2; }, jet: () => ({ jp: [JET.g.position.x, JET.g.position.y, JET.g.position.z].map(v => +v.toFixed(1)), cam: camera.position.toArray().map(v => +v.toFixed(1)), vis: JET.g.visible, inScene: !!JET.g.parent, v: Math.round(JET.v * 3.6), view: AIR.view, scr: JET.g.position.clone().project(camera).toArray().map(v => +v.toFixed(2)) }), heli: () => ({ on: HELI.on, x: +HELI.x.toFixed(1), v: +HELI.v.toFixed(1), hits: GS.hits, rockets: HELI.rockets.length, tgt: !!HELI.target, pv: player.root.visible }), rp: () => startReplay(() => { }), heavy: () => { const L = []; scene.traverse(o => { if ((o.isMesh || o.isInstancedMesh) && o.visible && o.geometry) { const g = o.geometry, t = (g.index ? g.index.count : g.attributes.position.count) / 3 * (o.isInstancedMesh ? o.count : 1); L.push([Math.round(t), o.isInstancedMesh ? 'inst' + o.count : 'mesh', g.type, (o.material && o.material.type) || '', o.parent && o.parent.type]); } }); L.sort((a, b) => b[0] - a[0]); return L.slice(0, 14); }, perf: () => { const i = renderer.info; let lights = 0, meshes = 0, vis = 0; scene.traverse(o => { if (o.isLight) lights++; if (o.isMesh || o.isInstancedMesh || o.isPoints || o.isSprite) { meshes++; if (o.visible) vis++; } }); return { calls: i.render.calls, tris: i.render.triangles, progs: i.programs.length, geos: i.memory.geometries, tex: i.memory.textures, lights, meshes, vis, q: curQ, pr: renderer.getPixelRatio(), fps: lastFps }; }, rpT: () => [RP.active, RP.t.toFixed(1), RP.t0.toFixed(1), RP.t1.toFixed(1), RP.buf.length], off: (k, lat) => { const e = EXITS[k]; const i = (e.i0 + 8) % N; player.place(i, e.side * lat); player.qOn = i; snapCamera(); }, info: () => ({ RAVINES, CUTS, BOOSTS: BOOSTS.length, RAMPS: RAMPS.length, TUN: [TUN0, TUN1], DS }) };
+window.__sr = { start: () => startRace(), get st() { return { state, countdown, raceTime, i: player.q.i, lat: player.q.lat, v: player.vF, y: player.pos.y, vy: player.vy, cars: cars.map(c => [c.q.i, +c.vF.toFixed(1), +c.pos.y.toFixed(2)]) }; }, cam: m => { camMode = m; }, bot: v => { settings.auto = v; }, tp: (i, lat = 0) => { player.place(i, lat); snapCamera(); }, set: (k, v) => { settings[k] = v; }, N, view: (i, back, up, side = 0) => { const j = (i - Math.round(back / DS) + N) % N; window.__fc = [PX[j] + NX[j] * side, up, PZ[j] + NZ[j] * side, PX[i], 0, PZ[i]]; }, free: () => { window.__fc = null; }, gar: (m, tab) => { if (state !== 'garage') openGarage(); gModel = m; if (tab) gTab = tab; buildGarageCar(); renderGarage(); }, pv: () => { const i = RAVINES.length ? RAVINES[0].i0 + 12 : CUTS.length ? CUTS[0].i : BOOSTS.length ? BOOSTS[0].i + 20 : 150; const j = (i - Math.round(75 / DS) + N) % N; window.__fc = [PX[j] + NX[j] * 34, 30, PZ[j] + NZ[j] * 34, PX[i], 0, PZ[i]]; document.body.classList.add('replay'); }, heat: v => { ST.heat = v; }, key: (k, v) => { keys[k] = v; }, go: () => { countdown = 0; }, space: () => ({ ramp: SPACE.ramp && SPACE.ramp.visible, on: SPACE.on, t: +SPACE.t.toFixed(1), y: Math.round(player.y), v: Math.round(player.vF * 3.6), x: Math.round(player.pos.x), rx: SPACE.ramp ? Math.round(SPACE.ramp.position.x) : 0 }), jump: t => { if (!SPACE.ramp) buildSpaceFx(); SPACE.on = true; SPACE.t = t; SPACE.x0 = player.pos.x; SPACE.z = player.pos.z; player.cine = true; spaceTick(0); }, boost: v => { player.vel.x = v; player.vel.z = 0; player.vF = v; player.h = Math.PI / 2; }, jet: () => ({ jp: [JET.g.position.x, JET.g.position.y, JET.g.position.z].map(v => +v.toFixed(1)), cam: camera.position.toArray().map(v => +v.toFixed(1)), vis: JET.g.visible, inScene: !!JET.g.parent, v: Math.round(JET.v * 3.6), view: AIR.view, scr: JET.g.position.clone().project(camera).toArray().map(v => +v.toFixed(2)) }), heli: () => ({ on: HELI.on, x: +HELI.x.toFixed(1), v: +HELI.v.toFixed(1), hits: GS.hits, rockets: HELI.rockets.length, tgt: !!HELI.target, pv: player.root.visible }), rp: () => startReplay(() => { }), coins: () => SAVE.coins, netFin: t => { player.finish = t ?? raceTime; netFinish(); }, net: () => ({ track: TRACK_ID, ready: [...NET.players.values()].map(p => !!p.ready), role: NET.role, code: NET.code, link: NET.code && roomLink(NET.code), t: raceTime, v: player && Math.round(player.vF*3.6), players: [...NET.players.values()].map(p => p.name), race: !!NET.race, remote: [...NET.remote.values()].map(r => [r.car.name, Math.round(r.car.pos.x), Math.round(r.car.pos.z), r.buf.length]), me: player && [Math.round(player.pos.x), Math.round(player.pos.z)], status: ($('onStatus') || {}).textContent, results: NET.results && { winner: NET.results.winner && NET.results.winner.name, me: NET.results.winner === player, n: NET.results.fin.length }, fin: !$('finish').classList.contains('hidden') }), heavy: () => { const L = []; scene.traverse(o => { if ((o.isMesh || o.isInstancedMesh) && o.visible && o.geometry) { const g = o.geometry, t = (g.index ? g.index.count : g.attributes.position.count) / 3 * (o.isInstancedMesh ? o.count : 1); L.push([Math.round(t), o.isInstancedMesh ? 'inst' + o.count : 'mesh', g.type, (o.material && o.material.type) || '', o.parent && o.parent.type]); } }); L.sort((a, b) => b[0] - a[0]); return L.slice(0, 14); }, perf: () => { const i = renderer.info; let lights = 0, meshes = 0, vis = 0; scene.traverse(o => { if (o.isLight) lights++; if (o.isMesh || o.isInstancedMesh || o.isPoints || o.isSprite) { meshes++; if (o.visible) vis++; } }); return { calls: i.render.calls, tris: i.render.triangles, progs: i.programs.length, geos: i.memory.geometries, tex: i.memory.textures, lights, meshes, vis, q: curQ, pr: renderer.getPixelRatio(), fps: lastFps }; }, rpT: () => [RP.active, RP.t.toFixed(1), RP.t0.toFixed(1), RP.t1.toFixed(1), RP.buf.length], off: (k, lat) => { const e = EXITS[k]; const i = (e.i0 + 8) % N; player.place(i, e.side * lat); player.qOn = i; snapCamera(); }, info: () => ({ RAVINES, CUTS, BOOSTS: BOOSTS.length, RAMPS: RAMPS.length, TUN: [TUN0, TUN1], DS }) };
 requestAnimationFrame(frame);
 
 </script>
