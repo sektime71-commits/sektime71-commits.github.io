@@ -934,6 +934,7 @@ function collideWorld(c) { // car as two circles vs axis-aligned boxes and round
   for (const off of OFS) {
     const px = c.pos.x + fx * off, pz = c.pos.z + fz * off;
     for (const [kind, o] of cand) {
+      if (o.dead) continue;
       let nx, nz, d;
       if (kind === 'box') { const qx = clamp(px, o[0] - o[2], o[0] + o[2]), qz = clamp(pz, o[1] - o[3], o[1] + o[3]); nx = px - qx; nz = pz - qz; d = Math.hypot(nx, nz);
         if (d < 1e-4) { const ex = o[2] - Math.abs(px - o[0]), ez = o[3] - Math.abs(pz - o[1]); if (ex < ez) { nx = Math.sign(px - o[0]); nz = 0; d = -ex; } else { nx = 0; nz = Math.sign(pz - o[1]); d = -ez; } } else { nx /= d; nz /= d; } }
@@ -5994,7 +5995,7 @@ function chunkStatic() {
 }
 chunkStatic();
 // far chunks hidden in the fog are not drawn at all
-function chunkCull() { if (!CHUNKS.length || !scene.fog) return; const cx = camera.position.x, cz = camera.position.z, far = scene.fog.far + 120; for (const c of CHUNKS) { const s = c.boundingSphere; if (!s) continue; c.visible = Math.hypot(s.center.x - cx, s.center.z - cz) - s.radius < far; } }
+function chunkCull() { if (!CHUNKS.length || !scene.fog) return; const cx = camera.position.x, cz = camera.position.z, far = Math.max(160, scene.fog.far) + 120; for (const c of CHUNKS) { const s = c.boundingSphere; if (!s) continue; c.visible = Math.hypot(s.center.x - cx, s.center.z - cz) - s.radius < far; } }
 window.__gameReady = true;
 setTimeout(thumbsIdle, 2500);
 window.__sr = { start: () => startRace(), get st() { return { state, countdown, raceTime, i: player.q.i, lat: player.q.lat, v: player.vF, y: player.pos.y, vy: player.vy, cars: cars.map(c => [c.q.i, +c.vF.toFixed(1), +c.pos.y.toFixed(2)]) }; }, cam: m => { camMode = m; }, bot: v => { settings.auto = v; }, tp: (i, lat = 0) => { player.place(i, lat); snapCamera(); }, set: (k, v) => { settings[k] = v; }, N, view: (i, back, up, side = 0) => { const j = (i - Math.round(back / DS) + N) % N; window.__fc = [PX[j] + NX[j] * side, up, PZ[j] + NZ[j] * side, PX[i], 0, PZ[i]]; }, free: () => { window.__fc = null; }, gar: (m, tab) => { if (state !== 'garage') openGarage(); gModel = m; if (tab) gTab = tab; buildGarageCar(); renderGarage(); }, pv: () => { const i = RAVINES.length ? RAVINES[0].i0 + 12 : CUTS.length ? CUTS[0].i : BOOSTS.length ? BOOSTS[0].i + 20 : 150; const j = (i - Math.round(75 / DS) + N) % N; window.__fc = [PX[j] + NX[j] * 34, 30, PZ[j] + NZ[j] * 34, PX[i], 0, PZ[i]]; document.body.classList.add('replay'); }, heat: v => { ST.heat = v; }, key: (k, v) => { keys[k] = v; }, go: () => { countdown = 0; }, space: () => ({ ramp: SPACE.ramp && SPACE.ramp.visible, on: SPACE.on, t: +SPACE.t.toFixed(1), y: Math.round(player.y), v: Math.round(player.vF * 3.6), x: Math.round(player.pos.x), rx: SPACE.ramp ? Math.round(SPACE.ramp.position.x) : 0 }), jump: t => { if (!SPACE.ramp) buildSpaceFx(); SPACE.on = true; SPACE.t = t; SPACE.x0 = player.pos.x; SPACE.z = player.pos.z; player.cine = true; spaceTick(0); }, boost: v => { player.vel.x = v; player.vel.z = 0; player.vF = v; player.h = Math.PI / 2; }, jet: () => ({ jp: [JET.g.position.x, JET.g.position.y, JET.g.position.z].map(v => +v.toFixed(1)), cam: camera.position.toArray().map(v => +v.toFixed(1)), vis: JET.g.visible, inScene: !!JET.g.parent, v: Math.round(JET.v * 3.6), view: AIR.view, scr: JET.g.position.clone().project(camera).toArray().map(v => +v.toFixed(2)) }), heli: () => ({ on: HELI.on, x: +HELI.x.toFixed(1), v: +HELI.v.toFixed(1), hits: GS.hits, rockets: HELI.rockets.length, tgt: !!HELI.target, pv: player.root.visible }), rp: () => startReplay(() => { }), coins: () => SAVE.coins, netFin: t => { player.finish = t ?? raceTime; netFinish(); }, net: () => ({ track: TRACK_ID, ready: [...NET.players.values()].map(p => !!p.ready), role: NET.role, code: NET.code, link: NET.code && roomLink(NET.code), t: raceTime, v: player && Math.round(player.vF*3.6), players: [...NET.players.values()].map(p => p.name), race: !!NET.race, remote: [...NET.remote.values()].map(r => [r.car.name, Math.round(r.car.pos.x), Math.round(r.car.pos.z), r.buf.length]), me: player && [Math.round(player.pos.x), Math.round(player.pos.z)], status: ($('onStatus') || {}).textContent, results: NET.results && { winner: NET.results.winner && NET.results.winner.name, me: NET.results.winner === player, n: NET.results.fin.length }, fin: !$('finish').classList.contains('hidden') }), heavy: () => { const L = []; scene.traverse(o => { if ((o.isMesh || o.isInstancedMesh) && o.visible && o.geometry) { const g = o.geometry, t = (g.index ? g.index.count : g.attributes.position.count) / 3 * (o.isInstancedMesh ? o.count : 1); L.push([Math.round(t), o.isInstancedMesh ? 'inst' + o.count : 'mesh', g.type, (o.material && o.material.type) || '', o.parent && o.parent.type]); } }); L.sort((a, b) => b[0] - a[0]); return L.slice(0, 14); }, perf: () => { const i = renderer.info; let lights = 0, meshes = 0, vis = 0; scene.traverse(o => { if (o.isLight) lights++; if (o.isMesh || o.isInstancedMesh || o.isPoints || o.isSprite) { meshes++; if (o.visible) vis++; } }); return { calls: i.render.calls, tris: i.render.triangles, progs: i.programs.length, geos: i.memory.geometries, tex: i.memory.textures, lights, meshes, vis, q: curQ, pr: renderer.getPixelRatio(), fps: lastFps }; }, rpT: () => [RP.active, RP.t.toFixed(1), RP.t0.toFixed(1), RP.t1.toFixed(1), RP.buf.length], off: (k, lat) => { const e = EXITS[k]; const i = (e.i0 + 8) % N; player.place(i, e.side * lat); player.qOn = i; snapCamera(); }, info: () => ({ RAVINES, CUTS, BOOSTS: BOOSTS.length, RAMPS: RAMPS.length, TUN: [TUN0, TUN1], DS }) };
@@ -6276,7 +6277,7 @@ function footCollide(r) {
     return;
   }
   const C = OBST.cell, cand = OBST.grid.get(Math.floor(FOOT.x / C) * 73856 + Math.floor(FOOT.z / C));
-  if (cand) for (const [kind, o] of cand) pushOut(kind, o[0], o[1], o[2], o[3], r);
+  if (cand) for (const [kind, o] of cand) if (!o.dead) pushOut(kind, o[0], o[1], o[2], o[3], r);
   // own parked car (two circles)
   const p = player, fx = Math.sin(p.h), fz = Math.cos(p.h);
   for (const off of [1.2, 0, -1.2]) pushOut('circ', p.pos.x + fx * off, p.pos.z + fz * off, 1.05, 0, r);
@@ -6460,8 +6461,8 @@ function placeCarAt(c, x, z, h, v = 0) { const n = nearestSample(x, z); c.place(
   const groups = new Map(); spots.forEach((p, k) => { const st = styles[k % styles.length], key = st + '|' + Math.floor(p[0] / 420) + ',' + Math.floor(p[1] / 420); if (!groups.has(key)) groups.set(key, { st, list: [] }); groups.get(key).list.push(p); });
   for (const { st, list: mine } of groups.values()) {
     const im = new THREE.InstancedMesh(buildLod(st, false, 0xffffff), lodMat, mine.length); im.userData.chunk = 1; CHUNKS.push(im);
-    mine.forEach((p, k) => { put(im, k, p[0], 0, p[1], p[2]); im.setColorAt(k, col.setHex(PAL[(k * 7 + st.length) % PAL.length])); const fx = Math.sin(p[2]), fz = Math.cos(p[2]); obstAdd('circ', [p[0] + fx * 1.2, p[1] + fz * 1.2, 1.05]); obstAdd('circ', [p[0] - fx * 1.2, p[1] - fz * 1.2, 1.05]);
-      CITY.parked.push({ x: p[0], z: p[1], h: p[2], im, k, style: st, color: PAL[(k * 7 + st.length) % PAL.length], gone: false }); });
+    mine.forEach((p, k) => { put(im, k, p[0], 0, p[1], p[2]); im.setColorAt(k, col.setHex(PAL[(k * 7 + st.length) % PAL.length])); const fx = Math.sin(p[2]), fz = Math.cos(p[2]), o1 = [p[0] + fx * 1.2, p[1] + fz * 1.2, 1.05], o2 = [p[0] - fx * 1.2, p[1] - fz * 1.2, 1.05]; obstAdd('circ', o1); obstAdd('circ', o2);
+      CITY.parked.push({ x: p[0], z: p[1], h: p[2], im, k, style: st, color: PAL[(k * 7 + st.length) % PAL.length], gone: false, obs: [o1, o2] }); });
     im.instanceColor.needsUpdate = true; im.castShadow = true; im.receiveShadow = true; im.computeBoundingSphere(); scene.add(im); CITY.parkI.push(im);
   }
   for (const m of [poles, arms, heads, tp, tb, tl]) { m.computeBoundingSphere(); scene.add(m); } poles.castShadow = tp.castShadow = true;
@@ -6837,7 +6838,7 @@ function cityAction() {
     let pk = null, bd = 3.4; for (const c of CITY.parked) if (!c.gone) { const d = Math.hypot(FOOT.x - c.x, FOOT.z - c.z); if (d < bd) { bd = d; pk = c; } }
     if (pk && Math.hypot(FOOT.x - p.pos.x, FOOT.z - p.pos.z) > 3.6) return ['🔓 УГНАТЬ ЭТУ МАШИНУ', () => {
       const md = CARS_ONLY.filter(m => m.style === pk.style); const mm = md[Math.floor(Math.random() * md.length)] || CARS_ONLY[0];
-      pk.gone = true; pk.m = new THREE.Matrix4(); pk.im.getMatrixAt(pk.k, pk.m); _m4.makeScale(0, 0, 0); pk.im.setMatrixAt(pk.k, _m4); pk.im.instanceMatrix.needsUpdate = true;
+      pk.gone = true; if (pk.obs) for (const o of pk.obs) o.dead = 1; /* the car is gone, so is its collision */ pk.m = new THREE.Matrix4(); pk.im.getMatrixAt(pk.k, pk.m); _m4.makeScale(0, 0, 0); pk.im.setMatrixAt(pk.k, _m4); pk.im.instanceMatrix.needsUpdate = true;
       stealCar({ model: mm.id, tune: Object.assign(defTune(mm), { color: pk.color, pattern: 'none', wing: 0, glow: 0 }), x: pk.x, z: pk.z, h: pk.h });
       if (nearCop(player.pos.x, player.pos.z, 120)) crime(1, 'Угон на глазах у полиции'); else flash('🔓 Машина твоя. Свою можно забрать позже — она отмечена 🚗', 2.4);
     }];
@@ -6924,7 +6925,7 @@ function todApplyBlend(hour) {
   const { a, b, u } = todBlendAt(hour), A = PRESETS[a], B = PRESETS[b], k = smooth(u), lp = (x, y) => x + (y - x) * k;
   const name = k < .5 ? a : b; if (preset.name !== name) applyTOD(name); // switch sky / emissives at the midpoint
   const P = preset; sun.color.set(A.sunC).lerp(tmpC.set(B.sunC), k); hemi.color.set(A.hemiS).lerp(tmpC.set(B.hemiS), k); hemi.groundColor.set(A.hemiG).lerp(tmpC.set(B.hemiG), k);
-  scene.fog.color.set(A.fog).lerp(tmpC.set(B.fog), k); scene.fog.near = lp(A.fogN, B.fogN); scene.fog.far = lp(A.fogF, B.fogF);
+  scene.fog.color.set(A.fog).lerp(tmpC.set(B.fog), k); scene.fog.near = lp(A.fogN, B.fogN); scene.fog.far = lp(A.fogF, B.fogF); scene.fog._b = [scene.fog.near, scene.fog.far];
   renderer.toneMappingExposure = lp(A.exp, B.exp); sun.intensity = lp(A.sunI, B.sunI);
   if (!P.night) { const el = lp(A.night ? -4 : A.elev, B.night ? -4 : B.elev), az = lp(A.az || 200, B.az || 200); sunDir.setFromSphericalCoords(1, THREE.MathUtils.degToRad(90 - el), THREE.MathUtils.degToRad(az)); sky.material.uniforms.sunPosition.value.copy(sunDir); }
   if (scene.background && scene.background.isColor && P.night) scene.background.set(0x05070f).lerp(tmpC.set(0x2a3350), (1 - k) * (A.night ? 0 : 1));
@@ -6949,7 +6950,7 @@ function remoteFoot(r, s0, s1, f) {
   const x = lerp(s0[16] ?? s1[16], s1[16], f), z = lerp(s0[17] ?? s1[17], s1[17], f), v = s1[19]; r.H.g.visible = !s1[20];
   r.ph += (frame.dtL || .016) * Math.abs(v) * 3.3; r.H.g.position.set(x, s1[21] || 0, z); r.H.g.rotation.set(0, s1[18], 0); animHuman(r.H, r.ph, clamp(Math.abs(v) / 6.4 * 1.15, Math.abs(v) > .2 ? .45 : 0, 1), timeAcc, false);
 }
-window.__sr.city = { ST_W, streetPoint, placeCarAt, snapCamera, crime, clearStars, todApplyBlend, MIS, CITY, DAY, LANE, get player() { return player; }, footAct: () => footAction(), places: () => PLACES.list.map(m => [m.T.id, m.x, m.z]), enterPlace: k => { const m = PLACES.list[k]; if (!FOOT.on) footExit(); shopEnter({ type: placeTypes()[m.T.id], dx: m.x, dz: m.z, nx: 1, nz: 0, h: Math.PI / 2 }); }, foot: FOOT, veh: (id, x, z, h) => { const c = new Car({ model: id, tune: defTune(MODEL[id]), plate: 'Т 001 ТТ' }, 't', false); c.grid = true; c.traffic = true; c.hold = true; npcs.push(c); placeCarAt(c, x, z, h); updateCarVisual(c, 0); return c; }, steal: c => stealCar(c), get camMode() { return camMode; }, set camMode(v) { camMode = v; } };
+window.__sr.city = { OBST, THREE, scene, get LIFE() { return LIFE; }, get WX() { return WX; }, get fog() { return [scene.fog.near, scene.fog.far]; }, chunksVis: () => CHUNKS.filter(c => c.visible).length + '/' + CHUNKS.length, ST_W, streetPoint, placeCarAt, snapCamera, crime, clearStars, todApplyBlend, MIS, CITY, DAY, LANE, get player() { return player; }, footAct: () => footAction(), places: () => PLACES.list.map(m => [m.T.id, m.x, m.z]), enterPlace: k => { const m = PLACES.list[k]; if (!FOOT.on) footExit(); shopEnter({ type: placeTypes()[m.T.id], dx: m.x, dz: m.z, nx: 1, nz: 0, h: Math.PI / 2 }); }, foot: FOOT, veh: (id, x, z, h) => { const c = new Car({ model: id, tune: defTune(MODEL[id]), plate: 'Т 001 ТТ' }, 't', false); c.grid = true; c.traffic = true; c.hold = true; npcs.push(c); placeCarAt(c, x, z, h); updateCarVisual(c, 0); return c; }, steal: c => stealCar(c), get camMode() { return camMode; }, set camMode(v) { camMode = v; } };
 window.__sr.netRaw = o => { o.id = NET.myId; netSend(o); return true; };
 window.__remoteFoot = () => { for (const [, r] of NET.remote) if (r.H) return { visible: r.H.g.visible, x: Math.round(r.H.g.position.x), z: Math.round(r.H.g.position.z) }; return null; };
 
@@ -7174,7 +7175,8 @@ function say(p, kind) { const L = PED_LINES[kind]; if (!L) return; const t = L[M
 /* ---- storms, fog, lightning ---- */
 function weatherLife(dt) {
   LIFE.storm = lerp(LIFE.storm, WX.cur === 'storm' ? 1 : 0, dt * .2); LIFE.fog = lerp(LIFE.fog, WX.cur === 'fog' ? 1 : 0, dt * .15);
-  if (scene.fog && (LIFE.fog > .01 || LIFE.storm > .01)) { scene.fog.near *= 1 - .85 * LIFE.fog - .3 * LIFE.storm; scene.fog.far *= 1 - .8 * LIFE.fog - .35 * LIFE.storm; scene.fog.color.lerp(tmpC.set(preset.night ? 0x1a1f28 : 0xb9c0c8), LIFE.fog * .6); }
+  if (scene.fog && (LIFE.fog > .01 || LIFE.storm > .01)) { if (!scene.fog._b) scene.fog._b = [scene.fog.near, scene.fog.far]; const [bn, bf] = scene.fog._b; // from the clean day-cycle values, never compounding frame after frame
+    scene.fog.near = bn * (1 - .85 * LIFE.fog - .3 * LIFE.storm); scene.fog.far = Math.max(90, bf * (1 - .8 * LIFE.fog - .35 * LIFE.storm)); scene.fog.color.lerp(tmpC.set(preset.night ? 0x1a1f28 : 0xb9c0c8), LIFE.fog * .6); }
   if (LIFE.storm > .5 && (LIFE.boltT -= dt) <= 0) { LIFE.boltT = 5 + Math.random() * 12; LIFE.flashK = 1; const dly = 300 + Math.random() * 2200; if (audio) setTimeout(() => boomSnd(.45 + Math.random() * .4), dly); }
   if (LIFE.flashK > 0) { LIFE.flashK = Math.max(0, LIFE.flashK - dt * 3.5); hemi.intensity = (preset.hemiI || 1) + LIFE.flashK * 6 * (Math.random() < .7 ? 1 : .3); renderer.toneMappingExposure += LIFE.flashK * .6; }
   if (WX.cur === 'storm') { WX.tRain = 1; SIMENV.grip = Math.min(SIMENV.grip, .78); }
