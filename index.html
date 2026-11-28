@@ -1846,10 +1846,11 @@ function vehMisStart(m) {
   if (m.type === 'bus') {
     vehGive('bus', s.x, s.z, s.h, [0x1d4ed8, 0xeab308, 0x16a34a][Math.floor(Math.random() * 3)]);
     const st = CITY.stops.slice(), route = []; let cx = s.x, cz = s.z;
-    for (let k = 0; k < 4 && st.length; k++) { let bi = -1, bd = 1e9; st.forEach(([x, z], i) => { const d = Math.hypot(x - cx, z - cz); if (d > 120 && d < bd) { bd = d; bi = i; } }); if (bi < 0) break; const [x, z] = st.splice(bi, 1)[0]; route.push({ x: x - ST_W / 2 - 2.2 + LANE, z }); cx = x; cz = z; }
+    for (let k = 0; k < 4 && st.length; k++) { let bi = -1, bd = 1e9; st.forEach(([x, z], i) => { const d = Math.hypot(x - cx, z - cz); if (d > 120 && d < bd) { bd = d; bi = i; } }); if (bi < 0) break; const [x, z] = st.splice(bi, 1)[0]; route.push({ x: x - ST_W / 2 - 2.2 + LANE, z, st: [x, z] }); cx = x; cz = z; }
     if (!route.length) return missionEnd();
     MIS.route = route; MIS.ri = 0; MIS.wait = 0; MIS.reward = 0; MIS.stage = 'go'; MIS.hp = 100;
     MIS.tMax = MIS.t = Math.hypot(route[0].x - s.x, route[0].z - s.z) * 1.4 / 9 + 30; setDest(route[0].x, route[0].z, T.col);
+    MIS.crowdT = 0;
     flash('🚌 Ты водитель автобуса! ' + route.length + ' остановки. Остановись у каждой и подожди пассажиров', 3);
   } else {
     vehGive('truck', s.x, s.z, s.h, [0xb91c1c, 0x0f766e, 0x334155][Math.floor(Math.random() * 3)]);
@@ -1872,9 +1873,10 @@ function vehMisTick(dt, p, atDest) {
     return;
   }
   const R = MIS.route, st = R[MIS.ri];
-  misHUD('🚌 МАРШРУТ · остановка ' + (MIS.ri + 1) + ' из ' + R.length, MIS.wait > 0 ? 'Пассажиры заходят…' : 'Комфорт пассажиров', MIS.t, MIS.wait > 0 ? MIS.wait / 2.2 * 100 : MIS.hp);
+  misHUD('🚌 МАРШРУТ · остановка ' + (MIS.ri + 1) + ' из ' + R.length, MIS.wait > 0 ? 'Пассажиры заходят…' : 'Комфорт пассажиров', MIS.t, MIS.wait > 0 ? MIS.wait / 3.4 * 100 : MIS.hp);
+  if (!st.crowd && Math.hypot(p.pos.x - st.x, p.pos.z - st.z) < 160) { st.crowd = 1; lifeStopCrowd(st.st, 2 + Math.floor(Math.random() * 3)); }
   const near = Math.hypot(p.pos.x - st.x, p.pos.z - st.z) < 8 && !FOOT.on;
-  if (near && Math.abs(p.vF) < 1.6) { MIS.wait += dt; if (MIS.wait > 2.2) {
+  if (near && Math.abs(p.vF) < 1.6) { MIS.wait += dt; if (MIS.wait > 3.4) {
     MIS.reward += Math.round(260 * (.5 + .5 * MIS.hp / 100)); MIS.ri++; MIS.wait = 0; if (audio) beep(880, .08, .1);
     if (MIS.ri >= R.length) { payout(MIS.reward + Math.round(MIS.t * 8), 'Маршрут пройден'); MIS._ok = 1; missionEnd(); return; }
     const nx = R[MIS.ri]; MIS.t = Math.max(MIS.t, 0) + Math.hypot(nx.x - p.pos.x, nx.z - p.pos.z) * 1.4 / 9 + 22; setDest(nx.x, nx.z, MTYPES.bus.col);
@@ -6526,7 +6528,14 @@ function cityTick(dt, racing) {
   // traffic lights cycle: 10 s green, 2.5 s yellow per direction
   CITY.phT += dt; const dur = CITY.phase % 2 ? 2.5 : 10; if (CITY.phT > dur) { CITY.phT = 0; CITY.phase = (CITY.phase + 1) % 4; cityLightsPaint(); }
   // traffic: drive, recycle far cars around the player
+  // traffic follows the clock: rush hours fill the streets, nights are empty
+  const hh = DAY.t, tf = hh < 5 ? .3 : hh < 7 ? .55 : hh < 10 ? 1 : hh < 17 ? .8 : hh < 20 ? 1 : hh < 23 ? .65 : .4, tWant = Math.round(CITY.traffic.length * tf);
+  CITY.traffic.forEach((c, k) => { if (c.patrol) return; const off = k >= tWant;
+    if (off && !c.sleep && Math.hypot(c.pos.x - me.x, c.pos.z - me.z) > 140) { c.sleep = true; c.hold = true; c.nav = null; placeCarAt(c, CITY.G.CX + 6000 + k * 20, CITY.G.CZ, 0); }
+    else if (!off && c.sleep) { c.sleep = false; c.hold = false; if (!gridSpawn(c, me, 170, 360)) { c.sleep = true; c.hold = true; } } });
+  CITY.rush = hh >= 7.5 && hh < 9.5 || hh >= 17.5 && hh < 19.5;
   for (const c of CITY.traffic) {
+    if (c.sleep) continue;
     if (Math.hypot(c.pos.x - me.x, c.pos.z - me.z) > 420 || c.wreck > 0 && c.wreckT > 6) { c.chase = false; gridSpawn(c, me, 170, 360); c.wreckT = 0; continue; }
     if (c.wreck > 0) c.wreckT = (c.wreckT || 0) + dt;
     if (c.patrol && CITY.stars > 0 && Math.hypot(c.pos.x - me.x, c.pos.z - me.z) < 200) { c.chase = true; c.police = true; CITY.cops.push(c); CITY.traffic.splice(CITY.traffic.indexOf(c), 1); break; }
@@ -6808,7 +6817,7 @@ function dayTick(dt) {
   if (DAY.t0 != null) { DAY.t = DAY.t0; DAY.t0 = null; }
   if ((DAY.acc = (DAY.acc || 0) + dt) > .5) { DAY.acc = 0; todApplyBlend(DAY.t); }
   const hh = Math.floor(DAY.t), mm = Math.floor(DAY.t % 1 * 60);
-  const ck = $('clock'); if (ck && DAY.last !== mm) { DAY.last = mm; ck.textContent = (DAY.t >= 6 && DAY.t < 21 ? '☀️ ' : '🌙 ') + String(hh).padStart(2, '0') + ':' + String(mm).padStart(2, '0') + ({ rain: ' 🌧', snow: ' ❄️', storm: ' ⛈', fog: ' 🌫' }[WX.cur] || ''); }
+  const ck = $('clock'); if (ck && DAY.last !== mm) { DAY.last = mm; ck.textContent = (DAY.t >= 6 && DAY.t < 21 ? '☀️ ' : '🌙 ') + String(hh).padStart(2, '0') + ':' + String(mm).padStart(2, '0') + ({ rain: ' 🌧', snow: ' ❄️', storm: ' ⛈', fog: ' 🌫' }[WX.cur] || '') + (CITY.rush ? ' · час пик' : DAY.t < 5 || DAY.t >= 23.5 ? ' · улицы пусты' : ''); }
   DAY.wxT -= dt; if (DAY.wxT <= 0 && !NET.race) { DAY.wxT = 200 + Math.random() * 260; cityWeather(); }
   if ((DAY.envT = (DAY.envT || 0) + dt) > 12) { DAY.envT = 0; try { captureEnvFull(); } catch (_) { } }
 }
@@ -6889,7 +6898,27 @@ function pedSpawn(p, near) {
   p.sp = .95 + Math.random() * .6; p.state = 'walk'; p.t = 0; p.ph = Math.random() * 6; p.down = 0; p.mem = p.mem || 0;
   p.type = PED_TYPES[Math.floor(Math.random() * PED_TYPES.length)]; p.shirt = PED_SHIRT[Math.floor(Math.random() * PED_SHIRT.length)]; p.skin = PED_SKIN[Math.floor(Math.random() * PED_SKIN.length)]; p.pants = PED_PANTS[Math.floor(Math.random() * PED_PANTS.length)]; p.hair = PED_HAIR[Math.floor(Math.random() * PED_HAIR.length)];
   p.brave = Math.random(); p.h = p.ax === 'z' ? (p.dir > 0 ? 0 : Math.PI) : (p.dir > 0 ? Math.PI / 2 : -Math.PI / 2);
+  p.inT = 0; p.shopT = 2 + Math.random() * 6; p.jog = false; p.goal = null; p.planH = -1;
+  if (!p.home) { const a = Math.random() * 6.283, r = G.R * (.45 + Math.random() * .4); p.home = { x: G.CX + Math.sin(a) * r, z: G.CZ + Math.cos(a) * r }; }
+  const h = DAY.t;
+  if ((h >= 6 && h < 9 || h >= 19 && h < 21.5) && p.id % 6 === 0 && WX.rain < .3) { p.jog = true; p.type = 'бегун'; p.shirt = [0xf43f5e, 0x22d3ee, 0xa3e635, 0xfacc15][p.id % 4]; p.pants = 0x111827; p.sp = 1; }
+  else if (CITY.stops && h >= 6 && h < 23.5 && Math.random() < .16) { // waiting at a bus stop
+    let best = null; for (let t = 0; t < 12 && !best; t++) { const st = CITY.stops[Math.floor(Math.random() * CITY.stops.length)], d = Math.hypot(st[0] - near.x, st[1] - near.z); if (d > 25 && d < 190) best = st; }
+    if (best) { p.state = 'stop'; p.x = best[0] + .45; p.z = best[1] + (Math.random() - .5) * 2.6; p.h = -Math.PI / 2; p.stopT = 25 + Math.random() * 70; p.stop = best; }
+  }
   return true;
+}
+// daily plan: where this person is heading at this hour
+function pedGoal(p) {
+  const h = DAY.t, G = CITY.G, office = p.type === 'офисный работник' || p.type === 'студент';
+  if (office && h >= 7 && h < 10) return { x: G.CX, z: G.CZ };        // morning commute to the centre
+  if (h >= 17 && h < 20.5 || h >= 22 || h < 6) return p.home;           // evening: home
+  if (p.type === 'турист' && h >= 10 && h < 19) return { x: G.CX + G.R * .6, z: G.CZ - G.R * .6 }; // tourists drift to the embankment
+  return null;
+}
+function pedHomeSide(p) { // a point on the building side of the pavement: a front door
+  const G = CITY.G, ln = p.ax === 'z' ? p.x : p.z, c = snapLine(ln, p.ax === 'z' ? G.x0 : G.z0), s2 = Math.sign(ln - c) || 1, off = s2 * (ST_W / 2 + 4.2);
+  return p.ax === 'z' ? { x: c + off, z: p.z + p.dir * 2 } : { x: p.x + p.dir * 2, z: c + off };
 }
 function lifeSetup() {
   if (!LIFE) return; LIFE.peds = [];
@@ -6917,31 +6946,51 @@ function lifeTick(dt) {
   const want = Math.round(LIFE.peds.length * clamp(night * wet * D.peds, .2, 1));
   let k = 0;
   for (const p of LIFE.peds) {
-    const idx = p.id; if (idx >= want) { p.hidden = true; continue; } p.hidden = false;
-    const d0 = Math.hypot(p.x - me.x, p.z - me.z);
+    const idx = p.id, d0 = Math.hypot(p.x - me.x, p.z - me.z);
+    if (idx >= want) { // fewer people outside now: the ones you can see walk home through a door, the rest are simply gone
+      if (p.hidden || d0 > 75 || p.down > 0) { p.hidden = true; p.indoor = 1; continue; }
+      if (p.state !== 'home' && p.state !== 'flee') { p.state = 'home'; p.t = 0; p.door = pedHomeSide(p); }
+    } else if (p.hidden) { if (p.state === 'inside') { /* shopping: keeps its timer below */ } else { p.hidden = false; if (p.indoor) { p.indoor = 0; pedSpawn(p, me); continue; } } }
     if (d0 > 200) { pedSpawn(p, me); continue; }
+    if (p.state === 'inside') { p.inT -= dt; if (p.inT <= 0) { p.hidden = false; p.state = 'walk'; p.x = p.sx; p.z = p.sz; p.t = 0; p.shopT = 25 + Math.random() * 40; } else { p.hidden = true; continue; } }
     p.t += dt;
     if (p.down > 0) { p.down -= dt; if (p.down <= 0) { p.state = p.mem > 0 ? 'angry' : 'walk'; p.t = 0; } }
     const th = p.down > 0 ? null : pedThreat(p);
     if (th && p.state !== 'flee') { p.state = 'flee'; p.t = 0; p.fx = th.x; p.fz = th.z; if (d0 < 25 && Math.random() < .4) say(p, 'flee'); }
     let vx = 0, vz = 0, spd = 0;
     if (p.state === 'flee') { const dx = p.x - p.fx, dz = p.z - p.fz, l = Math.hypot(dx, dz) || 1; spd = 5.5; vx = dx / l; vz = dz / l; if (p.t > 4) { p.state = 'walk'; p.ax = Math.abs(p.x - snapLine(p.x, G.x0)) < Math.abs(p.z - snapLine(p.z, G.z0)) ? 'z' : 'x'; p.line = p.ax === 'z' ? p.x : p.z; } }
+    else if (p.state === 'home' || p.state === 'enter') { // walk to a door and disappear inside
+      const D = p.state === 'home' ? p.door : p.tgt, dx = D.x - p.x, dz = D.z - p.z, l = Math.hypot(dx, dz); spd = 1.5 * p.sp;
+      if (l < .5 || p.t > 14) { p.hidden = true; if (p.state === 'home') { p.indoor = 1; continue; } p.state = 'inside'; p.inT = 8 + Math.random() * 28; continue; } vx = dx / l; vz = dz / l; }
+    else if (p.state === 'stop') { // waiting for a bus: board when one stops right here
+      p.stopT -= dt; p.h = -Math.PI / 2;
+      for (const c of npcs.concat([player])) if (c.vehKind === 'bus' && Math.abs(c.vF) < 1.6 && Math.hypot(c.pos.x - p.x, c.pos.z - p.z) < 13) { p.state = 'board'; p.bus = c; p.t = 0; break; }
+      if (p.state === 'stop' && p.stopT <= 0) { p.state = 'walk'; p.ax = 'z'; p.line = p.stop[0] - .6; p.dir = Math.random() < .5 ? 1 : -1; p.t = 0; }
+    }
+    else if (p.state === 'board') { const c = p.bus, door = { x: c.pos.x + Math.cos(c.h) * 1.4 + Math.sin(c.h) * 3, z: c.pos.z - Math.sin(c.h) * 1.4 + Math.cos(c.h) * 3 }, dx = door.x - p.x, dz = door.z - p.z, l = Math.hypot(dx, dz); spd = 2.2;
+      if (l < .7 || p.t > 6 || Math.abs(c.vF) > 3) { p.hidden = true; p.indoor = 1; if (c === player && typeof MIS !== 'undefined' && MIS.on && MIS.type === 'bus') MIS.boarded = (MIS.boarded || 0) + 1; continue; } vx = dx / l; vz = dz / l; }
     else if (p.state === 'talk') { if (p.t > p.tLen) { p.state = 'walk'; p.t = 0; } }
     else if (p.state === 'wait') { const crossAx = p.cross.ax; if (greenFor(crossAx === 'x' ? 'z' : 'x') && p.t > 1) { p.state = 'cross'; p.t = 0; } } // pedestrians cross while the parallel traffic has green
     else if (p.state === 'cross') { const c = p.cross; spd = 1.6 * p.sp; const tx = c.tx, tz = c.tz, dx = tx - p.x, dz = tz - p.z, l = Math.hypot(dx, dz); if (l < .4) { p.ax = c.ax2; p.line = c.line2; p.dir = c.dir2; p.state = 'walk'; } else { vx = dx / l; vz = dz / l; } }
     else if (p.state === 'angry') { spd = 0; if (p.t > 3) { p.state = 'walk'; } }
     else { // walk along the block, decide at corners
-      spd = 1.35 * p.sp * (WX.rain > .5 ? 1.25 : 1);
+      spd = (p.jog ? 3.3 : 1.35 * p.sp) * (WX.rain > .5 ? 1.25 : 1);
+      if ((p.shopT -= dt) <= 0) { p.shopT = 3 + Math.random() * 4; // pop into an open shop or café on the way
+        if (!p.jog && Math.random() < (DAY.t >= 11 && DAY.t < 15 || DAY.t >= 18 && DAY.t < 21 ? .5 : .25)) for (const S of SHOPS) { const sx = S.dx ?? S.x, sz = S.dz ?? S.z; if (Math.abs(sx - p.x) < 7 && Math.abs(sz - p.z) < 7 && shopOpen(S.type)) { p.state = 'enter'; p.t = 0; p.tgt = { x: sx - (S.nx || 0) * .4, z: sz - (S.nz || 0) * .4 }; p.sx = sx + (S.nx || 0) * 1.2; p.sz = sz + (S.nz || 0) * 1.2; break; } } }
       if (p.ax === 'z') { vz = p.dir; p.x += (p.line - p.x) * Math.min(1, dt * 2); } else { vx = p.dir; p.z += (p.line - p.z) * Math.min(1, dt * 2); }
       const along = p.ax === 'z' ? p.z : p.x, o = p.ax === 'z' ? G.z0 : G.x0, corner = o + Math.round((along - o) / G.B) * G.B, dc = (corner - along) * p.dir;
       if (dc > 0 && dc < ST_W / 2 + 1.6 && !p.atCorner) { p.atCorner = true;
-        const r = Math.random();
+        let r = Math.random(); const gl = pedGoal(p);
+        if (gl && Math.random() < .75) { // head towards the plan: straight on if that closes the gap along this street, else turn the right way
+          const ahead = p.ax === 'z' ? (gl.z - p.z) * p.dir : (gl.x - p.x) * p.dir, side = p.ax === 'z' ? Math.abs(gl.x - p.x) : Math.abs(gl.z - p.z);
+          r = ahead > side ? .2 : .55; }
         if (r < .4) { // cross the street ahead at the crosswalk
           const other = p.ax === 'z' ? p.x : p.z, sideSign = Math.sign(other - snapLine(other, p.ax === 'z' ? G.x0 : G.z0)) || 1;
           const tAlong = corner + p.dir * (ST_W / 2 + 1.5); p.cross = { ax: p.ax, tx: p.ax === 'z' ? p.x : tAlong, tz: p.ax === 'z' ? tAlong : p.z, ax2: p.ax, line2: p.line, dir2: p.dir }; p.state = 'wait'; p.t = 0;
         } else if (r < .75) { // turn the corner and keep walking around the block
           const tAlong = corner - p.dir * (ST_W / 2 + 1.5), other = p.ax === 'z' ? p.x : p.z, s2 = Math.sign(other - snapLine(other, p.ax === 'z' ? G.x0 : G.z0)) || 1;
-          if (p.ax === 'z') { p.ax = 'x'; p.line = tAlong; p.dir = s2; } else { p.ax = 'z'; p.line = tAlong; p.dir = s2; }
+          let d2 = s2; if (gl) d2 = Math.sign(p.ax === 'z' ? gl.x - p.x : gl.z - p.z) || s2;
+          if (p.ax === 'z') { p.ax = 'x'; p.line = tAlong; p.dir = d2; } else { p.ax = 'z'; p.line = tAlong; p.dir = d2; }
         } else p.dir = -p.dir;
       }
       if (dc < 0 || dc > ST_W) p.atCorner = false;
@@ -6986,6 +7035,13 @@ function cityWeather() { const r = Math.random(); const w = r < .5 ? 'clear' : r
 /* ---- reputation: the city remembers you ---- */
 var REP = { v: 0, add(d, why) { this.v = clamp(this.v + d, -100, 100); try { const S = JSON.parse(localStorage.getItem('sr3d_city') || '{}'); S.rep = this.v; localStorage.setItem('sr3d_city', JSON.stringify(S)); } catch (_) { } if (Math.abs(d) >= 3 && why) feed((d > 0 ? '⭐ Репутация +' : '⚠ Репутация ') + d + ' · ' + why, d > 0 ? 'gold' : 'red'); } };
 try { REP.v = +(JSON.parse(localStorage.getItem('sr3d_city') || '{}').rep || 0); } catch (_) { }
+
+// a small crowd at the stop you are driving to on a bus route
+function lifeStopCrowd(st, n) {
+  if (!LIFE.peds.length) return; let k = 0; const me = player.pos;
+  for (const p of LIFE.peds) { if (k >= n) break; if (!(p.hidden || Math.hypot(p.x - me.x, p.z - me.z) > 110) || p.state === 'stop') continue;
+    p.hidden = false; p.indoor = 0; p.down = 0; p.state = 'stop'; p.x = st[0] + .45; p.z = st[1] + (k - 1) * .9; p.h = -Math.PI / 2; p.stopT = 240; p.stop = st; p.jog = false; p.t = 0; k++; }
+}
 
 /* ================= VEHICLE DAMAGE: dents, broken lights & glass, dirt, fuel, wear that lasts until repair ================= */
 const crackTex = canvasTex(256, 256, (c, w, h) => {
