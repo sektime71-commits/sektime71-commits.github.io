@@ -1912,6 +1912,85 @@ function vehFootAction() {
   }];
 }
 
+/* ---- city services you can walk into: police stations, auto services; your garage shows your collection ---- */
+var PLACES = { list: [] };
+function placeTypes() {
+  const stars = () => (CITY && CITY.stars) || 0, P = () => player;
+  return {
+    police: { id: 'police', name: 'Полицейский участок', icon: '🚔', col: '#1e3a8a', acc: '#bfdbfe', wall: 0x334155, floor: ['#cbd5e1', '#94a3b8'], kind: 'police', special: policeRoom,
+      items: [['Сдаться и заплатить штраф', () => 300 + stars() * 450, () => { clearStars('🚔 Ты сдался. Розыск снят'); REP.add(-1); feed('🚔 Штраф оплачен, розыск снят', 'gold'); }, 'снимает все звёзды розыска', () => stars() ? '' : '🚔 «Вы не в розыске. Хорошего дня»'],
+        ['Справка о хорошем поведении', 1500, () => { REP.add(6, 'Справка из полиции'); }, '+6 к репутации в городе'],
+        ['Заявить о краже машины', 0, () => { flash('🚔 «Заявление принято. Будем искать»', 2); }, 'просто поговорить с дежурным']] },
+    service: { id: 'service', name: 'Автосервис', icon: '🔧', col: '#c2410c', acc: '#fed7aa', wall: 0x57534e, floor: ['#78716c', '#57534e'], kind: 'service', special: serviceRoom,
+      items: [['Полный ремонт', () => 150 + Math.round((P().dmg || 0) * 14), () => { repairWear(P(), true); try { saveWear(P()); } catch (_) { } flash('🔧 Машина как с завода', 2); }, 'вмятины, стёкла, фары, грязь', () => (P().dmg || 0) < 1 && !dmgState(P()).dents.length ? '🔧 «Машина целая, чинить нечего»' : ''],
+        ['Мойка', 80, () => { dmgState(P()).dirt = 0; applyWearLook(P()); }, 'смоет грязь'],
+        ['Залить нитро', 350, () => { P().nitro = 1; }, 'нитро 100%'],
+        ['Перебить номера', () => 400 + stars() * 250, () => { clearStars('🔧 Новые номера — полиция тебя потеряла'); }, 'сброс розыска', () => stars() ? '' : '🔧 «Тебя и так никто не ищет»']] },
+  };
+}
+function vehPlacesSetup() {
+  for (const m of PLACES.list) scene.remove(m.g); PLACES.list = [];
+  if (!CITY || !CITY.on || settings.mode !== 'free') return;
+  const C = CITY.G, TY = placeTypes(), want = [['police', 'cbd'], ['police', 'old'], ['service', 'ind'], ['service', 'res'], ['service', 'bay']];
+  for (const [ty, dist] of want) {
+    let q = null; for (let t = 0; t < 220 && !q; t++) { const r = streetPoint(C.CX, C.CZ, 60, C.R - 80); if (r && districtAt(r.x, r.z).id === dist && MIS.marks.concat(PROP.marks, PLACES.list).every(m => Math.hypot(m.x - r.x, m.z - r.z) > 70)) q = r; }
+    if (!q) continue; const T = TY[ty], g = makeBeacon(ty === 'police' ? 0x3b82f6 : 0xf97316, T.icon, 12); g.position.set(q.x, 0, q.z);
+    PLACES.list.push({ T, x: q.x, z: q.z, g });
+  }
+}
+function vehPlaceAction() {
+  if (!FOOT.on || FOOT.inside) return null;
+  for (const m of PLACES.list) if (Math.hypot(FOOT.x - m.x, FOOT.z - m.z) < 6) return [m.T.icon + ' ВОЙТИ: ' + m.T.name.toUpperCase(), () => { const T = placeTypes()[m.T.id]; shopEnter({ type: T, dx: m.x, dz: m.z, nx: 1, nz: 0, h: Math.PI / 2 }); }];
+  return null;
+}
+function policeRoom(S, std, box) {
+  const W = INT.W, D = INT.D, navy = std(0x1e3a8a, .6), desk = std(0x6b7280, .45, .2), scr = new THREE.MeshBasicMaterial({ color: 0x60a5fa, toneMapped: false });
+  if (INT.cashier) { INT.cashier.g.traverse(o => { if (o.isMesh && o.material && o.material.color && o.material.color.getHex() === new THREE.Color('#1e3a8a').getHex()) o.material = navy; }); const badge = box(.08, .1, .02, std(0xfacc15, .3, .8), .12, 1.42, -3.55); }
+  for (const x of [-4.6, 4.6]) { box(2.2, .76, 1.1, desk, x, .38, 1.4, true); const m = box(.7, .45, .05, std(0x111827, .4), x, 1.0, 1.1); const sc = new THREE.Mesh(new THREE.PlaneGeometry(.62, .38), scr); sc.position.set(x, 1.0, 1.13); S.add(sc); box(.5, .5, .5, std(0x111827, .7), x, .25, 2.3); }
+  // holding cell in the back left corner
+  const bars = std(0x9ca3af, .3, .9), cx0 = -W / 2, cx1 = -4.1, cz0 = -D / 2, cz1 = -1.6;
+  for (let z = cz0 + .2; z <= cz1; z += .22) { const b = new THREE.Mesh(new THREE.CylinderGeometry(.025, .025, 3.2, 6), bars); b.position.set(cx1, 1.6, z); S.add(b); }
+  for (let x = cx0 + .2; x <= cx1; x += .22) { const b = new THREE.Mesh(new THREE.CylinderGeometry(.025, .025, 3.2, 6), bars); b.position.set(x, 1.6, cz1); S.add(b); }
+  INT.solids.push(['box', (cx0 + cx1) / 2, (cz0 + cz1) / 2, (cx1 - cx0) / 2 + .2, (cz1 - cz0) / 2 + .2]); box(2.4, .4, .5, std(0x4b5563, .8), -5.6, .2, -4.6);
+  // wanted board with your face if you are wanted
+  const st = (CITY && CITY.stars) || 0, wb = new THREE.Mesh(new THREE.PlaneGeometry(3, 1.8), new THREE.MeshBasicMaterial({ map: canvasTex(512, 300, (c, w, h) => { c.fillStyle = '#d6c7a1'; c.fillRect(0, 0, w, h); for (let k = 0; k < 3; k++) { const x = 20 + k * 165; c.fillStyle = '#f5efe0'; c.fillRect(x, 30, 145, 240); c.fillStyle = '#111'; c.font = '900 22px Arial'; c.textAlign = 'center'; c.fillText('РОЗЫСК', x + 72, 62); c.fillStyle = k === 1 && st ? '#7f1d1d' : '#555'; c.beginPath(); c.arc(x + 72, 140, 42, 0, 7); c.fill(); c.fillRect(x + 30, 180, 84, 50); c.fillStyle = '#b91c1c'; c.font = '900 26px Arial'; c.fillText(k === 1 && st ? '★'.repeat(st) : '★', x + 72, 258); } }), toneMapped: false }));
+  wb.position.set(W / 2 - .02, 2.2, -1.5); wb.rotation.y = -Math.PI / 2; S.add(wb);
+  const flag = new THREE.Mesh(new THREE.PlaneGeometry(1.4, .9), new THREE.MeshBasicMaterial({ map: canvasTex(64, 40, (c, w, h) => { c.fillStyle = '#fff'; c.fillRect(0, 0, w, h / 3); c.fillStyle = '#1d4ed8'; c.fillRect(0, h / 3, w, h / 3); c.fillStyle = '#dc2626'; c.fillRect(0, 2 * h / 3, w, h / 3); }) })); flag.position.set(4.8, 2.9, -D / 2 + .03); S.add(flag);
+  for (const z of [3.2, 1.8]) box(.5, .45, 2, std(0x1e40af, .6), W / 2 - .5, .23, z, true);
+}
+function serviceRoom(S, std, box) {
+  const W = INT.W, D = INT.D, post = std(0xf59e0b, .4, .5), steel = std(0x9ca3af, .35, .8);
+  if (INT.cashier) INT.cashier.g.position.x = -4.2;
+  // a car up on the lift
+  for (const sx of [1.9, 5.3]) box(.3, 2.6, .3, post, sx, 1.3, -1.6, true);
+  box(3.6, .12, 4.8, steel, 3.6, 1.55, .4);
+  try { const md = CARS_ONLY[Math.floor(Math.random() * CARS_ONLY.length)], c = new Car({ model: md.id, tune: Object.assign(defTune(md), { color: PAINTS[Math.floor(Math.random() * PAINTS.length)] }), plate: 'СТО 01' }, '', false, S); c.root.position.set(3.6, 1.62, .5); c.root.rotation.y = Math.PI; c.root.scale.setScalar(.9); INT.solids.push(['box', 3.6, .4, 2, 2.6]); } catch (_) { }
+  // tyre stacks, oil drums, tool wall, workbench
+  const tyre = std(0x111214, .9); for (const [x, z] of [[-6.3, 3.8], [-5.6, 3.9], [6.3, 3.6]]) for (let k = 0; k < 4; k++) { const t = new THREE.Mesh(new THREE.TorusGeometry(.32, .13, 8, 18), tyre); t.rotation.x = Math.PI / 2; t.position.set(x, .13 + k * .26, z); S.add(t); }
+  for (const [x, z, c] of [[-6.4, 1.2, 0xb91c1c], [-6.4, .5, 0x1d4ed8]]) { const d = new THREE.Mesh(new THREE.CylinderGeometry(.3, .3, .9, 14), std(c, .5, .3)); d.position.set(x, .45, z); S.add(d); }
+  box(2.6, .9, .7, std(0x7c2d12, .6), -4.2, .45, 1.6, true); box(2.7, .06, .8, steel, -4.2, .93, 1.6);
+  const pb = new THREE.Mesh(new THREE.PlaneGeometry(3.4, 1.6), new THREE.MeshStandardMaterial({ map: canvasTex(340, 160, (c, w, h) => { c.fillStyle = '#d6d3d1'; c.fillRect(0, 0, w, h); c.fillStyle = '#a8a29e'; for (let x = 8; x < w; x += 16) for (let y = 8; y < h; y += 16) c.fillRect(x, y, 3, 3); c.strokeStyle = '#374151'; c.lineWidth = 6; for (let k = 0; k < 9; k++) { const x = 20 + k * 36; c.beginPath(); c.moveTo(x, 30); c.lineTo(x + (k % 2 ? 6 : -4), 110 + (k % 3) * 10); c.stroke(); } }) }));
+  pb.position.set(-W / 2 + .02, 2.0, 1.6); pb.rotation.y = Math.PI / 2; S.add(pb);
+}
+function garageInterior(S, T, std, box) {
+  const W = INT.W, D = INT.D, line = std(0xfacc15, .5);
+  for (const x of [-2.25, 2.25]) box(.12, .01, 6, line, x, .01, -1);
+  const own = SAVE.owned.filter(id => MODEL[id] && id !== player.cfg.model).slice(-3);
+  own.forEach((id, k) => { const x = (k - 1) * 4.5, md = MODEL[id];
+    try { const c = new Car({ model: id, tune: SAVE.cars[id], plate: 'ГАР ' + (k + 1) }, '', false, S); c.root.position.set(x, 0, -1.2); c.root.rotation.y = Math.PI * 0; INT.solids.push(['box', x, -1.2, md.veh ? .5 : 1.05, md.veh ? 1.1 : 2.4]); } catch (_) { }
+    const sign = new THREE.Mesh(new THREE.PlaneGeometry(2.2, .5), new THREE.MeshBasicMaterial({ map: canvasTex(256, 58, (c, w, h) => { c.fillStyle = '#111827'; c.fillRect(0, 0, w, h); c.fillStyle = '#facc15'; c.font = '900 30px Arial'; c.textAlign = 'center'; c.fillText(md.name, w / 2, 40); }), toneMapped: false })); sign.position.set(x, 3.1, -D / 2 + .03); S.add(sign);
+    INT.acts.push({ x, z: 1.9, r: 1.6, label: '🚗 ВЫЕХАТЬ НА ' + md.name, fn: () => garageDrive(id) });
+  });
+  if (!own.length) { const e = new THREE.Mesh(new THREE.PlaneGeometry(6, 1), new THREE.MeshBasicMaterial({ map: canvasTex(512, 86, (c, w, h) => { c.fillStyle = '#111827'; c.fillRect(0, 0, w, h); c.fillStyle = '#e5e7eb'; c.font = '700 30px Arial'; c.textAlign = 'center'; c.fillText('Пусто. Угони машину и поставь её сюда', w / 2, 54); }), toneMapped: false })); e.position.set(0, 2.2, -D / 2 + .03); S.add(e); }
+  box(.6, 2, 2.4, std(0xb91c1c, .5, .3), -W / 2 + .4, 1, 3, true);
+  S.add(FOOT.H.g);
+}
+function garageDrive(id) {
+  const s = FOOT.shop; if (!s) return; shopLeave();
+  stealCar({ model: id, tune: SAVE.cars[id], x: s.dx + 4, z: s.dz, h: Math.PI / 2 }); player.cfg.stolen = false;
+  SAVE.sel = MODELS.some(m => m.id === id) ? id : SAVE.sel; saveSave(); flash('🚗 ' + MODEL[id].name + ' выезжает из гаража', 2);
+}
+
 /* ===================== GAME (three.js) ===================== */
 const $ = id => document.getElementById(id);
 const NET = { race: null, remote: new Map(), players: new Map(), conns: new Map(), showCars: [] };
@@ -6032,7 +6111,7 @@ const INT = { scene: null, type: null, solids: [], cashier: null, W: 14, D: 10 }
 function buildInterior(T) {
   if (INT.scene && INT.type === T) return;
   if (INT.scene) INT.scene.traverse(o => { if (o.geometry) o.geometry.dispose(); if (o.material && o.material.map) o.material.map.dispose(); });
-  const S = new THREE.Scene(), W = INT.W, D = INT.D, HH = 4; INT.scene = S; INT.type = T; INT.solids = [];
+  const S = new THREE.Scene(), W = INT.W, D = INT.D, HH = 4; INT.scene = S; INT.type = T; INT.solids = []; INT.acts = []; INT.cashier = null;
   S.background = new THREE.Color(0x0b0d12);
   const std = (c, r = .7, m = 0) => new THREE.MeshStandardMaterial({ color: c, roughness: r, metalness: m });
   const box = (w, h, d, m, x, y, z, solid) => { const b = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), m); b.position.set(x, y, z); b.castShadow = b.receiveShadow = true; S.add(b); if (solid) INT.solids.push(['box', x, z, w / 2 + .25, d / 2 + .25]); return b; };
@@ -6055,6 +6134,7 @@ function buildInterior(T) {
   for (const [x, z] of [[-4, -2], [4, -2], [-4, 2.4], [4, 2.4], [0, 0]]) { const l = new THREE.Mesh(new THREE.CylinderGeometry(.35, .35, .06, 18), lampM); l.position.set(x, HH - .04, z); S.add(l); }
   const key = new THREE.PointLight(0xffe2b8, 26, 16, 1.6); key.position.set(0, 3.5, -1); key.castShadow = true; key.shadow.mapSize.set(512, 512); S.add(key);
   const fill = new THREE.PointLight(0xffe9cf, 14, 14, 1.6); fill.position.set(0, 3.4, 3); S.add(fill);
+  if (T.kind === 'garage') return garageInterior(S, T, std, box);
   // counter + cashier + menu board
   const cm = std(new THREE.Color(T.col).lerp(new THREE.Color(0x222222), .2), .5), top = std(0xe5e0d8, .25, .1);
   box(6.4, 1.05, .8, cm, 0, .525, -2.9, true); box(6.6, .07, 1, top, 0, 1.08, -2.9);
@@ -6063,7 +6143,7 @@ function buildInterior(T) {
   const board = canvasTex(1024, 420, (c, w, h) => {
     c.fillStyle = '#111317'; c.fillRect(0, 0, w, h); c.strokeStyle = T.acc; c.lineWidth = 10; c.strokeRect(8, 8, w - 16, h - 16);
     c.fillStyle = T.acc; c.font = '900 64px Arial'; c.textAlign = 'center'; c.fillText(T.icon + ' ' + T.name.toUpperCase(), w / 2, 92);
-    c.font = '700 46px Arial'; T.items.forEach((it, k) => { c.textAlign = 'left'; c.fillStyle = '#f5f5f5'; c.fillText(it[0], 70, 180 + k * 72); c.textAlign = 'right'; c.fillStyle = T.acc; c.fillText(it[1] + ' 💰', w - 70, 180 + k * 72); });
+    c.font = '700 46px Arial'; T.items.forEach((it, k) => { c.textAlign = 'left'; c.fillStyle = '#f5f5f5'; c.fillText(it[0], 70, 180 + k * 72); c.textAlign = 'right'; c.fillStyle = T.acc; c.fillText(typeof it[1] === 'function' ? 'по факту' : it[1] + ' 💰', w - 70, 180 + k * 72); });
   });
   const mb = new THREE.Mesh(new THREE.PlaneGeometry(5.2, 2.1), new THREE.MeshBasicMaterial({ map: board, toneMapped: false })); mb.position.set(0, 2.75, -D / 2 + .02); S.add(mb);
   if (T.kind === 'home') return homeInterior(S, T, std, box);
@@ -6079,6 +6159,7 @@ function buildInterior(T) {
       const plate = new THREE.Mesh(new THREE.CylinderGeometry(.16, .14, .02, 16), std(0xffffff, .3)); plate.position.set(x, .8, z); S.add(plate);
       INT.solids.push(['circ', x, z, 1.25]);
     }
+  } else if (T.special) { T.special(S, std, box); S.add(FOOT.H.g); return;
   } else {
     const shelf = std(0x8b9099, .5, .4), prod = ['#ef4444', '#f59e0b', '#22c55e', '#3b82f6', '#a855f7', '#ec4899', '#facc15'];
     for (const [x, z] of [[-3.6, 0], [3.6, 0], [-3.6, 2.6], [3.6, 2.6]]) {
@@ -6132,7 +6213,7 @@ function shopLeave() {
   const s = FOOT.shop; shopMenu(false);
   fadeTo(() => { FOOT.inside = false; scene.add(FOOT.H.g); Object.assign(FOOT, { x: s.dx + s.nx * .6, z: s.dz + s.nz * .6, y: 0, vy: 0, h: s.h, v: 0, camYaw: s.h, shop: null }); FOOT.cam.set(FOOT.x - Math.sin(s.h) * 4, 2.3, FOOT.z - Math.cos(s.h) * 4); if (audio && audio.master.gain.value > 0) audio.master.gain.value = .5; });
 }
-const shopPrice = it => Math.round(it[1] * (CITY && CITY.on && settings.mode === 'free' && FOOT.shop ? districtAt(FOOT.shop.dx, FOOT.shop.dz).price : 1) / 5) * 5;
+const shopPrice = it => Math.round((typeof it[1] === 'function' ? it[1]() : it[1]) * (CITY && CITY.on && settings.mode === 'free' && FOOT.shop ? districtAt(FOOT.shop.dx, FOOT.shop.dz).price : 1) / 5) * 5;
 function shopMenu(on) {
   const el = $('shopMenu'); if (!el) return; FOOT.menu = !!on; el.classList.toggle('hidden', !on); if (!on) return;
   if (FOOT.shop && FOOT.shop.type.clothes) { wardrobe(false); return; }
@@ -6145,12 +6226,14 @@ function shopMenu(on) {
 }
 function buyItem(it) {
   const [name, , eff] = it, price = shopPrice(it);
+  if (it[4]) { const er = it[4](); if (er) { flash(er, 1.8); if (audio) beep(220, .1, .1); return; } }
   if (!SAVE.unlimited && SAVE.coins < price) { flash('Не хватает ' + (price - SAVE.coins) + ' 💰', 1.5); if (audio) beep(200, .1, .1); return; }
   if (!SAVE.unlimited) SAVE.coins -= price; saveSave(); try { updateCoins(); } catch (_) { }
   if (eff === 'stam' || eff === 'nitro30') FOOT.stam = 1;
   if (eff === 'nitro30') player.nitro = Math.min(1, player.nitro + .3);
   if (eff === 'nitro') player.nitro = 1;
   if (eff === 'repair') { repairWear(player, false); }
+  if (typeof eff === 'function') { eff(); shopMenu(true); return; }
   const msg = { stam: 'Вкусно! Выносливость 100%', nitro30: 'Бодрит! Нитро +30%', nitro: 'Нитро заправлено на 100%', repair: 'Машина как новая', none: 'Приятный запах в салоне' }[eff];
   flash('😋 ' + name + ' — ' + msg, 2); feed(FOOT.shop.type.icon + ' ' + name + (SAVE.unlimited ? '' : ' −' + price + ' 💰'), 'gold'); if (audio) beep(1200, .08, .1);
   shopMenu(true);
@@ -6220,6 +6303,8 @@ function footTick(dt) {
     if (FOOT.inside) {
       if (INT.cashier) { animHuman(INT.cashier, 0, 0, FOOT.t + 1.3, false); INT.cashier.g.rotation.y = Math.atan2(FOOT.x, FOOT.z + 3.75) * .5; INT.cashier.arms[1].sh.rotation.x = Math.hypot(FOOT.x, FOOT.z + 2) < 2.6 ? -.9 + Math.sin(FOOT.t * 6) * .25 : 0; }
       if (Math.hypot(FOOT.x, FOOT.z - (INT.D / 2 - .6)) < 1.4) { label = '🚪 ВЫЙТИ НА УЛИЦУ'; act = shopLeave; }
+      else if (INT.acts && INT.acts.some(a => Math.hypot(FOOT.x - a.x, FOOT.z - a.z) < a.r)) { const a = INT.acts.find(a => Math.hypot(FOOT.x - a.x, FOOT.z - a.z) < a.r); label = a.label; act = a.fn; }
+      else if (FOOT.shop && FOOT.shop.type.kind === 'garage') { }
       else if (Math.abs(FOOT.x) < 3.4 && FOOT.z < -1.4) { const home = FOOT.shop && FOOT.shop.type.kind === 'home'; label = FOOT.menu ? '✕ ЗАКРЫТЬ' : home ? '🛏 ОТДЫХ · ГАРДЕРОБ' : '🧾 МЕНЮ'; act = home ? () => FOOT.menu ? shopMenu(false) : homeMenu(FOOT.shop.P) : () => shopMenu(!FOOT.menu); }
     } else {
       if (Math.hypot(FOOT.x - player.pos.x, FOOT.z - player.pos.z) < 3.6) { label = '🚗 СЕСТЬ В МАШИНУ'; act = footEnter; }
@@ -6518,7 +6603,7 @@ function citySetup() {
   if (!CITY.on || settings.mode !== 'free') return;
   const nT = curQ === 'low' ? 14 : curQ === 'mid' ? 20 : 26;
   for (let k = 0; k < nT; k++) { const c = gridCar(k < 2 ? 'cop' : 'traffic'); if (k < 2) { c.cop = true; c.patrol = true; c.lightR.visible = c.lightB.visible = false; c.police = false; } if (!gridSpawn(c, player.pos, 60, 330)) gridSpawn(c, player.pos, 60, 500); CITY.traffic.push(c); }
-  lifeSetup(); placeMarks(); vehRentSetup(); fuelStations(); econSetup(); storySetup(); radioSetup(); rndEvSetup(); DAY.t = settings.tod === 'day' ? 12 : settings.tod === 'sunset' ? 19.6 : 21.5; DAY.wxT = 180;
+  lifeSetup(); placeMarks(); vehRentSetup(); fuelStations(); econSetup(); vehPlacesSetup(); storySetup(); radioSetup(); rndEvSetup(); DAY.t = settings.tod === 'day' ? 12 : settings.tod === 'sunset' ? 19.6 : 21.5; DAY.wxT = 180;
 }
 const _m4 = new THREE.Matrix4();
 function cityTick(dt, racing) {
@@ -6715,7 +6800,7 @@ function cityAction() {
     if (CITY.ownCar && Math.hypot(FOOT.x - CITY.ownCar.pos.x, FOOT.z - CITY.ownCar.pos.z) < 3.6) return ['🚗 СЕСТЬ В СВОЮ МАШИНУ', takeOwnCar];
     if (MIS.on && MIS.type === 'theft' && MIS.stage === 'find' && MIS.thiefCar && Math.hypot(FOOT.x - MIS.thiefCar.pos.x, FOOT.z - MIS.thiefCar.pos.z) < 3.6)
       return ['🔓 УГНАТЬ ' + MIS.thiefCar.name.toUpperCase(), () => { const c = MIS.thiefCar; if (!c) return; MIS.thiefCar = null; stealCar(c); crime(2, 'Угон'); MIS.stage = 'deliver'; const q = streetPoint(player.pos.x, player.pos.z, 700, 1200); setDest(q.x, q.z, MTYPES.theft.col); flash('🔓 Угнал! Сбрось хвост полиции и гони в гараж', 3); }];
-    const vj = vehFootAction(); if (vj) return vj;
+    const vj = vehPlaceAction() || vehFootAction(); if (vj) return vj;
     let pk = null, bd = 3.4; for (const c of CITY.parked) if (!c.gone) { const d = Math.hypot(FOOT.x - c.x, FOOT.z - c.z); if (d < bd) { bd = d; pk = c; } }
     if (pk && Math.hypot(FOOT.x - p.pos.x, FOOT.z - p.pos.z) > 3.6) return ['🔓 УГНАТЬ ЭТУ МАШИНУ', () => {
       const md = CARS_ONLY.filter(m => m.style === pk.style); const mm = md[Math.floor(Math.random() * md.length)] || CARS_ONLY[0];
@@ -6831,7 +6916,7 @@ function remoteFoot(r, s0, s1, f) {
   const x = lerp(s0[16] ?? s1[16], s1[16], f), z = lerp(s0[17] ?? s1[17], s1[17], f), v = s1[19]; r.H.g.visible = !s1[20];
   r.ph += (frame.dtL || .016) * Math.abs(v) * 3.3; r.H.g.position.set(x, s1[21] || 0, z); r.H.g.rotation.set(0, s1[18], 0); animHuman(r.H, r.ph, clamp(Math.abs(v) / 6.4 * 1.15, Math.abs(v) > .2 ? .45 : 0, 1), timeAcc, false);
 }
-window.__sr.city = { ST_W, streetPoint, placeCarAt, snapCamera, crime, clearStars, todApplyBlend, MIS, CITY, DAY, LANE, get player() { return player; }, footAct: () => footAction(), veh: (id, x, z, h) => { const c = new Car({ model: id, tune: defTune(MODEL[id]), plate: 'Т 001 ТТ' }, 't', false); c.grid = true; c.traffic = true; c.hold = true; npcs.push(c); placeCarAt(c, x, z, h); updateCarVisual(c, 0); return c; }, steal: c => stealCar(c), get camMode() { return camMode; }, set camMode(v) { camMode = v; } };
+window.__sr.city = { ST_W, streetPoint, placeCarAt, snapCamera, crime, clearStars, todApplyBlend, MIS, CITY, DAY, LANE, get player() { return player; }, footAct: () => footAction(), places: () => PLACES.list.map(m => [m.T.id, m.x, m.z]), enterPlace: k => { const m = PLACES.list[k]; if (!FOOT.on) footExit(); shopEnter({ type: placeTypes()[m.T.id], dx: m.x, dz: m.z, nx: 1, nz: 0, h: Math.PI / 2 }); }, foot: FOOT, veh: (id, x, z, h) => { const c = new Car({ model: id, tune: defTune(MODEL[id]), plate: 'Т 001 ТТ' }, 't', false); c.grid = true; c.traffic = true; c.hold = true; npcs.push(c); placeCarAt(c, x, z, h); updateCarVisual(c, 0); return c; }, steal: c => stealCar(c), get camMode() { return camMode; }, set camMode(v) { camMode = v; } };
 window.__sr.netRaw = o => { o.id = NET.myId; netSend(o); return true; };
 window.__remoteFoot = () => { for (const [, r] of NET.remote) if (r.H) return { visible: r.H.g.visible, x: Math.round(r.H.g.position.x), z: Math.round(r.H.g.position.z) }; return null; };
 
@@ -7232,6 +7317,7 @@ function propAction() {
     if (!own) return ['🔑 КУПИТЬ: ' + P.name + ' · ' + fmtM(P.price) + ' 💰', () => { if (!pay(P.price, 'Покупка: ' + P.name)) return; CS.props.push(P.id); csSave(); m.g.userData.cyl.material.color.set(0x60a5fa); flash('🔑 ' + P.name + ' — теперь твоя!', 2.6); EV.emit('property', { P }); REP.add(5, 'Своё жильё'); }];
     if (P.kind === 'flat') return FOOT.on ? ['🏠 ЗАЙТИ ДОМОЙ', () => { const T = { id: 'home', name: P.name, icon: '🏠', col: '#1d4ed8', acc: '#bfdbfe', wall: P.id === 'pent_cbd' ? 0xe7e5e4 : 0x8b7355, floor: P.id === 'pent_cbd' ? ['#d6d3d1', '#e7e5e4'] : ['#8b5a2b', '#7a4e25'], kind: 'home', items: [] }; shopEnter({ type: T, P, dx: m.x, dz: m.z, nx: 1, nz: 0, h: Math.PI / 2 }); }] : ['🏠 ДОМОЙ: ' + P.name, () => homeMenu(P)];
     if (P.kind === 'garage' && !FOOT.on) return ['🅿 ГАРАЖ: оставить машину', () => garageStore()];
+    if (P.kind === 'garage' && FOOT.on) return ['🅿 ЗАЙТИ В ГАРАЖ', () => shopEnter({ type: { id: 'garage', name: P.name, icon: '🅿', col: '#374151', acc: '#facc15', wall: 0x52525b, floor: ['#71717a', '#52525b'], kind: 'garage', items: [] }, P, dx: m.x, dz: m.z, nx: 1, nz: 0, h: Math.PI / 2 })];
   }
   return null;
 }
