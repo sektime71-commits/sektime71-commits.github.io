@@ -409,6 +409,7 @@ button,.btn,.tile,.opt,.card,.rt,.ib,.mBar>*{-webkit-tap-highlight-color:transpa
 .onLink{font:700 10px system-ui;font-style:normal;letter-spacing:.5px;margin-left:6px;padding:2px 7px;border-radius:99px;background:rgba(255,255,255,.08)}.onLink.ok{color:#4ade80}.onLink.wait{color:#fbbf24;animation:hotP .8s ease-in-out infinite alternate}.onLink.bad{color:#f87171}
 
 /* open city HUD */
+.dyno{background:rgba(255,255,255,.06);border-radius:12px;padding:8px 12px;margin-bottom:8px;display:grid;grid-template-columns:1fr 1fr;gap:2px 10px;font-size:12px}.dyno b{grid-column:1/-1;font-size:13px}.dyno em{font-style:normal;font-weight:800}.dyno>small{grid-column:1/-1}
 body.free #tr,body.free #board{display:none}
 #stars{position:fixed;top:calc(env(safe-area-inset-top) + 44px);right:calc(env(safe-area-inset-right) + 14px);z-index:30;display:flex;gap:2px;opacity:0;transition:opacity .3s;pointer-events:none}
 #stars.show{opacity:1}#stars i{font-style:normal;font-size:22px;color:rgba(255,255,255,.22);text-shadow:0 2px 4px #000}#stars i.on{color:#fbbf24;text-shadow:0 0 10px #f59e0b,0 2px 4px #000}
@@ -2693,9 +2694,23 @@ function loadSave() {
 }
 function saveSave() { try { localStorage.setItem('sr3d_save', JSON.stringify(SAVE)); } catch (_) { } }
 loadSave();
-function statsOf(id) {
-  const m = MODEL[id], u = SAVE.cars[id].up;
-  return { pow: m.base.pow * (1 + .05 * u.eng), vmax: m.base.vmax * (1 + .025 * u.eng), grip: m.base.grip * (1 + .035 * u.tyr + .015 * u.sus + .05 * (u.grip || 0)), nit: m.base.nit * (1 + .07 * u.nit), eff: 1 + .1 * u.nit, steer: (m.base.st || 1) * (1 + .03 * u.sus + .07 * (u.hand || 0)) };
+function statsOf(id, stock) {
+  const m = MODEL[id], t = SAVE.cars[id], u = t.up;
+  const s = { pow: m.base.pow * (1 + .05 * u.eng), vmax: m.base.vmax * (1 + .025 * u.eng), grip: m.base.grip * (1 + .035 * u.tyr + .015 * u.sus + .05 * (u.grip || 0)), nit: m.base.nit * (1 + .07 * u.nit), eff: 1 + .1 * u.nit, steer: (m.base.st || 1) * (1 + .03 * u.sus + .07 * (u.hand || 0)) };
+  if (stock) return s;
+  // tuning you can feel: camber, ride height, wide body, wing and gearing change the physics, not just the looks
+  const cam = +t.camber || 0, hgt = +t.height || 0, gear = +t.gear || 0, wing = +t.wing ? 1 : 0, wide = t.wide ? 1 : 0;
+  s.grip *= 1 + Math.min(cam, 3) * .012 - Math.max(0, cam - 3) * .01 - hgt * 1.2 + wide * .04 + wing * .03;
+  s.vmax *= 1 - hgt * .4 - wide * .01 - wing * .015 - gear * .03;
+  s.pow *= 1 + gear * .06;
+  s.steer *= 1 + Math.min(cam, 4) * .01 + wide * .02;
+  return s;
+}
+// dyno: the same longitudinal model the race physics uses
+function dyno(s) {
+  let v = 0, t = 0, t100 = 0, t200 = 0; const dt = 1 / 60;
+  for (let k = 0; k < 60 * 60 && t < 60; k++) { const a = Math.min(s.pow * .5, 300 * s.pow / 16 / Math.max(v, 1)) * Math.max(0, 1 - Math.pow(v / s.vmax, 6)) - (.3 + .00016 * v * v); v += a * dt; t += dt; if (!t100 && v >= 100 / 3.6) t100 = t; if (!t200 && v >= 200 / 3.6) t200 = t; }
+  return { t100, t200, top: v * 3.6, g: 2.15 * 1.22 * s.grip };
 }
 const hex6 = c => '#' + (+c || 0).toString(16).padStart(6, '0');
 function patternTex(t, st) {
@@ -4122,6 +4137,7 @@ function frame(now) {
   moon.position.copy(camera.position).add(tmpV.set(-1500, 1200, 2200));
   waterNormal.offset.x += dt * .006; waterNormal.offset.y += dt * .01;
   updateSpeedLines(dt);
+  if ((frame.cc = (frame.cc || 0) + dt) > .4) { frame.cc = 0; chunkCull(); }
   cloudDome.position.copy(camera.position);
   render();
 }
@@ -4542,7 +4558,8 @@ function renderGarage() {
   else if (gTab === 'lights') h = `<div class="row"><label>Фары</label>${choices([['white', 'Белые'], ['xenon', 'Ксенон'], ['gold', 'Жёлтые']], t.head, 'head')}</div><div class="row"><label>Неон под днищем и подсветка салона</label>${swatches([0x00e5ff, 0xff2d95, 0x7c3aed, 0x39ff88, 0xffb000, 0xff3030], t.glow, 'glow', `<div class="opt ${t.glow ? '' : 'on'}" data-k="glow" data-v="0">Выкл</div>`)}</div><div class="row"><label>Пламя нитро</label>${swatches([0x4aa3ff, 0xa855f7, 0x39ff88, 0xff4a1a, 0xff2d95, 0xffffff], t.flame, 'flame')}</div>`;
   else if (gTab === 'wheels') h = `<div class="row"><label>Диски</label>${choices(RIMS, t.rim, 'rim')}</div><div class="row"><label>Цвет дисков</label>${swatches([0xd7d9dd, 0x1a1a1c, 0xc9a24a, 0x9aa0a8, 0xd10f2f, 0x1f5fff, 0xffb000, 0xf4f4f4], t.rimColor, 'rimColor')}</div>` + slider('camber', 'Развал', 0, 8, .5, t.camber, SLFMT.camber) + `<div class="row"><label>Суппорты</label>${swatches([0xd11b1b, 0xffcc00, 0x1d4ed8, 0x18b866, 0x111111, 0xff5a1f], t.caliper, 'caliper')}</div>`;
   else if (gTab === 'interior') h = `<div class="row"><label>Кожа салона</label>${swatches([0x1c1c20, 0x5a1a1a, 0x6b4a32, 0xd8cbb0, 0x1b2b4b, 0x3a3d42], t.interior, 'interior')}</div><div class="row"><label>Строчка и акценты</label>${swatches([0xff2d55, 0xffb000, 0x22d3ee, 0x39ff88, 0xffffff, 0xa855f7], t.stitch, 'stitch')}</div><div class="row"><label>Каркас безопасности</label>${choices([[0, 'Нет'], [1, 'Сталь'], [2, 'В цвет кузова']], t.cage, 'cage')}</div>` + slider('tint', 'Тонировка', 0, 1, .05, t.tint, SLFMT.tint);
-  else if (gTab === 'perf') h = UPG.map(u => { const lv = t.up[u.id], cost = u.cost[lv]; return `<div class="upg"><div><b>${u.icon} ${u.name}</b><div class="lv">${'▰'.repeat(lv)}${'▱'.repeat(5 - lv)}</div></div>${lv >= 5 ? '<div class="opt on">МАКС</div>' : `<div class="opt buy ${owned && (SAVE.unlimited || SAVE.coins >= cost) ? '' : 'dis'}" data-up="${u.id}">${SAVE.unlimited ? '♾ БЕСПЛАТНО' : '💰 ' + cost.toLocaleString('ru-RU')}</div>`}</div>`; }).join('') + (owned ? '' : '<div class="help">Сначала купи машину</div>');
+  else if (gTab === 'perf') h = (() => { const a = dyno(statsOf(gModel)), b = dyno(statsOf(gModel, true)), d = (x, y, inv) => { const df = x - y; if (Math.abs(df) < .005) return ''; const good = inv ? df < 0 : df > 0; return ` <small style="color:${good ? '#4ade80' : '#f87171'}">${df > 0 ? '+' : ''}${df.toFixed(2)}</small>`; };
+    return `<div class="dyno"><b>📊 Тест-стенд</b><div>0–100: <em>${a.t100 ? a.t100.toFixed(2) + ' с' : '—'}</em>${d(a.t100, b.t100, true)}</div><div>0–200: <em>${a.t200 ? a.t200.toFixed(2) + ' с' : '—'}</em>${d(a.t200, b.t200, true)}</div><div>Макс.: <em>${Math.round(a.top)} км/ч</em>${d(a.top, b.top)}</div><div>Сцепление: <em>${a.g.toFixed(2)} g</em>${d(a.g, b.g)}</div><small style="opacity:.6">Цифры с учётом развала, клиренса, обвеса, антикрыла и передач</small></div>` + slider('gear', 'Передачи (− длинные: выше макс., + короткие: резвее разгон)', -2, 2, 1, +t.gear || 0, v => (v > 0 ? '+' : '') + v); })() + UPG.map(u => { const lv = t.up[u.id], cost = u.cost[lv]; return `<div class="upg"><div><b>${u.icon} ${u.name}</b><div class="lv">${'▰'.repeat(lv)}${'▱'.repeat(5 - lv)}</div></div>${lv >= 5 ? '<div class="opt on">МАКС</div>' : `<div class="opt buy ${owned && (SAVE.unlimited || SAVE.coins >= cost) ? '' : 'dis'}" data-up="${u.id}">${SAVE.unlimited ? '♾ БЕСПЛАТНО' : '💰 ' + cost.toLocaleString('ru-RU')}</div>`}</div>`; }).join('') + (owned ? '' : '<div class="help">Сначала купи машину</div>');
   if (!owned && gTab !== 'cars') h = `<div class="gLock"><i>🔒</i><b>${m.name}</b><small>Тюнинг и прокачка откроются после покупки</small><div class="opt buy" id="gLockBuy">КУПИТЬ 💰 ${m.price.toLocaleString('ru-RU')}</div></div>`;
   $('gPanel').innerHTML = h;
   if ($('gLockBuy')) $('gLockBuy').onclick = () => $('gAct').onclick();
@@ -4578,8 +4595,10 @@ $('gPanel').addEventListener('input', e => {
   const o = e.target; if (!o.dataset.k) return;
   if (o.dataset.k === 'plate') { clearTimeout(rebuildT); SAVE.cars[gModel].plate = (o.value || 'SR 777').toUpperCase().slice(0, 8); saveSave(); rebuildT = setTimeout(buildGarageCar, 500); return; }
   const v = o.type === 'color' ? parseInt(o.value.slice(1), 16) : o.value;
-  if (o.dataset.fmt) $('lbl_' + o.dataset.k).textContent = SLFMT[o.dataset.fmt](o.value);
+  if (o.dataset.fmt && SLFMT[o.dataset.fmt]) $('lbl_' + o.dataset.k).textContent = SLFMT[o.dataset.fmt](o.value);
   setTune(o.dataset.k, v);
+  $('gStats').innerHTML = statBars(gModel); // stats react to tuning live
+  if (o.dataset.k === 'gear') { clearTimeout(setTune.rg); setTune.rg = setTimeout(renderGarage, 250); }
 });
 $('gTabs').addEventListener('click', e => { const o = e.target.closest('.gt'); if (!o) return; gTab = o.dataset.t; if (gTab !== 'interior') gAuto = true; renderGarage(); });
 $('gAct').onclick = () => {
@@ -5557,10 +5576,11 @@ $('loading').classList.add('hidden');
 $('menu').classList.remove('hidden');
 setRoom(ROOM);
 for (const id of ['airHint', 'keyHint']) { const e = document.getElementById(id); if (e) document.body.appendChild(e); }
-(function chunkStatic() {
+const CHUNKS = [];
+function chunkStatic() {
   const dyn = new Set([typeof pickI !== 'undefined' && pickI, typeof capI !== 'undefined' && capI, typeof haloI !== 'undefined' && haloI, pedMesh].filter(Boolean));
   const tri = g => (g.index ? g.index.count : g.attributes.position.count) / 3;
-  const list = []; scene.traverse(o => { if (o.isInstancedMesh && o.count >= 60 && !dyn.has(o) && o.parent === scene && o.count * tri(o.geometry) > 12000) list.push(o); });
+  const list = []; scene.traverse(o => { if (o.isInstancedMesh && !o.userData.chunk && !o.userData.dynamic && o.count >= 60 && !dyn.has(o) && o.parent === scene && o.count * tri(o.geometry) > 12000) list.push(o); });
   const CELL = 420, m4 = new THREE.Matrix4(), p = new THREE.Vector3(), col = new THREE.Color();
   for (const o of list) {
     const cells = new Map();
@@ -5569,11 +5589,14 @@ for (const id of ['airHint', 'keyHint']) { const e = document.getElementById(id)
     for (const idx of cells.values()) {
       const c = new THREE.InstancedMesh(o.geometry, o.material, idx.length); c.castShadow = o.castShadow; c.receiveShadow = o.receiveShadow; c.renderOrder = o.renderOrder;
       idx.forEach((k, j) => { o.getMatrixAt(k, m4); c.setMatrixAt(j, m4); if (o.instanceColor) { o.getColorAt(k, col); c.setColorAt(j, col); } });
-      c.computeBoundingSphere(); scene.add(c);
+      c.computeBoundingSphere(); c.userData.chunk = 1; scene.add(c); CHUNKS.push(c);
     }
     scene.remove(o);
   }
-})();
+}
+chunkStatic();
+// far chunks hidden in the fog are not drawn at all
+function chunkCull() { if (!CHUNKS.length || !scene.fog) return; const cx = camera.position.x, cz = camera.position.z, far = scene.fog.far + 120; for (const c of CHUNKS) { const s = c.boundingSphere; if (!s) continue; c.visible = Math.hypot(s.center.x - cx, s.center.z - cz) - s.radius < far; } }
 window.__gameReady = true;
 setTimeout(thumbsIdle, 2500);
 window.__sr = { start: () => startRace(), get st() { return { state, countdown, raceTime, i: player.q.i, lat: player.q.lat, v: player.vF, y: player.pos.y, vy: player.vy, cars: cars.map(c => [c.q.i, +c.vF.toFixed(1), +c.pos.y.toFixed(2)]) }; }, cam: m => { camMode = m; }, bot: v => { settings.auto = v; }, tp: (i, lat = 0) => { player.place(i, lat); snapCamera(); }, set: (k, v) => { settings[k] = v; }, N, view: (i, back, up, side = 0) => { const j = (i - Math.round(back / DS) + N) % N; window.__fc = [PX[j] + NX[j] * side, up, PZ[j] + NZ[j] * side, PX[i], 0, PZ[i]]; }, free: () => { window.__fc = null; }, gar: (m, tab) => { if (state !== 'garage') openGarage(); gModel = m; if (tab) gTab = tab; buildGarageCar(); renderGarage(); }, pv: () => { const i = RAVINES.length ? RAVINES[0].i0 + 12 : CUTS.length ? CUTS[0].i : BOOSTS.length ? BOOSTS[0].i + 20 : 150; const j = (i - Math.round(75 / DS) + N) % N; window.__fc = [PX[j] + NX[j] * 34, 30, PZ[j] + NZ[j] * 34, PX[i], 0, PZ[i]]; document.body.classList.add('replay'); }, heat: v => { ST.heat = v; }, key: (k, v) => { keys[k] = v; }, go: () => { countdown = 0; }, space: () => ({ ramp: SPACE.ramp && SPACE.ramp.visible, on: SPACE.on, t: +SPACE.t.toFixed(1), y: Math.round(player.y), v: Math.round(player.vF * 3.6), x: Math.round(player.pos.x), rx: SPACE.ramp ? Math.round(SPACE.ramp.position.x) : 0 }), jump: t => { if (!SPACE.ramp) buildSpaceFx(); SPACE.on = true; SPACE.t = t; SPACE.x0 = player.pos.x; SPACE.z = player.pos.z; player.cine = true; spaceTick(0); }, boost: v => { player.vel.x = v; player.vel.z = 0; player.vF = v; player.h = Math.PI / 2; }, jet: () => ({ jp: [JET.g.position.x, JET.g.position.y, JET.g.position.z].map(v => +v.toFixed(1)), cam: camera.position.toArray().map(v => +v.toFixed(1)), vis: JET.g.visible, inScene: !!JET.g.parent, v: Math.round(JET.v * 3.6), view: AIR.view, scr: JET.g.position.clone().project(camera).toArray().map(v => +v.toFixed(2)) }), heli: () => ({ on: HELI.on, x: +HELI.x.toFixed(1), v: +HELI.v.toFixed(1), hits: GS.hits, rockets: HELI.rockets.length, tgt: !!HELI.target, pv: player.root.visible }), rp: () => startReplay(() => { }), coins: () => SAVE.coins, netFin: t => { player.finish = t ?? raceTime; netFinish(); }, net: () => ({ track: TRACK_ID, ready: [...NET.players.values()].map(p => !!p.ready), role: NET.role, code: NET.code, link: NET.code && roomLink(NET.code), t: raceTime, v: player && Math.round(player.vF*3.6), players: [...NET.players.values()].map(p => p.name), race: !!NET.race, remote: [...NET.remote.values()].map(r => [r.car.name, Math.round(r.car.pos.x), Math.round(r.car.pos.z), r.buf.length]), me: player && [Math.round(player.pos.x), Math.round(player.pos.z)], status: ($('onStatus') || {}).textContent, results: NET.results && { winner: NET.results.winner && NET.results.winner.name, me: NET.results.winner === player, n: NET.results.fin.length }, fin: !$('finish').classList.contains('hidden') }), heavy: () => { const L = []; scene.traverse(o => { if ((o.isMesh || o.isInstancedMesh) && o.visible && o.geometry) { const g = o.geometry, t = (g.index ? g.index.count : g.attributes.position.count) / 3 * (o.isInstancedMesh ? o.count : 1); L.push([Math.round(t), o.isInstancedMesh ? 'inst' + o.count : 'mesh', g.type, (o.material && o.material.type) || '', o.parent && o.parent.type]); } }); L.sort((a, b) => b[0] - a[0]); return L.slice(0, 14); }, perf: () => { const i = renderer.info; let lights = 0, meshes = 0, vis = 0; scene.traverse(o => { if (o.isLight) lights++; if (o.isMesh || o.isInstancedMesh || o.isPoints || o.isSprite) { meshes++; if (o.visible) vis++; } }); return { calls: i.render.calls, tris: i.render.triangles, progs: i.programs.length, geos: i.memory.geometries, tex: i.memory.textures, lights, meshes, vis, q: curQ, pr: renderer.getPixelRatio(), fps: lastFps }; }, rpT: () => [RP.active, RP.t.toFixed(1), RP.t0.toFixed(1), RP.t1.toFixed(1), RP.buf.length], off: (k, lat) => { const e = EXITS[k]; const i = (e.i0 + 8) % N; player.place(i, e.side * lat); player.qOn = i; snapCamera(); }, info: () => ({ RAVINES, CUTS, BOOSTS: BOOSTS.length, RAMPS: RAMPS.length, TUN: [TUN0, TUN1], DS }) };
@@ -6003,9 +6026,9 @@ function placeCarAt(c, x, z, h, v = 0) { const n = nearestSample(x, z); c.place(
   for (const lz of zs) for (let k = 0; k < xs.length - 1; k++) for (const s of [-1, 1]) { const x = xs[k] + 14 + Math.random() * (G.B - 28), z = lz + s * (ST_W / 2 - 1.3); if (Math.random() < .42 && ok(x, z)) spots.push([x, z, Math.random() < .5 ? Math.PI / 2 : -Math.PI / 2]); }
   const styles = [...new Set(MODELS.map(m => m.style))], PAL = [0xe6e6e6, 0x1d1f24, 0x8a8f96, 0x9b1c1c, 0x1d3557, 0x2f5d3a, 0xb8a98c, 0xc7c9cc, 0x4b2e83, 0xd97706];
   CITY.parkI = [];
-  for (const st of styles) {
-    const mine = spots.filter((_, k) => k % styles.length === styles.indexOf(st)); if (!mine.length) continue;
-    const im = new THREE.InstancedMesh(buildLod(st, false, 0xffffff), lodMat, mine.length);
+  const groups = new Map(); spots.forEach((p, k) => { const st = styles[k % styles.length], key = st + '|' + Math.floor(p[0] / 420) + ',' + Math.floor(p[1] / 420); if (!groups.has(key)) groups.set(key, { st, list: [] }); groups.get(key).list.push(p); });
+  for (const { st, list: mine } of groups.values()) {
+    const im = new THREE.InstancedMesh(buildLod(st, false, 0xffffff), lodMat, mine.length); im.userData.chunk = 1; CHUNKS.push(im);
     mine.forEach((p, k) => { put(im, k, p[0], 0, p[1], p[2]); im.setColorAt(k, col.setHex(PAL[(k * 7 + st.length) % PAL.length])); const fx = Math.sin(p[2]), fz = Math.cos(p[2]); obstAdd('circ', [p[0] + fx * 1.2, p[1] + fz * 1.2, 1.05]); obstAdd('circ', [p[0] - fx * 1.2, p[1] - fz * 1.2, 1.05]);
       CITY.parked.push({ x: p[0], z: p[1], h: p[2], im, k, style: st, color: PAL[(k * 7 + st.length) % PAL.length], gone: false }); });
     im.instanceColor.needsUpdate = true; im.castShadow = true; im.receiveShadow = true; im.computeBoundingSphere(); scene.add(im); CITY.parkI.push(im);
@@ -7251,6 +7274,8 @@ function rndEvAction() {
 }
 function rndEvEnd() { const E = RNDEV.cur; if (!E) return; if (E.ped) scene.remove(E.ped.g); if (E.cars) for (const c of E.cars) { const k = npcs.indexOf(c); if (k >= 0) npcs.splice(k, 1); scene.remove(c.root); c.dispose(); } RNDEV.cur = null; PHONE.way = null; if (!MIS.on) misHUD(null); }
 function rndEvSetup() { rndEvEnd(); RNDEV.t = 50; }
+
+chunkStatic(); // city furniture, parked cars, kiosks: split into cells so the camera only draws what is near
 
 </script>
 </body>
